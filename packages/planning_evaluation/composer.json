@@ -1,0 +1,87 @@
+{
+    "name": "quochao56/planning-evaluation",
+    "description": "This is my PlanningEvaluation package",
+    "keywords": [
+        "quochao56",
+        "laravel",
+        "filamentphp",
+        "filament",
+        "filament-plugin",
+        "planning-evaluation"
+    ],
+    "homepage": "https://github.com/quochao56/planning-evaluation",
+    "support": {
+        "issues": "https://github.com/quochao56/planning-evaluation/issues",
+        "source": "https://github.com/quochao56/planning-evaluation"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hảo Lê",
+            "email": "thomaszen63@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^5.0",
+        "filament/forms": "^5.0",
+        "filament/tables": "^5.0",
+        "phpoffice/phpword": "^1.2",
+        "spatie/laravel-package-tools": "^1.15.0",
+        "quochao56/student": "*@dev",
+        "quochao56/employee": "*@dev"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.7|^4.0",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+        "rector/rector": "^2.0",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quochao56\\PlanningEvaluation\\": "src/",
+            "Quochao56\\PlanningEvaluation\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Quochao56\\PlanningEvaluation\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "phpstan analyse",
+        "lint": "pint",
+        "refactor": "rector",
+        "test": "pest",
+        "test:lint": "pint --test",
+        "test:refactor": "rector --dry-run"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Quochao56\\PlanningEvaluation\\PlanningEvaluationServiceProvider"
+            ],
+            "aliases": {
+                "planning-evaluation": "Quochao56\\PlanningEvaluation\\Facades\\PlanningEvaluation"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
