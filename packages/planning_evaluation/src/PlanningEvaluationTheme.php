@@ -5,7 +5,7 @@ namespace Quochao56\PlanningEvaluation;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Assets\Theme;
-use Filament\Support\Color;
+use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentAsset;
 
 class PlanningEvaluationTheme implements Plugin
