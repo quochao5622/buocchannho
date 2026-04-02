@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use Awcodes\ClockWidget\ClockWidget;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Support\Enums\Width;
 use Quochao56\Employee\EmployeePlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -64,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
                 StudentPlugin::make(),
                 PlanningEvaluationPlugin::make(),
             ])
+             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop(true);
     }
 }
