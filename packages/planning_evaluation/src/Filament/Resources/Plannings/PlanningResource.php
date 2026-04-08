@@ -22,7 +22,7 @@ class PlanningResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Planning';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
     {

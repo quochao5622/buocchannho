@@ -15,6 +15,7 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "quochao56/employee": "*@dev",
+        "quochao56/equipment": "*@dev",
         "quochao56/planning-evaluation": "*@dev",
         "quochao56/student": "*@dev"
     },

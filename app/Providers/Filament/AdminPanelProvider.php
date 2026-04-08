@@ -23,6 +23,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Quochao56\PlanningEvaluation\PlanningEvaluationPlugin;
 use Quochao56\Student\StudentPlugin;
+use Quochao56\Equipment\EquipmentPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -64,9 +65,10 @@ class AdminPanelProvider extends PanelProvider
                 EmployeePlugin::make(),
                 StudentPlugin::make(),
                 PlanningEvaluationPlugin::make(),
+                EquipmentPlugin::make(),
             ])
             ->spa()
-             ->maxContentWidth(Width::Full)
+            ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop(true);
     }
 }

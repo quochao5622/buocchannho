@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d595923fbfd7529f902bd323fb3d61a",
+    "content-hash": "a4cee145813d92eb8306b7dac2f63e41",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5361,6 +5361,61 @@
                 "issues": "https://github.com/quochao56/employee/issues",
                 "source": "https://github.com/quochao56/employee"
             },
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "quochao56/equipment",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/equipment",
+                "reference": "3e17b04254a552e3b4b2c447d58c8fd4102b58aa"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "filament/forms": "^5.0",
+                "filament/tables": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Quochao56\\Equipment\\EquipmentServiceProvider"
+                    ],
+                    "aliases": {
+                        "Equipment": "Quochao56\\Equipment\\Facades\\Equipment"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quochao56\\Equipment\\": "src/",
+                    "Quochao56\\Equipment\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hảo Lê",
+                    "email": "thomaszen63@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Equipment management plugin for Filament",
+            "keywords": [
+                "equipment",
+                "filament",
+                "filament-plugin",
+                "filamentphp",
+                "laravel",
+                "quochao56"
+            ],
             "transport-options": {
                 "relative": true
             }
@@ -12589,6 +12644,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "quochao56/employee": 20,
+        "quochao56/equipment": 20,
         "quochao56/planning-evaluation": 20,
         "quochao56/student": 20
     },
