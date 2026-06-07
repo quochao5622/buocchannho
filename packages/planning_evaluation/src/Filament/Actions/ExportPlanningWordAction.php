@@ -33,12 +33,12 @@ class ExportPlanningWordAction extends Action
 
             return $record->trashed();
         });
-        
+
         $this->action(function (Model $record): BinaryFileResponse {
             $startMonth = data_get($record, 'start_date') ? $record->start_date->format('n') : 'unknown';
             $endMonth = data_get($record, 'end_date') ? $record->end_date->format('n') : 'unknown';
             $timeRange = "T{$startMonth}-T{$endMonth}";
-            $outputFile = "KHGDCN_" . ($record->student?->name ?? 'unknown') . "_" . $timeRange . "_" . time() . ".docx";
+            $outputFile = "KHCN_" . ($record->student?->name ?? 'unknown') . "_" . $timeRange . "_" . time() . ".docx";
             $path = $this->generateWordFile($record, $outputFile);
 
             return response()->download(

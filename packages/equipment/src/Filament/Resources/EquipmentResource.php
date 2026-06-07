@@ -16,11 +16,15 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Maatwebsite\Excel\Excel;
+use Quochao56\Equipment\Filament\Exports\EquipmentExcelExport;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\CreateEquipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\EditEquipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\ListEquipments;
 use Quochao56\Equipment\Models\Equipment;
 use Quochao56\Equipment\Models\EquipmentCategory;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Columns\Column;
 
 class EquipmentResource extends Resource
 {
@@ -154,6 +158,31 @@ class EquipmentResource extends Resource
                 SelectFilter::make('status')
                     ->label('Trạng thái')
                     ->options(Equipment::statusOptions()),
+            ])
+            ->headerActions([
+                ExportAction::make('export')
+                    ->label('Xuất Excel')
+                    ->exports([
+                        EquipmentExcelExport::make('equipments')
+                            ->fromTable()
+                            ->withWriterType(Excel::XLSX)
+                            ->withFilename(fn (): string => 'hoc-cu-' . now()->format('Y-m-d-H-i-s'))
+                            ->withColumns([
+                                Column::make('image')
+                                    ->heading('Image')
+                                    ->width(24)
+                                    ->formatStateUsing(fn (): ?string => null),
+                                Column::make('name')->heading(trans('packages.equiqment::equiqment.fields.name')),
+                                Column::make('unit')->heading(trans('packages.equiqment::equiqment.fields.unit')),
+                                Column::make('category.name')->heading(trans('packages.equiqment::equiqment.fields.category_id')),
+                                Column::make('quantity')->heading(trans('packages.equiqment::equiqment.fields.quantity')),
+                                Column::make('status')
+                                    ->heading(trans('packages.equiqment::equiqment.fields.status'))
+                                    ->formatStateUsing(fn (?string $state): string => Equipment::statusOptions()[$state] ?? ($state ?? '-')),
+                                Column::make('actual_quantity')->heading(trans('packages.equiqment::equiqment.fields.actual_quantity')),
+                                Column::make('note')->heading(trans('packages.equiqment::equiqment.fields.note')),
+                            ]),
+                    ]),
             ])
             ->actions([
                 EditAction::make(),

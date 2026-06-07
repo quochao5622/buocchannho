@@ -39,7 +39,8 @@ class ExportEvaluationWordAction extends Action
             $startMonth = $planning?->start_date?->format('n') ?? 'unknown';
             $endMonth   = $planning?->end_date?->format('n') ?? 'unknown';
             $timeRange  = "T{$startMonth}-T{$endMonth}";
-            $outputFile = 'KQDG_' . ($student?->name ?? 'unknown') . "_{$timeRange}_" . time() . '.docx';
+            $studentName =mb_strtoupper($student?->name ?? 'unknown', 'UTF-8');
+            $outputFile = 'KQDG_' . $studentName . "_{$timeRange}_" . time() . '.docx';
 
             $path = $this->generateWordFile($record, $outputFile);
 

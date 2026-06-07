@@ -46,6 +46,7 @@ class EvaluationForm
                                 ->schema([
                                     \Filament\Forms\Components\Textarea::make('content')
                                         ->label(trans('planning-evaluation::evaluation.fields.content'))
+                                        ->rows(3)
                                         ->dehydrated(),
                                     \Filament\Forms\Components\Select::make('danh_gia')
                                         ->label(trans('planning-evaluation::evaluation.fields.danh_gia'))
@@ -59,7 +60,8 @@ class EvaluationForm
                                             '-' => '-',
                                         ]),
                                     \Filament\Forms\Components\Textarea::make('nhan_xet')
-                                        ->label(trans('planning-evaluation::evaluation.fields.nhan_xet')),
+                                        ->label(trans('planning-evaluation::evaluation.fields.nhan_xet'))
+                                        ->rows(4),
                                 ])
                                 ->createItemButtonLabel(trans('planning-evaluation::evaluation.actions.add_muc_tieu'))
                                 ->collapsible(),

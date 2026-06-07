@@ -2,8 +2,6 @@
 
 namespace Quochao56\Equipment;
 
-use Illuminate\Filesystem\Filesystem;
-use Livewire\Features\SupportTesting\Testable;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -35,6 +33,10 @@ class EquipmentServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        if (is_dir(__DIR__ . '/../lang')) {
+            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.equiqment');
+        }
     }
 
     /**
