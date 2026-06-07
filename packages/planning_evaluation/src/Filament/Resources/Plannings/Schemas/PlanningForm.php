@@ -20,6 +20,7 @@ class PlanningForm
                 \Filament\Forms\Components\Select::make('employee_id')
                     ->label(trans('planning-evaluation::planning.fields.employee'))
                     ->relationship('employee', 'name')
+                    ->default(4)
                     ->searchable(),
                 \Filament\Forms\Components\Select::make('student_id')
                     ->label(trans('planning-evaluation::planning.fields.student'))
