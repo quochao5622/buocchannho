@@ -17,16 +17,16 @@ class EvaluationsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(trans('planning-evaluation::evaluation.fields.name'))
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.name'))
                     ->searchable(),
                 TextColumn::make('planning.name')
-                    ->label(trans('planning-evaluation::evaluation.fields.planning_id'))
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.planning_id'))
                     ->searchable(),
                 TextColumn::make('status')
-                    ->label(trans('planning-evaluation::evaluation.fields.status'))
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                     ->badge(),
                 TextColumn::make('updated_at')
-                    ->label(trans('planning-evaluation::planning.fields.updated_at'))
+                    ->label(trans('packages.planning_evaluation::planning.fields.updated_at'))
                     ->dateTime(),
             ])
             ->actions([

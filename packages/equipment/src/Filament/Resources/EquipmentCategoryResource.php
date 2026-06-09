@@ -30,40 +30,40 @@ class EquipmentCategoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.navigation_group');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Danh mục học cụ';
+        return trans('packages.equipment::equipment.category.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Danh mục';
+        return trans('packages.equipment::equipment.category.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Danh mục học cụ';
+        return trans('packages.equipment::equipment.category.plural_model_label');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('code')
-                ->label('Mã danh mục')
+                ->label(trans('packages.equipment::equipment.category.fields.code'))
                 ->maxLength(50)
                 ->default(fn () => (new EquipmentCategory())->generateCode()),
 
-            TextInput::make('name') 
-                ->label('Tên danh mục')
+            TextInput::make('name')
+                ->label(trans('packages.equipment::equipment.category.fields.name'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(255),
 
             Textarea::make('description')
-                ->label('Mô tả')
+                ->label(trans('packages.equipment::equipment.category.fields.description'))
                 ->columnSpanFull(),
         ]);
     }
@@ -73,19 +73,19 @@ class EquipmentCategoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('code')
-                    ->label('Mã')
+                    ->label(trans('packages.equipment::equipment.category.table.code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
-                    ->label('Tên')
+                    ->label(trans('packages.equipment::equipment.category.table.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('equipments_count')
                     ->counts('equipments')
-                    ->label('Số học cụ')
+                    ->label(trans('packages.equipment::equipment.category.table.equipments_count'))
                     ->sortable(),
                 TextColumn::make('updated_at')
-                    ->label('Cập nhật')
+                    ->label(trans('packages.equipment::equipment.category.table.updated_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])

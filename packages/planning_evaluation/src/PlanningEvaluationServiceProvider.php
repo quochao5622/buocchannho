@@ -48,7 +48,7 @@ class PlanningEvaluationServiceProvider extends PackageServiceProvider
             $package->hasMigrations($this->getMigrations());
         }
 
-        if (file_exists($package->basePath('/../resources/lang'))) {
+        if (file_exists($package->basePath('/../lang'))) {
             $package->hasTranslations();
         }
 
@@ -60,6 +60,10 @@ class PlanningEvaluationServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        if (is_dir(__DIR__ . '/../lang')) {
+            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.planning_evaluation');
+        }
     }
 
     public function packageBooted(): void

@@ -37,7 +37,7 @@ class EditEvaluation extends EditRecord
     protected function getValidationMessages(): array
     {
         return [
-            'data.evaluation_details.*.muc_tieu.*.danh_gia.required_if' => trans('planning-evaluation::evaluation.validation.danh_gia_required_when_published'),
+            'data.evaluation_details.*.muc_tieu.*.danh_gia.required_if' => trans('packages.planning_evaluation::evaluation.validation.danh_gia_required_when_published'),
         ];
     }
 
@@ -74,7 +74,7 @@ class EditEvaluation extends EditRecord
             foreach ((array) data_get($row, 'muc_tieu', []) as $goalIndex => $goal) {
                 if (blank(data_get($goal, 'danh_gia'))) {
                     $path = "evaluation_details.{$rowIndex}.muc_tieu.{$goalIndex}.danh_gia";
-                    $message = trans('planning-evaluation::evaluation.validation.danh_gia_required_when_published');
+                    $message = trans('packages.planning_evaluation::evaluation.validation.danh_gia_required_when_published');
                     $messages[$path] = $message;
                     $messages["data.{$path}"] = $message;
                 }

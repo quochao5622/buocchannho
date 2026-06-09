@@ -25,6 +25,10 @@ class EquipmentServiceProvider extends PackageServiceProvider
             $package->hasMigrations($this->getMigrations());
         }
 
+        if (file_exists($package->basePath('/../lang'))) {
+            $package->hasTranslations();
+        }
+
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
         }
@@ -35,7 +39,7 @@ class EquipmentServiceProvider extends PackageServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         if (is_dir(__DIR__ . '/../lang')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.equiqment');
+            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.equipment');
         }
     }
 

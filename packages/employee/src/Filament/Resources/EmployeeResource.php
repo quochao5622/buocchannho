@@ -35,93 +35,93 @@ class EmployeeResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return trans('employee::employee.navigation_label');
+        return trans('packages.employee::employee.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return trans('employee::employee.model_label');
+        return trans('packages.employee::employee.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans('employee::employee.plural_model_label');
+        return trans('packages.employee::employee.plural_model_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return trans('employee::employee.navigation_group');
+        return trans('packages.employee::employee.navigation_group');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('employee_code')
-                ->label(trans('employee::employee.fields.employee_code'))
+                ->label(trans('packages.employee::employee.fields.employee_code'))
                 ->maxLength(50)
                 ->unique(ignoreRecord: true),
 
             TextInput::make('name')
-                ->label(trans('employee::employee.fields.name'))
+                ->label(trans('packages.employee::employee.fields.name'))
                 ->required()
                 ->maxLength(255),
 
             TextInput::make('email')
-                ->label(trans('employee::employee.fields.email'))
+                ->label(trans('packages.employee::employee.fields.email'))
                 ->email()
                 ->unique(ignoreRecord: true)
                 ->maxLength(255),
             Select::make('gender')
-                ->label(trans('employee::employee.fields.gender'))
+                ->label(trans('packages.employee::employee.fields.gender'))
                 ->options([
-                    'male' => trans('employee::employee.gender.male'),
-                    'female' => trans('employee::employee.gender.female'),
-                    'other' => trans('employee::employee.gender.other'),
+                    'male' => trans('packages.employee::employee.gender.male'),
+                    'female' => trans('packages.employee::employee.gender.female'),
+                    'other' => trans('packages.employee::employee.gender.other'),
                 ]),
 
             DatePicker::make('dob')
-                ->label(trans('employee::employee.fields.dob'))
+                ->label(trans('packages.employee::employee.fields.dob'))
                 ->native(false),
 
             TextInput::make('phone')
-                ->label(trans('employee::employee.fields.phone'))
+                ->label(trans('packages.employee::employee.fields.phone'))
                 ->tel()
                 ->maxLength(20),
 
             TextInput::make('address')
-                ->label(trans('employee::employee.fields.address'))
+                ->label(trans('packages.employee::employee.fields.address'))
                 ->maxLength(255),
 
             TextInput::make('position')
-                ->label(trans('employee::employee.fields.position'))
+                ->label(trans('packages.employee::employee.fields.position'))
                 ->maxLength(255),
 
             Select::make('employment_type')
-                ->label(trans('employee::employee.fields.employment_type'))
+                ->label(trans('packages.employee::employee.fields.employment_type'))
                 ->options([
-                    'full-time' => trans('employee::employee.employment_type.full_time'),
-                    'part-time' => trans('employee::employee.employment_type.part_time'),
-                    'intern' => trans('employee::employee.employment_type.intern'),
-                    'contract' => trans('employee::employee.employment_type.contract'),
+                    'full-time' => trans('packages.employee::employee.employment_type.full_time'),
+                    'part-time' => trans('packages.employee::employee.employment_type.part_time'),
+                    'intern' => trans('packages.employee::employee.employment_type.intern'),
+                    'contract' => trans('packages.employee::employee.employment_type.contract'),
                 ]),
 
             DatePicker::make('hired_at')
-                ->label(trans('employee::employee.fields.hired_at'))
+                ->label(trans('packages.employee::employee.fields.hired_at'))
                 ->native(false),
 
             DatePicker::make('probation_end_at')
-                ->label(trans('employee::employee.fields.probation_end_at'))
+                ->label(trans('packages.employee::employee.fields.probation_end_at'))
                 ->native(false),
 
             FileUpload::make('avatar')
-                ->label(trans('employee::employee.fields.avatar'))
+                ->label(trans('packages.employee::employee.fields.avatar'))
                 ->image()
                 ->directory('employees')
                 ->imageEditor(),
 
 
             Select::make('status')
-                ->label(trans('employee::employee.fields.status'))
+                ->label(trans('packages.employee::employee.fields.status'))
                 ->options([
                     BaseStatusEnum::Active->value   => BaseStatusEnum::Active->getLabel(),
                     BaseStatusEnum::Inactive->value => BaseStatusEnum::Inactive->getLabel(),
@@ -136,82 +136,82 @@ class EmployeeResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('avatar')
-                    ->label(trans('employee::employee.fields.avatar'))
+                    ->label(trans('packages.employee::employee.fields.avatar'))
                     ->circular(),
                 TextColumn::make('employee_code')
-                    ->label(trans('employee::employee.fields.employee_code'))
+                    ->label(trans('packages.employee::employee.fields.employee_code'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('name')
-                    ->label(trans('employee::employee.fields.name'))
+                    ->label(trans('packages.employee::employee.fields.name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('email')
-                    ->label(trans('employee::employee.fields.email'))
+                    ->label(trans('packages.employee::employee.fields.email'))
                     ->searchable(),
 
                 TextColumn::make('phone')
-                    ->label(trans('employee::employee.fields.phone')),
+                    ->label(trans('packages.employee::employee.fields.phone')),
 
                 TextColumn::make('address')
-                    ->label(trans('employee::employee.fields.address')),
+                    ->label(trans('packages.employee::employee.fields.address')),
 
 
                 TextColumn::make('position')
-                    ->label(trans('employee::employee.fields.position'))
+                    ->label(trans('packages.employee::employee.fields.position'))
                     ->searchable(),
 
                 TextColumn::make('employment_type')
-                    ->label(trans('employee::employee.fields.employment_type'))
+                    ->label(trans('packages.employee::employee.fields.employment_type'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'full-time' => trans('employee::employee.employment_type.full_time'),
-                        'part-time' => trans('employee::employee.employment_type.part_time'),
-                        'intern' => trans('employee::employee.employment_type.intern'),
-                        'contract' => trans('employee::employee.employment_type.contract'),
+                        'full-time' => trans('packages.employee::employee.employment_type.full_time'),
+                        'part-time' => trans('packages.employee::employee.employment_type.part_time'),
+                        'intern' => trans('packages.employee::employee.employment_type.intern'),
+                        'contract' => trans('packages.employee::employee.employment_type.contract'),
                         default => $state ?? '-',
                     }),
 
                 TextColumn::make('hired_at')
-                    ->label(trans('employee::employee.fields.hired_at'))
+                    ->label(trans('packages.employee::employee.fields.hired_at'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 TextColumn::make('probation_end_at')
-                    ->label(trans('employee::employee.fields.probation_end_at'))
+                    ->label(trans('packages.employee::employee.fields.probation_end_at'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 TextColumn::make('gender')
-                    ->label(trans('employee::employee.fields.gender'))
+                    ->label(trans('packages.employee::employee.fields.gender'))
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'male' => trans('employee::employee.gender.male'),
-                        'female' => trans('employee::employee.gender.female'),
-                        'other' => trans('employee::employee.gender.other'),
+                        'male' => trans('packages.employee::employee.gender.male'),
+                        'female' => trans('packages.employee::employee.gender.female'),
+                        'other' => trans('packages.employee::employee.gender.other'),
                         default => $state ?? '-',
                     }),
 
                 TextColumn::make('status')
-                    ->label(trans('employee::employee.fields.status'))
+                    ->label(trans('packages.employee::employee.fields.status'))
                     ->badge()
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label(trans('employee::employee.fields.status'))
+                    ->label(trans('packages.employee::employee.fields.status'))
                     ->options([
                         BaseStatusEnum::Active->value   => BaseStatusEnum::Active->getLabel(),
                         BaseStatusEnum::Inactive->value => BaseStatusEnum::Inactive->getLabel(),
                     ]),
 
                 SelectFilter::make('employment_type')
-                    ->label(trans('employee::employee.fields.employment_type'))
+                    ->label(trans('packages.employee::employee.fields.employment_type'))
                     ->options([
-                        'full-time' => trans('employee::employee.employment_type.full_time'),
-                        'part-time' => trans('employee::employee.employment_type.part_time'),
-                        'intern' => trans('employee::employee.employment_type.intern'),
-                        'contract' => trans('employee::employee.employment_type.contract'),
+                        'full-time' => trans('packages.employee::employee.employment_type.full_time'),
+                        'part-time' => trans('packages.employee::employee.employment_type.part_time'),
+                        'intern' => trans('packages.employee::employee.employment_type.intern'),
+                        'contract' => trans('packages.employee::employee.employment_type.contract'),
                     ])
             ])
             ->actions([

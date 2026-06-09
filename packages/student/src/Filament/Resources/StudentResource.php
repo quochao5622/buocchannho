@@ -34,77 +34,77 @@ class StudentResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return trans('student::student.navigation_label');
+        return trans('packages.student::student.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return trans('student::student.model_label');
+        return trans('packages.student::student.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans('student::student.plural_model_label');
+        return trans('packages.student::student.plural_model_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return trans('student::student.navigation_group');
+        return trans('packages.student::student.navigation_group');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('student_code')
-                ->label(trans('student::student.fields.student_code'))
+                ->label(trans('packages.student::student.fields.student_code'))
                 ->maxLength(50)
                 ->unique(ignoreRecord: true),
             TextInput::make('name')
-                ->label(trans('student::student.fields.name'))
+                ->label(trans('packages.student::student.fields.name'))
                 ->required()
                 ->maxLength(255),
 
             TextInput::make('nickname')
-                ->label(trans('student::student.fields.nickname'))
+                ->label(trans('packages.student::student.fields.nickname'))
                 ->maxLength(255),
             Select::make('gender')
-                ->label(trans('student::student.fields.gender'))
+                ->label(trans('packages.student::student.fields.gender'))
                 ->options([
-                    'male'   => trans('student::student.gender.male'),
-                    'female' => trans('student::student.gender.female'),
-                    'other'  => trans('student::student.gender.other')
+                    'male'   => trans('packages.student::student.gender.male'),
+                    'female' => trans('packages.student::student.gender.female'),
+                    'other'  => trans('packages.student::student.gender.other')
                 ]),
             DatePicker::make('dob')
-                ->label(trans('student::student.fields.dob'))
+                ->label(trans('packages.student::student.fields.dob'))
                 ->native(false),
             TextInput::make('father_name')
-                ->label(trans('student::student.fields.father_name'))
+                ->label(trans('packages.student::student.fields.father_name'))
                 ->maxLength(255),
 
             TextInput::make('father_phone')
-                ->label(trans('student::student.fields.father_phone'))
+                ->label(trans('packages.student::student.fields.father_phone'))
                 ->tel()
                 ->maxLength(20),
 
             TextInput::make('mother_name')
-                ->label(trans('student::student.fields.mother_name'))
+                ->label(trans('packages.student::student.fields.mother_name'))
                 ->maxLength(255),
 
             TextInput::make('mother_phone')
-                ->label(trans('student::student.fields.mother_phone'))
+                ->label(trans('packages.student::student.fields.mother_phone'))
                 ->tel()
                 ->maxLength(20),
 
             Select::make('status')
-                ->label(trans('student::student.fields.status'))
+                ->label(trans('packages.student::student.fields.status'))
                 ->options([
-                    'active'   => trans('student::student.status.active'),
-                    'inactive' => trans('student::student.status.inactive')
+                    'active'   => trans('packages.student::student.status.active'),
+                    'inactive' => trans('packages.student::student.status.inactive')
                 ])
                 ->default('active')
                 ->required(),
             FileUpload::make('avatar')
-                ->label(trans('student::student.fields.avatar'))
+                ->label(trans('packages.student::student.fields.avatar'))
                 ->image()
                 ->directory('students')
                 ->imageEditor()
@@ -117,41 +117,41 @@ class StudentResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('avatar')
-                    ->label(trans('student::student.fields.avatar'))
+                    ->label(trans('packages.student::student.fields.avatar'))
                     ->circular(),
 
                 TextColumn::make('name')
-                    ->label(trans('student::student.fields.name'))
+                    ->label(trans('packages.student::student.fields.name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('nickname')
-                    ->label(trans('student::student.fields.nickname'))
+                    ->label(trans('packages.student::student.fields.nickname'))
                     ->searchable(),
 
                 TextColumn::make('father_name')
-                    ->label(trans('student::student.fields.father_name'))
+                    ->label(trans('packages.student::student.fields.father_name'))
                     ->searchable(),
 
                 TextColumn::make('father_phone')
-                    ->label(trans('student::student.fields.father_phone')),
+                    ->label(trans('packages.student::student.fields.father_phone')),
 
                 TextColumn::make('mother_name')
-                    ->label(trans('student::student.fields.mother_name'))
+                    ->label(trans('packages.student::student.fields.mother_name'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('mother_phone')
-                    ->label(trans('student::student.fields.mother_phone'))
+                    ->label(trans('packages.student::student.fields.mother_phone'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('dob')
-                    ->label(trans('student::student.fields.dob'))
+                    ->label(trans('packages.student::student.fields.dob'))
                     ->date('d/m/Y')
                     ->sortable(),
 
                 TextColumn::make('status')
-                    ->label(trans('student::student.fields.status'))
+                    ->label(trans('packages.student::student.fields.status'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'active'   => 'success',
@@ -159,17 +159,17 @@ class StudentResource extends Resource
                         default    => 'gray',
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'active'   => trans('student::student.status.active'),
-                        'inactive' => trans('student::student.status.inactive'),
+                        'active'   => trans('packages.student::student.status.active'),
+                        'inactive' => trans('packages.student::student.status.inactive'),
                         default    => $state,
                     })
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label(trans('student::student.fields.status'))
+                    ->label(trans('packages.student::student.fields.status'))
                     ->options([
-                        'active'   => trans('student::student.status.active'),
-                        'inactive' => trans('student::student.status.inactive')
+                        'active'   => trans('packages.student::student.status.active'),
+                        'inactive' => trans('packages.student::student.status.inactive')
                     ])
             ])
             ->actions([

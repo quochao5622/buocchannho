@@ -6,6 +6,7 @@ use Filament\Actions\Action;
 use Quochao56\Equipment\Models\EquipmentInventory;
 use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Quochao56\Equipment\Models\Equipment;
 
 class ApproveAction extends Action
@@ -38,12 +39,12 @@ class ApproveAction extends Action
             });
     
             Notification::make()
-                ->title('Đã duyệt phiếu và cập nhật tồn kho.')
+                ->title(trans('packages.equipment::equipment.inventory.approve.success'))
                 ->success()
                 ->send();
         } catch (\Throwable $th) {
             Notification::make()
-                ->title('Lỗi khi duyệt phiếu.')
+                ->title(trans('packages.equipment::equipment.inventory.approve.error'))
                 ->danger()
                 ->send();
             Log::error($th);
@@ -55,7 +56,7 @@ class ApproveAction extends Action
     {
         parent::setUp();
 
-        $this->label('Duyệt phiếu');
+        $this->label(trans('packages.equipment::equipment.inventory.approve.label'));
         $this->color('success');
         $this->requiresConfirmation();
         $this->visible(fn (EquipmentInventory $record) => $record->status === 'completed');

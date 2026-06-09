@@ -45,29 +45,29 @@ class EquipmentInventoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.navigation_group');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Kiểm kê học cụ';
+        return trans('packages.equipment::equipment.inventory.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Phiếu kiểm kê';
+        return trans('packages.equipment::equipment.inventory.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Phiếu kiểm kê';
+        return trans('packages.equipment::equipment.inventory.plural_model_label');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('inventory_code')
-                ->label('Mã phiếu')
+                ->label(trans('packages.equipment::equipment.inventory.fields.inventory_code'))
                 ->required()
                 ->maxLength(50)
                 ->unique(ignoreRecord: true)
@@ -77,27 +77,27 @@ class EquipmentInventoryResource extends Resource
                 ->default(fn () => Auth::id()),
 
             DatePicker::make('inventory_date')
-                ->label('Ngày kiểm kê')
+                ->label(trans('packages.equipment::equipment.inventory.fields.inventory_date'))
                 ->native(false)
                 ->default(now())
                 ->required(),
 
             Select::make('status')
-                ->label('Trạng thái')
+                ->label(trans('packages.equipment::equipment.inventory.fields.status'))
                 ->options(EquipmentInventory::statusOptions())
                 ->default('draft')
                 ->required(),
 
             Textarea::make('notes')
-                ->label('Ghi chú')
+                ->label(trans('packages.equipment::equipment.inventory.fields.notes'))
                 ->columnSpanFull(),
 
             Hidden::make('details_buffer')
                 ->dehydrated(false),
 
             TextInput::make('detail_equipment_search')
-                ->label('Tìm học cụ')
-                ->placeholder('Nhập mã, tên hoặc vị trí để lọc nhanh trong danh sách bên dưới')
+                ->label(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search'))
+                ->placeholder(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_placeholder'))
                 ->live(debounce: 300)
                 ->dehydrated(false)
                 ->afterStateUpdated(function (?string $state, Get $get, Set $set): void {
@@ -118,11 +118,11 @@ class EquipmentInventoryResource extends Resource
 
                     $set('details', static::filterDetailsByKeyword($buffer, $keyword));
                 })
-                ->helperText('Gõ để lọc trực tiếp các item trong repeater và highlight phần khớp.')
+                ->helperText(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_helper'))
                 ->columnSpanFull(),
 
             Repeater::make('details')
-                ->label('Chi tiết kiểm kê')
+                ->label(trans('packages.equipment::equipment.inventory.fields.details'))
                 ->relationship(modifyQueryUsing: function ($query) {
                     return $query
                         ->leftJoin('equipments', 'equipment_inventory_details.equipment_id', '=', 'equipments.id')
@@ -176,7 +176,7 @@ class EquipmentInventoryResource extends Resource
                         $set('details', $buffer);
                     }
                 }, shouldUpdateValidatedStateAfter: true)
-                ->helperText('Tìm kiếm lọc trực tiếp danh sách bên dưới. Khi lưu vẫn giữ đầy đủ dữ liệu kiểm kê.')
+                ->helperText(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_helper'))
                 ->addable(false)
                 ->itemLabel(function (array $state, Get $get): HtmlString|string {
                     $label = static::getDetailLabel($state);
@@ -194,7 +194,7 @@ class EquipmentInventoryResource extends Resource
                     Hidden::make('equipment_location_snapshot')
                         ->dehydrated(false),
                     Placeholder::make('equipment_image')
-                        ->label('Hình')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.equipment_image'))
                         ->content(function (Get $get): HtmlString {
                             static $imageByEquipmentId = [];
 
@@ -223,7 +223,7 @@ class EquipmentInventoryResource extends Resource
                             );
                         }),
                     Select::make('equipment_id')
-                        ->label('Học cụ')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.equipment'))
                         ->relationship(
                             name: 'equipment',
                             titleAttribute: 'name',
@@ -234,22 +234,22 @@ class EquipmentInventoryResource extends Resource
                         ->dehydrated()
                         ->required(),
                     TextInput::make('quantity_expected')
-                        ->label('SL dự kiến')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.quantity_expected'))
                         ->numeric()
                         ->disabled()
                         ->dehydrated()
                         ->required(),
                     TextInput::make('quantity_actual')
-                        ->label('SL thực tế')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.quantity_actual'))
                         ->numeric()
                         ->minValue(0)
                         ->required(),
                     Select::make('status')
-                        ->label('Tình trạng')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.status'))
                         ->options(EquipmentInventoryDetail::statusOptions())
                         ->required(),
                     Textarea::make('notes')
-                        ->label('Ghi chú')
+                        ->label(trans('packages.equipment::equipment.inventory.fields.notes'))
                         ->columnSpanFull(),
                 ])
                 ->columns(5)
@@ -262,22 +262,22 @@ class EquipmentInventoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('inventory_code')
-                    ->label('Mã phiếu')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.inventory_code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('inventory_date')
-                    ->label('Ngày')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.inventory_date'))
                     ->date('d/m/Y')
                     ->sortable(),
                 TextColumn::make('inspector.name')
-                    ->label('Người kiểm kê')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.inspector'))
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label('Trạng thái')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => EquipmentInventory::statusOptions()[$state] ?? ($state ?? '-')),
                 TextColumn::make('updated_at')
-                    ->label('Cập nhật')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.updated_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -285,7 +285,7 @@ class EquipmentInventoryResource extends Resource
             ->defaultSort('inventory_date', 'desc')
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Trạng thái')
+                    ->label(trans('packages.equipment::equipment.inventory.fields.status'))
                     ->options(EquipmentInventory::statusOptions()),
             ])
             ->actions([

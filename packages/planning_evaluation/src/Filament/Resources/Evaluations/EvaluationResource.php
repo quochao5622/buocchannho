@@ -26,22 +26,22 @@ class EvaluationResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return trans('planning-evaluation::evaluation.navigation_label');
+        return trans('packages.planning_evaluation::evaluation.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return trans('planning-evaluation::evaluation.model_label');
+        return trans('packages.planning_evaluation::evaluation.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans('planning-evaluation::evaluation.plural_model_label');
+        return trans('packages.planning_evaluation::evaluation.plural_model_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return trans('planning-evaluation::evaluation.navigation_group');
+        return trans('packages.planning_evaluation::evaluation.navigation_group');
     }
 
     public static function form(Schema $schema): Schema

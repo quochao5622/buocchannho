@@ -21,21 +21,21 @@ class PlanningsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label(trans('planning-evaluation::planning.fields.name'))->searchable(),
+                TextColumn::make('name')->label(trans('packages.planning_evaluation::planning.fields.name'))->searchable(),
                 TextColumn::make('employee.name')
-                    ->label(trans('planning-evaluation::planning.fields.employee'))
+                    ->label(trans('packages.planning_evaluation::planning.fields.employee'))
                     ->searchable()
                     ->formatStateUsing(fn ($state) => $state ?: '-'),
                 TextColumn::make('student.name')
-                    ->label(trans('planning-evaluation::planning.fields.student'))
+                    ->label(trans('packages.planning_evaluation::planning.fields.student'))
                     ->searchable()
                     ->formatStateUsing(fn ($state) => $state ?: '-'),
-                TextColumn::make('start_date')->label(trans('planning-evaluation::planning.fields.start_date'))->date('d/m/Y'),
-                TextColumn::make('end_date')->label(trans('planning-evaluation::planning.fields.end_date'))->date('d/m/Y'),
-                TextColumn::make('status')->label(trans('planning-evaluation::planning.fields.status'))
+                TextColumn::make('start_date')->label(trans('packages.planning_evaluation::planning.fields.start_date'))->date('d/m/Y'),
+                TextColumn::make('end_date')->label(trans('packages.planning_evaluation::planning.fields.end_date'))->date('d/m/Y'),
+                TextColumn::make('status')->label(trans('packages.planning_evaluation::planning.fields.status'))
                 ->badge(),
-                TextColumn::make('created_at')->label(trans('planning-evaluation::planning.fields.created_at'))->dateTime(),
-                TextColumn::make('updated_at')->label(trans('planning-evaluation::planning.fields.updated_at'))->dateTime(),
+                TextColumn::make('created_at')->label(trans('packages.planning_evaluation::planning.fields.created_at'))->dateTime(),
+                TextColumn::make('updated_at')->label(trans('packages.planning_evaluation::planning.fields.updated_at'))->dateTime(),
             ])
             ->filters([
                 //

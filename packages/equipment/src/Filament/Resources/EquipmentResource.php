@@ -39,76 +39,76 @@ class EquipmentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.navigation_group');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Học cụ';
+        return trans('packages.equipment::equipment.common.plural_model_label');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('equipment_code')
-                ->label('Mã học cụ')
+                ->label(trans('packages.equipment::equipment.form.equipment_code'))
                 ->required()
                 ->maxLength(50)
                 ->unique(ignoreRecord: true)
                 ->default(fn () => (new Equipment())->generateCode()),
 
             TextInput::make('name')
-                ->label('Tên học cụ')
+                ->label(trans('packages.equipment::equipment.form.name'))
                 ->required()
                 ->maxLength(255),
 
             Select::make('category_id')
-                ->label('Danh mục')
+                ->label(trans('packages.equipment::equipment.form.category'))
                 ->required()
                 ->options(fn () => EquipmentCategory::query()->orderBy('name')->pluck('name', 'id')->all())
                 ->searchable(),
 
             FileUpload::make('image')
-                ->label('Hình ảnh')
+                ->label(trans('packages.equipment::equipment.form.image'))
                 ->image()
                 ->directory('equipments')
                 ->imageEditor(),
 
             TextInput::make('quantity')
-                ->label('Số lượng')
+                ->label(trans('packages.equipment::equipment.form.quantity'))
                 ->numeric()
                 ->minValue(0)
                 ->default(0)
                 ->required(),
 
             Select::make('status')
-                ->label('Trạng thái')
+                ->label(trans('packages.equipment::equipment.form.status'))
                 ->options(Equipment::statusOptions())
                 ->default('good')
                 ->required(),
 
             TextInput::make('location')
-                ->label('Vị trí')
+                ->label(trans('packages.equipment::equipment.form.location'))
                 ->maxLength(255),
 
             TextInput::make('unit')
-                ->label('Đơn vị tính')
+                ->label(trans('packages.equipment::equipment.form.unit'))
                 ->required()
                 ->maxLength(50)
                 ->default('cái'),
 
             Textarea::make('note')
-                ->label('Ghi chú')
+                ->label(trans('packages.equipment::equipment.form.note'))
                 ->columnSpanFull(),
         ]);
     }
@@ -118,34 +118,34 @@ class EquipmentResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                    ->label('Hình')
+                    ->label(trans('packages.equipment::equipment.form.image'))
                     ->square()
                     ->size(48)
                     ->defaultImageUrl(fn (): string => 'https://placehold.co/96x96?text=HC')
                     ->openUrlInNewTab(),
                 TextColumn::make('equipment_code')
-                    ->label('Mã')
+                    ->label(trans('packages.equipment::equipment.form.equipment_code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
-                    ->label('Tên')
+                    ->label(trans('packages.equipment::equipment.form.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('category.name')
-                    ->label('Danh mục')
+                    ->label(trans('packages.equipment::equipment.form.category'))
                     ->sortable(),
                 TextColumn::make('quantity')
-                    ->label('Số lượng')
+                    ->label(trans('packages.equipment::equipment.form.quantity'))
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label('Trạng thái')
+                    ->label(trans('packages.equipment::equipment.form.status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => Equipment::statusOptions()[$state] ?? ($state ?? '-')),
                 TextColumn::make('location')
-                    ->label('Vị trí')
+                    ->label(trans('packages.equipment::equipment.form.location'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label('Cập nhật')
+                    ->label(trans('packages.equipment::equipment.form.updated_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -153,15 +153,15 @@ class EquipmentResource extends Resource
             ->defaultSort('equipment_code', 'asc')
             ->filters([
                 SelectFilter::make('category_id')
-                    ->label('Danh mục')
+                    ->label(trans('packages.equipment::equipment.form.category'))
                     ->options(fn () => EquipmentCategory::query()->orderBy('name')->pluck('name', 'id')->all()),
                 SelectFilter::make('status')
-                    ->label('Trạng thái')
+                    ->label(trans('packages.equipment::equipment.form.status'))
                     ->options(Equipment::statusOptions()),
             ])
             ->headerActions([
                 ExportAction::make('export')
-                    ->label('Xuất Excel')
+                    ->label(trans('packages.equipment::equipment.form.export'))
                     ->exports([
                         EquipmentExcelExport::make('equipments')
                             ->fromTable()
@@ -172,15 +172,15 @@ class EquipmentResource extends Resource
                                     ->heading('Image')
                                     ->width(24)
                                     ->formatStateUsing(fn (): ?string => null),
-                                Column::make('name')->heading(trans('packages.equiqment::equiqment.fields.name')),
-                                Column::make('unit')->heading(trans('packages.equiqment::equiqment.fields.unit')),
-                                Column::make('category.name')->heading(trans('packages.equiqment::equiqment.fields.category_id')),
-                                Column::make('quantity')->heading(trans('packages.equiqment::equiqment.fields.quantity')),
+                                Column::make('name')->heading(trans('packages.equipment::equipment.fields.name')),
+                                Column::make('unit')->heading(trans('packages.equipment::equipment.fields.unit')),
+                                Column::make('category.name')->heading(trans('packages.equipment::equipment.fields.category_id')),
+                                Column::make('quantity')->heading(trans('packages.equipment::equipment.fields.quantity')),
                                 Column::make('status')
-                                    ->heading(trans('packages.equiqment::equiqment.fields.status'))
+                                    ->heading(trans('packages.equipment::equipment.fields.status'))
                                     ->formatStateUsing(fn (?string $state): string => Equipment::statusOptions()[$state] ?? ($state ?? '-')),
-                                Column::make('actual_quantity')->heading(trans('packages.equiqment::equiqment.fields.actual_quantity')),
-                                Column::make('note')->heading(trans('packages.equiqment::equiqment.fields.note')),
+                                Column::make('actual_quantity')->heading(trans('packages.equipment::equipment.fields.actual_quantity')),
+                                Column::make('note')->heading(trans('packages.equipment::equipment.fields.note')),
                             ]),
                     ]),
             ])

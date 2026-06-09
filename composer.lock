@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2561797dd08960b62f10d18fe4ae6b68",
+    "content-hash": "b4d4f2e23a6d3d5feae1b278bc79cac0",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5850,6 +5850,40 @@
             "time": "2026-02-20T12:35:33+00:00"
         },
         {
+            "name": "quochao56/core",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/core",
+                "reference": "7e082b326b3817bfb80f7a3463d0903f40f17c7f"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Quochao56\\Core\\CoreServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quochao56\\Core\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Shared core utilities for Quochao56 packages",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "quochao56/employee",
             "version": "dev-main",
             "dist": {
@@ -5955,13 +5989,14 @@
             "dist": {
                 "type": "path",
                 "url": "packages/equipment",
-                "reference": "3e17b04254a552e3b4b2c447d58c8fd4102b58aa"
+                "reference": "301a536e289c1cce7173afd9602f1ed507e6615f"
             },
             "require": {
                 "filament/filament": "^5.0",
                 "filament/forms": "^5.0",
                 "filament/tables": "^5.0",
                 "php": "^8.2",
+                "quochao56/core": "*@dev",
                 "spatie/laravel-package-tools": "^1.15.0"
             },
             "type": "library",
@@ -13250,6 +13285,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "quochao56/core": 20,
         "quochao56/employee": 20,
         "quochao56/equipment": 20,
         "quochao56/planning-evaluation": 20,

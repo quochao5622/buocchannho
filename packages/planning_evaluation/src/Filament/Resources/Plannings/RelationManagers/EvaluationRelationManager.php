@@ -23,14 +23,14 @@ class EvaluationRelationManager extends RelationManager
     {
         return $schema->components([
             TextInput::make('name')
-                ->label(trans('planning-evaluation::evaluation.fields.name'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.name'))
                 ->required(),
             Textarea::make('description')
-                ->label(trans('planning-evaluation::evaluation.fields.description')),
+                ->label(trans('packages.planning_evaluation::evaluation.fields.description')),
             Textarea::make('evaluation_details')
-                ->label(trans('planning-evaluation::evaluation.fields.evaluation_details')),
+                ->label(trans('packages.planning_evaluation::evaluation.fields.evaluation_details')),
             \Filament\Forms\Components\Select::make('status')
-                ->label(trans('planning-evaluation::evaluation.fields.status'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                 ->options([
                     BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
                     BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
@@ -46,12 +46,12 @@ class EvaluationRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(trans('planning-evaluation::evaluation.fields.name')),
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.name')),
                 TextColumn::make('description')
-                    ->label(trans('planning-evaluation::evaluation.fields.description'))
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.description'))
                     ->limit(60),
                 TextColumn::make('status')
-                    ->label(trans('planning-evaluation::evaluation.fields.status'))
+                    ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                     ->badge(),
             ])
             ->headerActions([

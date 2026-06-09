@@ -31,22 +31,22 @@ class PlanningResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return trans('planning-evaluation::planning.navigation_label');
+        return trans('packages.planning_evaluation::planning.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return trans('planning-evaluation::planning.model_label');
+        return trans('packages.planning_evaluation::planning.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans('planning-evaluation::planning.plural_model_label');
+        return trans('packages.planning_evaluation::planning.plural_model_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return trans('planning-evaluation::planning.navigation_group');
+        return trans('packages.planning_evaluation::planning.navigation_group');
     }
     public static function form(Schema $schema): Schema
     {

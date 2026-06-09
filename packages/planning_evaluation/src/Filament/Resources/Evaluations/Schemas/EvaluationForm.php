@@ -12,19 +12,19 @@ class EvaluationForm
     {
         return $schema->components([
             \Filament\Forms\Components\TextInput::make('name')
-                ->label(trans('planning-evaluation::evaluation.fields.name'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.name'))
                 ->required(),
             \Filament\Forms\Components\Textarea::make('description')
-                ->label(trans('planning-evaluation::evaluation.fields.description')),
+                ->label(trans('packages.planning_evaluation::evaluation.fields.description')),
             \Filament\Forms\Components\Select::make('planning_id')
-                ->label(trans('planning-evaluation::evaluation.fields.planning_id'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.planning_id'))
                 ->relationship('planning', 'name')
                 ->disabled()
                 ->dehydrated(false)
                 ->required()
                 ->searchable(),
             \Filament\Forms\Components\Select::make('status')
-                ->label(trans('planning-evaluation::evaluation.fields.status'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                 ->options([
                     BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
                     BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
@@ -33,26 +33,26 @@ class EvaluationForm
                 ->default(BaseStatusEnum::Draft->value)
                 ->required(),
             \Filament\Forms\Components\Repeater::make('evaluation_details')
-                ->label(trans('planning-evaluation::evaluation.fields.evaluation_details'))
+                ->label(trans('packages.planning_evaluation::evaluation.fields.evaluation_details'))
                 ->schema([
                     \Filament\Schemas\Components\Grid::make(2)
                         ->schema([
                             \Filament\Forms\Components\Textarea::make('linh_vuc')
-                                ->label(trans('planning-evaluation::evaluation.fields.linh_vuc'))
+                                ->label(trans('packages.planning_evaluation::evaluation.fields.linh_vuc'))
                                 ->disabled()
                                 ->dehydrated(),
                             \Filament\Forms\Components\Repeater::make('muc_tieu')
-                                ->label(trans('planning-evaluation::evaluation.fields.muc_tieu'))
+                                ->label(trans('packages.planning_evaluation::evaluation.fields.muc_tieu'))
                                 ->schema([
                                     \Filament\Forms\Components\Textarea::make('content')
-                                        ->label(trans('planning-evaluation::evaluation.fields.content'))
+                                        ->label(trans('packages.planning_evaluation::evaluation.fields.content'))
                                         ->rows(3)
                                         ->dehydrated(),
                                     \Filament\Forms\Components\Select::make('danh_gia')
-                                        ->label(trans('planning-evaluation::evaluation.fields.danh_gia'))
+                                        ->label(trans('packages.planning_evaluation::evaluation.fields.danh_gia'))
                                         ->required(fn (Get $get): bool => ($get('../../../../status') === BaseStatusEnum::Published->value))
                                         ->validationMessages([
-                                            'required' => trans('planning-evaluation::evaluation.validation.danh_gia_required_when_published'),
+                                            'required' => trans('packages.planning_evaluation::evaluation.validation.danh_gia_required_when_published'),
                                         ])
                                         ->options([
                                             '+' => '+',
@@ -60,14 +60,14 @@ class EvaluationForm
                                             '-' => '-',
                                         ]),
                                     \Filament\Forms\Components\Textarea::make('nhan_xet')
-                                        ->label(trans('planning-evaluation::evaluation.fields.nhan_xet'))
+                                        ->label(trans('packages.planning_evaluation::evaluation.fields.nhan_xet'))
                                         ->rows(4),
                                 ])
-                                ->createItemButtonLabel(trans('planning-evaluation::evaluation.actions.add_muc_tieu'))
+                                ->createItemButtonLabel(trans('packages.planning_evaluation::evaluation.actions.add_muc_tieu'))
                                 ->collapsible(),
                         ]),
                 ])
-                ->createItemButtonLabel(trans('planning-evaluation::evaluation.actions.add_linh_vuc'))
+                ->createItemButtonLabel(trans('packages.planning_evaluation::evaluation.actions.add_linh_vuc'))
                 ->collapsible()
                 ->columnSpanFull(),
         ]);
