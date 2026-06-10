@@ -51,7 +51,7 @@ class ExportPlanningWordAction extends Action
     protected function generateWordFile(Model $record, string $outputFile): string
     {
         $templatePath = realpath(
-            __DIR__ . '/../../../resources/templates/template_KHGDCN.docx'
+            __DIR__ . '/../../../resources/templates/template_KHCN.docx'
         );
 
         if (! $templatePath || ! file_exists($templatePath)) {

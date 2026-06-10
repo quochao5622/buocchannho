@@ -15,8 +15,73 @@ class EquipmentCategory extends Model
     protected $fillable = [
         'name',
         'code',
+        'parent_id',
         'description',
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo(EquipmentCategory::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(EquipmentCategory::class, 'parent_id');
+    }
+
+    private static ?array $allCategoriesMap = null;
+
+    public function getDepth(): int
+    {
+        if (self::$allCategoriesMap === null) {
+            self::$allCategoriesMap = static::pluck('parent_id', 'id')->toArray();
+        }
+
+        $depth = 0;
+        $parentId = $this->parent_id;
+        while ($parentId && array_key_exists($parentId, self::$allCategoriesMap)) {
+            $depth++;
+            $parentId = self::$allCategoriesMap[$parentId];
+        }
+        return $depth;
+    }
+
+    public static function getTreeOptions(?int $exceptId = null): array
+    {
+        $categories = static::with('children')->whereNull('parent_id')->get();
+        $options = [];
+
+        $traverse = function ($categories, $prefix = '') use (&$traverse, &$options, $exceptId) {
+            foreach ($categories as $category) {
+                if ($exceptId && $category->id === $exceptId) {
+                    continue;
+                }
+                $options[$category->id] = $prefix . $category->name;
+                $traverse($category->children, $prefix . '— ');
+            }
+        };
+
+        $traverse($categories);
+
+        return $options;
+    }
+
+    public static function getTreeIds(): array
+    {
+        $categories = static::with('children')->whereNull('parent_id')->get();
+        $ids = [];
+
+        $traverse = function ($categories) use (&$traverse, &$ids) {
+            foreach ($categories as $category) {
+                $ids[] = $category->id;
+                $traverse($category->children);
+            }
+        };
+
+        $traverse($categories);
+
+        return $ids;
+    }
 
     /**
      * @return HasMany<Equipment, $this>
@@ -45,4 +110,3 @@ class EquipmentCategory extends Model
         return $this->attributes['code'];
     }
 }
-

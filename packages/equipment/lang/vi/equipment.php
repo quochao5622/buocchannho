@@ -97,6 +97,7 @@ return [
 
         'fields' => [
             'code' => 'Mã danh mục',
+            'parent_id' => 'Danh mục cha',
             'name' => 'Tên danh mục',
             'description' => 'Mô tả',
         ],
@@ -104,6 +105,7 @@ return [
         'table' => [
             'code' => 'Mã',
             'name' => 'Tên',
+            'parent_id' => 'Danh mục cha',
             'equipments_count' => 'Số học cụ',
             'updated_at' => 'Cập nhật',
         ],

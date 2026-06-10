@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -61,6 +62,12 @@ class EquipmentCategoryResource extends Resource
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(255),
+            
+            Select::make('parent_id')
+                ->label(trans('packages.equipment::equipment.category.fields.parent_id'))
+                ->options(fn (?EquipmentCategory $record) => EquipmentCategory::getTreeOptions($record?->id))
+                ->default(null)
+                ->nullable(),
 
             Textarea::make('description')
                 ->label(trans('packages.equipment::equipment.category.fields.description'))
@@ -79,6 +86,10 @@ class EquipmentCategoryResource extends Resource
                 TextColumn::make('name')
                     ->label(trans('packages.equipment::equipment.category.table.name'))
                     ->searchable()
+                    ->sortable()
+                    ->formatStateUsing(fn (EquipmentCategory $record) => str_repeat('— ', $record->getDepth()) . $record->name),
+                TextColumn::make('parent.name')
+                    ->label(trans('packages.equipment::equipment.category.fields.parent_id'))
                     ->sortable(),
                 TextColumn::make('equipments_count')
                     ->counts('equipments')
@@ -89,7 +100,15 @@ class EquipmentCategoryResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
-            ->defaultSort('code', 'asc')
+            ->modifyQueryUsing(function ($query) {
+                if (empty($query->getQuery()->orders)) {
+                    $orderedIds = EquipmentCategory::getTreeIds();
+                    if (!empty($orderedIds)) {
+                        $query->orderByRaw('FIELD(id, ' . implode(',', $orderedIds) . ')');
+                    }
+                }
+                return $query;
+            })
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
@@ -110,4 +129,3 @@ class EquipmentCategoryResource extends Resource
         ];
     }
 }
-

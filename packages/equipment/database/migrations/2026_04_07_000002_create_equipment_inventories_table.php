@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('equipment_inventories', function (Blueprint $table) {
-            $table->id();
-            $table->string('inventory_code')->unique();
-            $table->foreignId('inspector_id')->constrained('users');
-            $table->date('inventory_date')->index();
-            $table->string('status')->default('draft')->index();
-            $table->text('notes')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('equipment_inventories')) {
+            Schema::create('equipment_inventories', function (Blueprint $table) {
+                $table->id();
+                $table->string('inventory_code')->unique();
+                $table->foreignId('inspector_id')->constrained('users');
+                $table->date('inventory_date')->index();
+                $table->string('status')->default('draft')->index();
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

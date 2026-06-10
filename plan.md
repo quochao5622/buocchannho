@@ -1,0 +1,18 @@
+lĩnh vực:
+- Kỹ năng tiền đề
+    - Chú ý
+    - Bắt chước
+    - Kỹ năng chơi
+    - Luân phiên - chờ
+- Vận động
+    - Vận động tinh
+    - Vận động thô
+- Nhận thức
+- Kỹ năng đọc – viết
+- Biểu tượng toán
+- Ngôn ngữ và giao tiếp
+    - Ngôn ngữ tiếp nhận
+    - Ngôn ngữ nói
+- Cá nhân và xã hội
+- Kỹ năng tự phục vụ
+- Cảm xúc

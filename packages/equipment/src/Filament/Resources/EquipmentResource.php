@@ -75,8 +75,7 @@ class EquipmentResource extends Resource
             Select::make('category_id')
                 ->label(trans('packages.equipment::equipment.form.category'))
                 ->required()
-                ->options(fn () => EquipmentCategory::query()->orderBy('name')->pluck('name', 'id')->all())
-                ->searchable(),
+                ->options(fn () => EquipmentCategory::getTreeOptions()),
 
             FileUpload::make('image')
                 ->label(trans('packages.equipment::equipment.form.image'))
@@ -154,7 +153,7 @@ class EquipmentResource extends Resource
             ->filters([
                 SelectFilter::make('category_id')
                     ->label(trans('packages.equipment::equipment.form.category'))
-                    ->options(fn () => EquipmentCategory::query()->orderBy('name')->pluck('name', 'id')->all()),
+                    ->options(fn () => EquipmentCategory::getTreeOptions()),
                 SelectFilter::make('status')
                     ->label(trans('packages.equipment::equipment.form.status'))
                     ->options(Equipment::statusOptions()),
@@ -204,4 +203,3 @@ class EquipmentResource extends Resource
         ];
     }
 }
-
