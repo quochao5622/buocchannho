@@ -39,12 +39,12 @@ class ApproveAction extends Action
             });
     
             Notification::make()
-                ->title(trans('packages.equipment::equipment.inventory.approve.success'))
+                ->title(trans('packages.equipment::equipment_inventory.approve.success'))
                 ->success()
                 ->send();
         } catch (\Throwable $th) {
             Notification::make()
-                ->title(trans('packages.equipment::equipment.inventory.approve.error'))
+                ->title(trans('packages.equipment::equipment_inventory.approve.error'))
                 ->danger()
                 ->send();
             Log::error($th);
@@ -56,7 +56,7 @@ class ApproveAction extends Action
     {
         parent::setUp();
 
-        $this->label(trans('packages.equipment::equipment.inventory.approve.label'));
+        $this->label(trans('packages.equipment::equipment_inventory.approve.label'));
         $this->color('success');
         $this->requiresConfirmation();
         $this->visible(fn (EquipmentInventory $record) => $record->status === 'completed');

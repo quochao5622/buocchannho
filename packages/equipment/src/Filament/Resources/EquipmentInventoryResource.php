@@ -50,24 +50,24 @@ class EquipmentInventoryResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return trans('packages.equipment::equipment.inventory.navigation_label');
+        return trans('packages.equipment::equipment_inventory.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return trans('packages.equipment::equipment.inventory.model_label');
+        return trans('packages.equipment::equipment_inventory.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans('packages.equipment::equipment.inventory.plural_model_label');
+        return trans('packages.equipment::equipment_inventory.plural_model_label');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('inventory_code')
-                ->label(trans('packages.equipment::equipment.inventory.fields.inventory_code'))
+                ->label(trans('packages.equipment::equipment_inventory.fields.inventory_code'))
                 ->required()
                 ->maxLength(50)
                 ->unique(ignoreRecord: true)
@@ -77,27 +77,27 @@ class EquipmentInventoryResource extends Resource
                 ->default(fn () => Auth::id()),
 
             DatePicker::make('inventory_date')
-                ->label(trans('packages.equipment::equipment.inventory.fields.inventory_date'))
+                ->label(trans('packages.equipment::equipment_inventory.fields.inventory_date'))
                 ->native(false)
                 ->default(now())
                 ->required(),
 
             Select::make('status')
-                ->label(trans('packages.equipment::equipment.inventory.fields.status'))
+                ->label(trans('packages.equipment::equipment_inventory.fields.status'))
                 ->options(EquipmentInventory::statusOptions())
                 ->default('draft')
                 ->required(),
 
             Textarea::make('notes')
-                ->label(trans('packages.equipment::equipment.inventory.fields.notes'))
+                ->label(trans('packages.equipment::equipment_inventory.fields.notes'))
                 ->columnSpanFull(),
 
             Hidden::make('details_buffer')
                 ->dehydrated(false),
 
             TextInput::make('detail_equipment_search')
-                ->label(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search'))
-                ->placeholder(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_placeholder'))
+                ->label(trans('packages.equipment::equipment_inventory_detail.fields.detail_equipment_search'))
+                ->placeholder(trans('packages.equipment::equipment_inventory_detail.fields.detail_equipment_search_placeholder'))
                 ->live(debounce: 300)
                 ->dehydrated(false)
                 ->afterStateUpdated(function (?string $state, Get $get, Set $set): void {
@@ -118,11 +118,11 @@ class EquipmentInventoryResource extends Resource
 
                     $set('details', static::filterDetailsByKeyword($buffer, $keyword));
                 })
-                ->helperText(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_helper'))
+                ->helperText(trans('packages.equipment::equipment_inventory_detail.fields.detail_equipment_search_helper'))
                 ->columnSpanFull(),
 
             Repeater::make('details')
-                ->label(trans('packages.equipment::equipment.inventory.fields.details'))
+                ->label(trans('packages.equipment::equipment_inventory.fields.details'))
                 ->relationship(modifyQueryUsing: function ($query) {
                     return $query
                         ->leftJoin('equipments', 'equipment_inventory_details.equipment_id', '=', 'equipments.id')
@@ -176,7 +176,7 @@ class EquipmentInventoryResource extends Resource
                         $set('details', $buffer);
                     }
                 }, shouldUpdateValidatedStateAfter: true)
-                ->helperText(trans('packages.equipment::equipment.inventory.fields.detail_equipment_search_helper'))
+                ->helperText(trans('packages.equipment::equipment_inventory_detail.fields.detail_equipment_search_helper'))
                 ->addable(false)
                 ->itemLabel(function (array $state, Get $get): HtmlString|string {
                     $label = static::getDetailLabel($state);
@@ -194,7 +194,7 @@ class EquipmentInventoryResource extends Resource
                     Hidden::make('equipment_location_snapshot')
                         ->dehydrated(false),
                     Placeholder::make('equipment_image')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.equipment_image'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.equipment_image'))
                         ->content(function (Get $get): HtmlString {
                             static $imageByEquipmentId = [];
 
@@ -223,7 +223,7 @@ class EquipmentInventoryResource extends Resource
                             );
                         }),
                     Select::make('equipment_id')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.equipment'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.equipment'))
                         ->relationship(
                             name: 'equipment',
                             titleAttribute: 'name',
@@ -234,22 +234,22 @@ class EquipmentInventoryResource extends Resource
                         ->dehydrated()
                         ->required(),
                     TextInput::make('quantity_expected')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.quantity_expected'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_expected'))
                         ->numeric()
                         ->disabled()
                         ->dehydrated()
                         ->required(),
                     TextInput::make('quantity_actual')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.quantity_actual'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_actual'))
                         ->numeric()
                         ->minValue(0)
                         ->required(),
                     Select::make('status')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.status'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.status'))
                         ->options(EquipmentInventoryDetail::statusOptions())
                         ->required(),
                     Textarea::make('notes')
-                        ->label(trans('packages.equipment::equipment.inventory.fields.notes'))
+                        ->label(trans('packages.equipment::equipment_inventory_detail.fields.notes'))
                         ->columnSpanFull(),
                 ])
                 ->columns(5)
@@ -262,22 +262,22 @@ class EquipmentInventoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('inventory_code')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.inventory_code'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.inventory_code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('inventory_date')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.inventory_date'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.inventory_date'))
                     ->date('d/m/Y')
                     ->sortable(),
                 TextColumn::make('inspector.name')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.inspector'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.inspector'))
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.status'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => EquipmentInventory::statusOptions()[$state] ?? ($state ?? '-')),
                 TextColumn::make('updated_at')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.updated_at'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.updated_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -285,7 +285,7 @@ class EquipmentInventoryResource extends Resource
             ->defaultSort('inventory_date', 'desc')
             ->filters([
                 SelectFilter::make('status')
-                    ->label(trans('packages.equipment::equipment.inventory.fields.status'))
+                    ->label(trans('packages.equipment::equipment_inventory.fields.status'))
                     ->options(EquipmentInventory::statusOptions()),
             ])
             ->actions([
