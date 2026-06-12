@@ -33,7 +33,7 @@ class Student extends Model
     {
         return $this->hasMany(\Quochao56\PlanningEvaluation\Models\Planning::class, 'student_id');
     }
-        public function setNameAttribute($value)
+    public function setNameAttribute($value)
     {
         // strip tags and trim whitespace
         $this->attributes['name'] = trim(strip_tags($value));

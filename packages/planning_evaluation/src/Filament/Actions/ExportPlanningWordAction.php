@@ -38,7 +38,9 @@ class ExportPlanningWordAction extends Action
             $startMonth = data_get($record, 'start_date') ? $record->start_date->format('n') : 'unknown';
             $endMonth = data_get($record, 'end_date') ? $record->end_date->format('n') : 'unknown';
             $timeRange = "T{$startMonth}-T{$endMonth}";
-            $outputFile = "KHCN_" . ($record->student?->name ?? 'unknown') . "_" . $timeRange . "_" . time() . ".docx";
+            $studentName = mb_strtoupper($record->student?->name ?? 'unknown', 'UTF-8');
+            $studentName = implode(' ', array_slice(explode(' ', $studentName), -2));
+            $outputFile = "KHCN_" . $studentName . "_" . $timeRange . "_" . time() . ".docx";
             $path = $this->generateWordFile($record, $outputFile);
 
             return response()->download(
@@ -91,15 +93,96 @@ class ExportPlanningWordAction extends Action
         $details = $record->planning_details ?? [];
 
         if (! empty($details)) {
-            $templateProcessor->cloneRow('linh_vuc', count($details));
+            $tableRows = [];
+            foreach ($details as $detail) {
+                $linhVucItems = $detail['linh_vuc'] ?? [];
+                $parentCategory = '';
+                $subCategory = '';
 
-            foreach ($details as $i => $row) {
+                $contents = [];
+                foreach ($linhVucItems as $item) {
+                    $content = trim($item['content'] ?? '');
+                    if ($content !== '') {
+                        $contents[] = $content;
+                    }
+                }
+
+                if (count($contents) >= 2) {
+                    $parentCategory = $contents[0];
+                    $subCategory = $contents[1];
+                } elseif (count($contents) === 1) {
+                    $lines = explode("\n", $contents[0]);
+                    if (count($lines) >= 2) {
+                        $parentCategory = trim($lines[0]);
+                        $subCategory = trim($lines[1]);
+                    } else {
+                        $parentCategory = $contents[0];
+                    }
+                }
+
+                $cleanSubCategory = $subCategory;
+                if (str_starts_with($cleanSubCategory, '- ')) {
+                    $cleanSubCategory = substr($cleanSubCategory, 2);
+                }
+                $cleanSubCategory = trim($cleanSubCategory, '*_');
+
+                if ($cleanSubCategory !== '') {
+                    // Subheader row
+                    $tableRows[] = [
+                        'type' => 'subheader',
+                        'parent_category' => $parentCategory,
+                        'sub_category' => $cleanSubCategory,
+                        'linh_vuc' => [['content' => $parentCategory]],
+                        'muc_tieu' => [['content' => '*' . $cleanSubCategory . '*']],
+                        'hoat_dong' => [],
+                        'phuong_tien' => [],
+                        'muc_tieu_du_phong' => [],
+                    ];
+
+                    // Content row
+                    $tableRows[] = [
+                        'type' => 'content',
+                        'parent_category' => $parentCategory,
+                        'sub_category' => $cleanSubCategory,
+                        'linh_vuc' => [['content' => $parentCategory]],
+                        'muc_tieu' => $detail['muc_tieu'] ?? [],
+                        'hoat_dong' => $detail['hoat_dong'] ?? [],
+                        'phuong_tien' => $detail['phuong_tien'] ?? [],
+                        'muc_tieu_du_phong' => $detail['muc_tieu_du_phong'] ?? [],
+                    ];
+                } else {
+                    $tableRows[] = [
+                        'type' => 'content',
+                        'parent_category' => $parentCategory,
+                        'sub_category' => '',
+                        'linh_vuc' => [['content' => $parentCategory]],
+                        'muc_tieu' => $detail['muc_tieu'] ?? [],
+                        'hoat_dong' => $detail['hoat_dong'] ?? [],
+                        'phuong_tien' => $detail['phuong_tien'] ?? [],
+                        'muc_tieu_du_phong' => $detail['muc_tieu_du_phong'] ?? [],
+                    ];
+                }
+            }
+
+            $templateProcessor->cloneRow('linh_vuc', count($tableRows));
+
+            $this->applyCellMerges($templateProcessor, $tableRows);
+
+            foreach ($tableRows as $i => $row) {
                 $n = $i + 1;
-                $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildCellTextRun($row['linh_vuc'] ?? []));
-                $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildCellTextRun($row['muc_tieu'] ?? []));
-                $templateProcessor->setComplexValue("hoat_dong#{$n}", $this->buildCellTextRun($row['hoat_dong'] ?? []));
-                $templateProcessor->setComplexValue("phuong_tien#{$n}", $this->buildCellTextRun($row['phuong_tien'] ?? []));
-                $templateProcessor->setComplexValue("muc_tieu_du_phong#{$n}", $this->buildCellTextRun($row['muc_tieu_du_phong'] ?? []));
+                if ($row['type'] === 'subheader') {
+                    $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildCellTextRun($row['linh_vuc'] ?? []));
+                    $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildCellTextRun($row['muc_tieu'] ?? []));
+                    $templateProcessor->setValue("hoat_dong#{$n}", '');
+                    $templateProcessor->setValue("phuong_tien#{$n}", '');
+                    $templateProcessor->setValue("muc_tieu_du_phong#{$n}", '');
+                } else {
+                    $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildCellTextRun($row['linh_vuc'] ?? []));
+                    $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildCellTextRun($row['muc_tieu'] ?? []));
+                    $templateProcessor->setComplexValue("hoat_dong#{$n}", $this->buildCellTextRun($row['hoat_dong'] ?? []));
+                    $templateProcessor->setComplexValue("phuong_tien#{$n}", $this->buildCellTextRun($row['phuong_tien'] ?? []));
+                    $templateProcessor->setComplexValue("muc_tieu_du_phong#{$n}", $this->buildCellTextRun($row['muc_tieu_du_phong'] ?? []));
+                }
             }
         } else {
             $templateProcessor->setValue('linh_vuc', '');
@@ -151,7 +234,7 @@ class ExportPlanningWordAction extends Action
                     $textRun->addTextBreak();
                 }
 
-                if (str_starts_with($line, '- ')) {
+                if (str_starts_with($line, '- ') || str_starts_with($line, '* ')) {
                     $textRun->addText('- ', $this->defaultTextStyle());
                     $line = substr($line, 2);
                 }
@@ -210,5 +293,169 @@ class ExportPlanningWordAction extends Action
             'name' => 'Times New Roman',
             'size' => 11,
         ];
+    }
+
+    /**
+     * Apply horizontal gridSpan merges for subheaders and vertical vMerge merges for parent categories.
+     */
+    protected function applyCellMerges(TemplateProcessor $tp, array $tableRows): void
+    {
+        $reflProp = new \ReflectionProperty(TemplateProcessor::class, 'tempDocumentMainPart');
+        $reflProp->setAccessible(true);
+        $xml = $reflProp->getValue($tp);
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        libxml_use_internal_errors(true);
+        $dom->loadXML($xml);
+        libxml_clear_errors();
+
+        $wNs   = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('w', $wNs);
+
+        // Group rows by parent_category to apply vertical vMerge
+        $groups = [];
+        $currentParent = null;
+        $currentStartIndex = null;
+
+        foreach ($tableRows as $i => $row) {
+            $parent = $row['parent_category'];
+            if ($parent !== $currentParent) {
+                if ($currentParent !== null) {
+                    $groups[] = [
+                        'start' => $currentStartIndex,
+                        'end' => $i - 1,
+                    ];
+                }
+                $currentParent = $parent;
+                $currentStartIndex = $i;
+            }
+        }
+        if ($currentParent !== null) {
+            $groups[] = [
+                'start' => $currentStartIndex,
+                'end' => count($tableRows) - 1,
+            ];
+        }
+
+        foreach ($groups as $group) {
+            $start = $group['start'];
+            $end = $group['end'];
+            if ($start === $end) {
+                continue;
+            }
+
+            for ($i = $start; $i <= $end; $i++) {
+                $n = $i + 1;
+                $cells = $xpath->query("//w:tc[.//w:t[contains(., 'linh_vuc#{$n}')]]");
+                if ($cells->length === 0) {
+                    continue;
+                }
+                /** @var \DOMElement $cell */
+                $cell = $cells->item(0);
+
+                $tcPr = $xpath->query('w:tcPr', $cell)->item(0);
+                if ($tcPr === null) {
+                    $tcPr = $dom->createElementNS($wNs, 'w:tcPr');
+                    $cell->insertBefore($tcPr, $cell->firstChild);
+                }
+
+                foreach (iterator_to_array($xpath->query('w:vMerge', $tcPr)) as $old) {
+                    $tcPr->removeChild($old);
+                }
+
+                $vMerge = $dom->createElementNS($wNs, 'w:vMerge');
+                if ($i === $start) {
+                    $vMerge->setAttributeNS($wNs, 'w:val', 'restart');
+                } else {
+                    foreach (iterator_to_array($xpath->query('w:p', $cell)) as $p) {
+                        $cell->removeChild($p);
+                    }
+                    $cell->appendChild($dom->createElementNS($wNs, 'w:p'));
+                }
+                $tcPr->appendChild($vMerge);
+            }
+        }
+
+        // Apply gridSpan merges for subheader rows
+        foreach ($tableRows as $i => $row) {
+            if ($row['type'] !== 'subheader') {
+                continue;
+            }
+            $n = $i + 1;
+
+            $cells = $xpath->query("//w:tc[.//w:t[contains(., 'muc_tieu#{$n}')]]");
+            if ($cells->length === 0) {
+                continue;
+            }
+            /** @var \DOMElement $mucTieuCell */
+            $mucTieuCell = $cells->item(0);
+
+            $tcPr = $xpath->query('w:tcPr', $mucTieuCell)->item(0);
+            if ($tcPr === null) {
+                $tcPr = $dom->createElementNS($wNs, 'w:tcPr');
+                $mucTieuCell->insertBefore($tcPr, $mucTieuCell->firstChild);
+            }
+
+            $gridSpan = $dom->createElementNS($wNs, 'w:gridSpan');
+            $gridSpan->setAttributeNS($wNs, 'w:val', '4');
+            $tcPr->appendChild($gridSpan);
+
+            $tcW = $xpath->query('w:tcW', $tcPr)->item(0);
+            if ($tcW !== null) {
+                $tcW->setAttributeNS($wNs, 'w:w', '12900');
+            }
+
+            /** @var \DOMElement|null $p */
+            $p = $xpath->query('w:p', $mucTieuCell)->item(0);
+            if ($p !== null) {
+                $pPr = $xpath->query('w:pPr', $p)->item(0);
+                if ($pPr === null) {
+                    $pPr = $dom->createElementNS($wNs, 'w:pPr');
+                    $p->insertBefore($pPr, $p->firstChild);
+                }
+                $jc = $xpath->query('w:jc', $pPr)->item(0);
+                if ($jc !== null) {
+                    $pPr->removeChild($jc);
+                }
+                $newJc = $dom->createElementNS($wNs, 'w:jc');
+                $newJc->setAttributeNS($wNs, 'w:val', 'center');
+                $pPr->appendChild($newJc);
+            }
+
+            foreach (['hoat_dong', 'phuong_tien', 'muc_tieu_du_phong'] as $key) {
+                $remCells = $xpath->query("//w:tc[.//w:t[contains(., '{$key}#{$n}')]]");
+                if ($remCells->length > 0) {
+                    $remCell = $remCells->item(0);
+                    $remCell->parentNode->removeChild($remCell);
+                }
+            }
+
+            // Remove trHeight to let the height fit the content automatically
+            $tr = $mucTieuCell->parentNode;
+            $trPr = $xpath->query('w:trPr', $tr)->item(0);
+            if ($trPr !== null) {
+                foreach (iterator_to_array($xpath->query('w:trHeight', $trPr)) as $heightNode) {
+                    $trPr->removeChild($heightNode);
+                }
+            }
+
+            // Shade only the merged cell in this row in light gray
+            $cPr = $xpath->query('w:tcPr', $mucTieuCell)->item(0);
+            if ($cPr === null) {
+                $cPr = $dom->createElementNS($wNs, 'w:tcPr');
+                $mucTieuCell->insertBefore($cPr, $mucTieuCell->firstChild);
+            }
+            foreach (iterator_to_array($xpath->query('w:shd', $cPr)) as $oldShd) {
+                $cPr->removeChild($oldShd);
+            }
+            $shd = $dom->createElementNS($wNs, 'w:shd');
+            $shd->setAttributeNS($wNs, 'w:val', 'clear');
+            $shd->setAttributeNS($wNs, 'w:color', 'auto');
+            $shd->setAttributeNS($wNs, 'w:fill', 'F2F2F2'); // Light gray background
+            $cPr->appendChild($shd);
+        }
+
+        $reflProp->setValue($tp, $dom->saveXML($dom->documentElement));
     }
 }

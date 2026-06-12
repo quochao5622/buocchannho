@@ -1,6 +1,6 @@
 <?php
 
-namespace Quochao56\Student\Tests;
+namespace Quochao56\PlanningEvaluation\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
@@ -20,6 +20,8 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use Quochao56\Student\StudentServiceProvider;
+use Quochao56\Employee\EmployeeServiceProvider;
+use Quochao56\PlanningEvaluation\PlanningEvaluationServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -31,7 +33,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Quochao56\\Student\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Quochao56\\PlanningEvaluation\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -52,6 +54,8 @@ class TestCase extends Orchestra
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
             StudentServiceProvider::class,
+            EmployeeServiceProvider::class,
+            PlanningEvaluationServiceProvider::class,
         ];
 
         sort($providers);

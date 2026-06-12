@@ -27,6 +27,12 @@ class Planning extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (self $planning): void {
+            if (is_array($planning->planning_details)) {
+                $planning->planning_details = static::replaceTabsInArray($planning->planning_details);
+            }
+        });
+
         static::saved(function (self $planning): void {
             PlanningHistory::query()->create([
                 'planning_id' => $planning->getKey(),
@@ -34,6 +40,18 @@ class Planning extends Model
                 'saved_by' => Auth::id(),
             ]);
         });
+    }
+
+    protected static function replaceTabsInArray(array $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = static::replaceTabsInArray($value);
+            } elseif (is_string($value)) {
+                $array[$key] = str_replace("\t", ' ', $value);
+            }
+        }
+        return $array;
     }
 
     public function employee()

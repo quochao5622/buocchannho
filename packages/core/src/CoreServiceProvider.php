@@ -17,4 +17,11 @@ class CoreServiceProvider extends PackageServiceProvider
             $package->hasTranslations();
         }
     }
+
+    public function packageRegistered(): void
+    {
+        if (is_dir(__DIR__ . '/../lang')) {
+            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.core');
+        }
+    }
 }

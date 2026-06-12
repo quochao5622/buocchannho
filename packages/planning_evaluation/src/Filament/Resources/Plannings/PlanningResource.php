@@ -60,9 +60,7 @@ class PlanningResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            EvaluationRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array

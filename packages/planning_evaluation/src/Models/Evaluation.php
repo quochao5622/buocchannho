@@ -23,6 +23,12 @@ class Evaluation extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (self $evaluation): void {
+            if (is_array($evaluation->evaluation_details)) {
+                $evaluation->evaluation_details = static::replaceTabsInArray($evaluation->evaluation_details);
+            }
+        });
+
         static::saved(function (self $evaluation): void {
             EvaluationHistory::query()->create([
                 'evaluation_id' => $evaluation->getKey(),
@@ -30,6 +36,18 @@ class Evaluation extends Model
                 'saved_by' => Auth::id(),
             ]);
         });
+    }
+
+    protected static function replaceTabsInArray(array $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = static::replaceTabsInArray($value);
+            } elseif (is_string($value)) {
+                $array[$key] = str_replace("\t", ' ', $value);
+            }
+        }
+        return $array;
     }
 
     public function planning()

@@ -124,7 +124,14 @@ class StudentResource extends Resource
                     ->label(trans('packages.student::student.fields.name'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('gender')
+                    ->label(trans('packages.student::student.fields.gender'))
+                    ->formatStateUsing(fn(?string $state): string => trans('packages.core::core.gender.' . $state ?? 'male')),
 
+                TextColumn::make('dob')
+                    ->label(trans('packages.student::student.fields.dob'))
+                    ->date('d/m/Y')
+                    ->sortable(),
                 TextColumn::make('nickname')
                     ->label(trans('packages.student::student.fields.nickname'))
                     ->searchable(),
@@ -145,10 +152,7 @@ class StudentResource extends Resource
                     ->label(trans('packages.student::student.fields.mother_phone'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('dob')
-                    ->label(trans('packages.student::student.fields.dob'))
-                    ->date('d/m/Y')
-                    ->sortable(),
+
 
                 TextColumn::make('status')
                     ->label(trans('packages.student::student.fields.status'))
@@ -191,5 +195,4 @@ class StudentResource extends Resource
             'edit'   => EditStudent::route('/{record}/edit')
         ];
     }
-
 }

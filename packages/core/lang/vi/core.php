@@ -9,4 +9,9 @@ return [
             'error' => 'Duyệt thất bại',
         ],
     ],
+    'gender' => [
+        'male' => "Nam",
+        'female' => "Nữ",
+        'other' => "Khác",
+    ]
 ];

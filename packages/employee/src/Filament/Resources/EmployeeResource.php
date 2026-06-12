@@ -71,6 +71,7 @@ class EmployeeResource extends Resource
                 ->email()
                 ->unique(ignoreRecord: true)
                 ->maxLength(255),
+
             Select::make('gender')
                 ->label(trans('packages.employee::employee.fields.gender'))
                 ->options([
@@ -152,6 +153,10 @@ class EmployeeResource extends Resource
                     ->label(trans('packages.employee::employee.fields.email'))
                     ->searchable(),
 
+                TextColumn::make('gender')
+                    ->label(trans('packages.employee::employee.fields.gender'))
+                    ->formatStateUsing(fn(?string $state): string => trans('packages.core::core.gender.' . $state ?? 'male')),
+
                 TextColumn::make('phone')
                     ->label(trans('packages.employee::employee.fields.phone')),
 
@@ -166,7 +171,7 @@ class EmployeeResource extends Resource
                 TextColumn::make('employment_type')
                     ->label(trans('packages.employee::employee.fields.employment_type'))
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                    ->formatStateUsing(fn(?string $state): string => match ($state) {
                         'full-time' => trans('packages.employee::employee.employment_type.full_time'),
                         'part-time' => trans('packages.employee::employee.employment_type.part_time'),
                         'intern' => trans('packages.employee::employee.employment_type.intern'),
@@ -184,14 +189,7 @@ class EmployeeResource extends Resource
                     ->date('d/m/Y')
                     ->sortable(),
 
-                TextColumn::make('gender')
-                    ->label(trans('packages.employee::employee.fields.gender'))
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'male' => trans('packages.employee::employee.gender.male'),
-                        'female' => trans('packages.employee::employee.gender.female'),
-                        'other' => trans('packages.employee::employee.gender.other'),
-                        default => $state ?? '-',
-                    }),
+
 
                 TextColumn::make('status')
                     ->label(trans('packages.employee::employee.fields.status'))

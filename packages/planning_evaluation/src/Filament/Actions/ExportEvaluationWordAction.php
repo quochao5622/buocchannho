@@ -39,7 +39,9 @@ class ExportEvaluationWordAction extends Action
             $startMonth = $planning?->start_date?->format('n') ?? 'unknown';
             $endMonth   = $planning?->end_date?->format('n') ?? 'unknown';
             $timeRange  = "T{$startMonth}-T{$endMonth}";
-            $studentName =mb_strtoupper($student?->name ?? 'unknown', 'UTF-8');
+            $studentName = mb_strtoupper($student?->name ?? 'unknown', 'UTF-8');
+            $studentName = implode(' ', array_slice(explode(' ', $studentName), -2));
+
             $outputFile = 'KQDG_' . $studentName . "_{$timeRange}_" . time() . '.docx';
 
             $path = $this->generateWordFile($record, $outputFile);
@@ -86,22 +88,28 @@ class ExportEvaluationWordAction extends Action
         if ($total > 0) {
             $templateProcessor->cloneRow('linh_vuc', $total);
 
-            // Apply vertical cell merging for the linh_vuc column.
-            $this->applyVerticalMerges($templateProcessor, $flatRows);
+            // Apply merges and formatting for the table.
+            $this->applyCellMerges($templateProcessor, $flatRows);
 
             foreach ($flatRows as $i => $row) {
                 $n       = $i + 1;
                 $danhGia = $row['danh_gia'] ?? null;
 
-                $templateProcessor->setComplexValue(
-                    "linh_vuc#{$n}",
-                    $this->buildTextRunFromMarkdown($row['is_first_in_group'] ? (string) $row['linh_vuc'] : ''),
-                );
-                $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildTextRunFromMarkdown((string) $row['content']));
-                $templateProcessor->setComplexValue("nhan_xet#{$n}", $this->buildTextRunFromMarkdown((string) ($row['nhan_xet'] ?? '')));
-                $templateProcessor->setValue("danh_gia_1#{$n}", $danhGia === '+'   ? '+' : '');
-                $templateProcessor->setValue("danh_gia_2#{$n}", $danhGia === '+/-' ? '+/-' : '');
-                $templateProcessor->setValue("danh_gia_3#{$n}", $danhGia === '-'   ? '-' : '');
+                if ($row['type'] === 'subheader') {
+                    $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildTextRunFromMarkdown((string) $row['linh_vuc']));
+                    $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildTextRunFromMarkdown((string) $row['content']));
+                    $templateProcessor->setValue("danh_gia_1#{$n}", '');
+                    $templateProcessor->setValue("danh_gia_2#{$n}", '');
+                    $templateProcessor->setValue("danh_gia_3#{$n}", '');
+                    $templateProcessor->setValue("nhan_xet#{$n}", '');
+                } else {
+                    $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildTextRunFromMarkdown((string) $row['linh_vuc']));
+                    $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildTextRunFromMarkdown((string) $row['content']));
+                    $templateProcessor->setComplexValue("nhan_xet#{$n}", $this->buildTextRunFromMarkdown((string) ($row['nhan_xet'] ?? '')));
+                    $templateProcessor->setValue("danh_gia_1#{$n}", $danhGia === '+'   ? '+' : '');
+                    $templateProcessor->setValue("danh_gia_2#{$n}", $danhGia === '+/-' ? '+/-' : '');
+                    $templateProcessor->setValue("danh_gia_3#{$n}", $danhGia === '-'   ? '-' : '');
+                }
             }
         } else {
             foreach (['linh_vuc', 'muc_tieu', 'danh_gia_1', 'danh_gia_2', 'danh_gia_3', 'nhan_xet'] as $key) {
@@ -127,7 +135,7 @@ class ExportEvaluationWordAction extends Action
     }
 
     /**
-     * Flatten evaluation_details into one row per mục tiêu entry.
+     * Flatten evaluation_details into one row per mục tiêu entry, inserting subheaders when needed.
      */
     protected function buildFlatRows(array $details): array
     {
@@ -138,27 +146,73 @@ class ExportEvaluationWordAction extends Action
             $mucList = (array) ($detail['muc_tieu'] ?? []);
             $count   = count($mucList);
 
-            if ($count === 0) {
-                $rows[] = [
-                    'linh_vuc'          => $linhVuc,
-                    'is_first_in_group' => true,
-                    'is_only_in_group'  => true,
-                    'content'           => '',
-                    'danh_gia'          => null,
-                    'nhan_xet'          => '',
-                ];
-                continue;
+            $lines = explode("\n", $linhVuc);
+            $parentCategory = '';
+            $subCategory = '';
+            if (count($lines) >= 2) {
+                $parentCategory = trim($lines[0]);
+                $subCategory = trim($lines[1]);
+            } else {
+                $parentCategory = $linhVuc;
             }
 
-            foreach ($mucList as $idx => $goal) {
+            $cleanSubCategory = $subCategory;
+            if (str_starts_with($cleanSubCategory, '- ')) {
+                $cleanSubCategory = substr($cleanSubCategory, 2);
+            }
+            if (str_starts_with($cleanSubCategory, '* ')) {
+                $cleanSubCategory = substr($cleanSubCategory, 2);
+            }
+            $cleanSubCategory = trim($cleanSubCategory, '*_');
+
+            if ($cleanSubCategory !== '') {
+                // Subheader row
                 $rows[] = [
-                    'linh_vuc'          => $linhVuc,
-                    'is_first_in_group' => $idx === 0,
-                    'is_only_in_group'  => $count === 1,
-                    'content'           => (string) ($goal['content'] ?? ''),
-                    'danh_gia'          => $goal['danh_gia'] ?? null,
-                    'nhan_xet'          => (string) ($goal['nhan_xet'] ?? ''),
+                    'type' => 'subheader',
+                    'parent_category' => $parentCategory,
+                    'sub_category' => $cleanSubCategory,
+                    'linh_vuc' => $parentCategory,
+                    'content' => '*' . $cleanSubCategory . '*',
+                    'danh_gia' => null,
+                    'nhan_xet' => '',
                 ];
+
+                // Content rows
+                foreach ($mucList as $goal) {
+                    $rows[] = [
+                        'type' => 'content',
+                        'parent_category' => $parentCategory,
+                        'sub_category' => $cleanSubCategory,
+                        'linh_vuc' => $parentCategory,
+                        'content' => (string) ($goal['content'] ?? ''),
+                        'danh_gia' => $goal['danh_gia'] ?? null,
+                        'nhan_xet' => (string) ($goal['nhan_xet'] ?? ''),
+                    ];
+                }
+            } else {
+                if ($count === 0) {
+                    $rows[] = [
+                        'type' => 'content',
+                        'parent_category' => $parentCategory,
+                        'sub_category' => '',
+                        'linh_vuc' => $parentCategory,
+                        'content' => '',
+                        'danh_gia' => null,
+                        'nhan_xet' => '',
+                    ];
+                } else {
+                    foreach ($mucList as $goal) {
+                        $rows[] = [
+                            'type' => 'content',
+                            'parent_category' => $parentCategory,
+                            'sub_category' => '',
+                            'linh_vuc' => $parentCategory,
+                            'content' => (string) ($goal['content'] ?? ''),
+                            'danh_gia' => $goal['danh_gia'] ?? null,
+                            'nhan_xet' => (string) ($goal['nhan_xet'] ?? ''),
+                        ];
+                    }
+                }
             }
         }
 
@@ -168,13 +222,30 @@ class ExportEvaluationWordAction extends Action
     protected function buildTextRunFromMarkdown(string $text): TextRun
     {
         $textRun = new TextRun();
+        $hasContent = false;
 
-        foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [''] as $lineIndex => $line) {
-            if ($lineIndex > 0) {
+        foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [] as $line) {
+            $line = trim($line);
+
+            if ($line === '') {
+                continue;
+            }
+
+            if ($hasContent) {
                 $textRun->addTextBreak();
             }
 
-            $this->appendMarkdownInlineToTextRun($textRun, trim($line));
+            if (str_starts_with($line, '- ') || str_starts_with($line, '* ')) {
+                $textRun->addText('- ', $this->defaultTextStyle());
+                $line = substr($line, 2);
+            }
+
+            $this->appendMarkdownInlineToTextRun($textRun, $line);
+            $hasContent = true;
+        }
+
+        if (! $hasContent) {
+            $textRun->addText('', $this->defaultTextStyle());
         }
 
         return $textRun;
@@ -225,13 +296,9 @@ class ExportEvaluationWordAction extends Action
     }
 
     /**
-     * Add <w:vMerge> attributes to the linh_vuc column cells for grouped rows.
-     *
-     * First row in a group  → <w:vMerge w:val="restart"/>
-     * Continuation rows     → <w:vMerge/> + paragraph content cleared
-     * Single-row groups     → no change
+     * Apply horizontal gridSpan merges for subheaders and vertical vMerge merges for parent categories in Evaluation.
      */
-    protected function applyVerticalMerges(TemplateProcessor $tp, array $flatRows): void
+    protected function applyCellMerges(TemplateProcessor $tp, array $flatRows): void
     {
         $reflProp = new \ReflectionProperty(TemplateProcessor::class, 'tempDocumentMainPart');
         $reflProp->setAccessible(true);
@@ -246,49 +313,142 @@ class ExportEvaluationWordAction extends Action
         $xpath = new \DOMXPath($dom);
         $xpath->registerNamespace('w', $wNs);
 
+        // Group rows by parent_category to apply vertical vMerge
+        $groups = [];
+        $currentParent = null;
+        $currentStartIndex = null;
+
         foreach ($flatRows as $i => $row) {
-            if ($row['is_only_in_group']) {
+            $parent = $row['parent_category'];
+            if ($parent !== $currentParent) {
+                if ($currentParent !== null) {
+                    $groups[] = [
+                        'start' => $currentStartIndex,
+                        'end' => $i - 1,
+                    ];
+                }
+                $currentParent = $parent;
+                $currentStartIndex = $i;
+            }
+        }
+        if ($currentParent !== null) {
+            $groups[] = [
+                'start' => $currentStartIndex,
+                'end' => count($flatRows) - 1,
+            ];
+        }
+
+        foreach ($groups as $group) {
+            $start = $group['start'];
+            $end = $group['end'];
+            if ($start === $end) {
                 continue;
             }
 
+            for ($i = $start; $i <= $end; $i++) {
+                $n = $i + 1;
+                $cells = $xpath->query("//w:tc[.//w:t[contains(., 'linh_vuc#{$n}')]]");
+                if ($cells->length === 0) {
+                    continue;
+                }
+                /** @var \DOMElement $cell */
+                $cell = $cells->item(0);
+
+                $tcPr = $xpath->query('w:tcPr', $cell)->item(0);
+                if ($tcPr === null) {
+                    $tcPr = $dom->createElementNS($wNs, 'w:tcPr');
+                    $cell->insertBefore($tcPr, $cell->firstChild);
+                }
+
+                foreach (iterator_to_array($xpath->query('w:vMerge', $tcPr)) as $old) {
+                    $tcPr->removeChild($old);
+                }
+
+                $vMerge = $dom->createElementNS($wNs, 'w:vMerge');
+                if ($i === $start) {
+                    $vMerge->setAttributeNS($wNs, 'w:val', 'restart');
+                } else {
+                    foreach (iterator_to_array($xpath->query('w:p', $cell)) as $p) {
+                        $cell->removeChild($p);
+                    }
+                    $cell->appendChild($dom->createElementNS($wNs, 'w:p'));
+                }
+                $tcPr->appendChild($vMerge);
+            }
+        }
+
+        // Apply gridSpan merges for subheader rows
+        foreach ($flatRows as $i => $row) {
+            if ($row['type'] !== 'subheader') {
+                continue;
+            }
             $n = $i + 1;
 
-            // Locate the <w:tc> element that contains the linh_vuc#N placeholder.
-            $cells = $xpath->query("//w:tc[.//w:t[contains(., 'linh_vuc#{$n}')]]");
+            $cells = $xpath->query("//w:tc[.//w:t[contains(., 'muc_tieu#{$n}')]]");
             if ($cells->length === 0) {
                 continue;
             }
+            /** @var \DOMElement $mucTieuCell */
+            $mucTieuCell = $cells->item(0);
 
-            /** @var \DOMElement $cell */
-            $cell = $cells->item(0);
-
-            // Get or create <w:tcPr>.
-            /** @var \DOMElement|null $tcPr */
-            $tcPr = $xpath->query('w:tcPr', $cell)->item(0);
+            $tcPr = $xpath->query('w:tcPr', $mucTieuCell)->item(0);
             if ($tcPr === null) {
                 $tcPr = $dom->createElementNS($wNs, 'w:tcPr');
-                $cell->insertBefore($tcPr, $cell->firstChild);
+                $mucTieuCell->insertBefore($tcPr, $mucTieuCell->firstChild);
             }
 
-            // Remove any previously existing <w:vMerge>.
-            foreach (iterator_to_array($xpath->query('w:vMerge', $tcPr)) as $old) {
-                $tcPr->removeChild($old);
+            // gridSpan w:val="5" to cover muc_tieu, danh_gia_1, danh_gia_2, danh_gia_3, nhan_xet
+            $gridSpan = $dom->createElementNS($wNs, 'w:gridSpan');
+            $gridSpan->setAttributeNS($wNs, 'w:val', '5');
+            $tcPr->appendChild($gridSpan);
+
+            // Set width to 12049 dxa (sum of the 5 columns)
+            $tcW = $xpath->query('w:tcW', $tcPr)->item(0);
+            if ($tcW !== null) {
+                $tcW->setAttributeNS($wNs, 'w:w', '12049');
             }
 
-            $vMerge = $dom->createElementNS($wNs, 'w:vMerge');
-
-            if ($row['is_first_in_group']) {
-                // Mark this as the start of the merged region.
-                $vMerge->setAttributeNS($wNs, 'w:val', 'restart');
-            } else {
-                // Continuation cell: clear all paragraphs and replace with one empty paragraph.
-                foreach (iterator_to_array($xpath->query('w:p', $cell)) as $p) {
-                    $cell->removeChild($p);
+            /** @var \DOMElement|null $p */
+            $p = $xpath->query('w:p', $mucTieuCell)->item(0);
+            if ($p !== null) {
+                $pPr = $xpath->query('w:pPr', $p)->item(0);
+                if ($pPr === null) {
+                    $pPr = $dom->createElementNS($wNs, 'w:pPr');
+                    $p->insertBefore($pPr, $p->firstChild);
                 }
-                $cell->appendChild($dom->createElementNS($wNs, 'w:p'));
+                $jc = $xpath->query('w:jc', $pPr)->item(0);
+                if ($jc !== null) {
+                    $pPr->removeChild($jc);
+                }
+                $newJc = $dom->createElementNS($wNs, 'w:jc');
+                $newJc->setAttributeNS($wNs, 'w:val', 'center');
+                $pPr->appendChild($newJc);
             }
 
-            $tcPr->appendChild($vMerge);
+            // Remove sibling cells in subheader row
+            foreach (['danh_gia_1', 'danh_gia_2', 'danh_gia_3', 'nhan_xet'] as $key) {
+                $remCells = $xpath->query("//w:tc[.//w:t[contains(., '{$key}#{$n}')]]");
+                if ($remCells->length > 0) {
+                    $remCell = $remCells->item(0);
+                    $remCell->parentNode->removeChild($remCell);
+                }
+            }
+
+            // Remove trHeight to let height fit content automatically
+            $tr = $mucTieuCell->parentNode;
+            $trPr = $xpath->query('w:trPr', $tr)->item(0);
+            if ($trPr !== null) {
+                foreach (iterator_to_array($xpath->query('w:trHeight', $trPr)) as $heightNode) {
+                    $trPr->removeChild($heightNode);
+                }
+            }
+
+            // Shade only the merged cell in this row in light gray
+            $shd = $dom->createElementNS($wNs, 'w:shd');
+            $shd->setAttributeNS($wNs, 'w:val', 'clear');
+            $shd->setAttributeNS($wNs, 'w:color', 'auto');
+            $shd->setAttributeNS($wNs, 'w:fill', 'F2F2F2');
+            $tcPr->appendChild($shd);
         }
 
         $reflProp->setValue($tp, $dom->saveXML($dom->documentElement));

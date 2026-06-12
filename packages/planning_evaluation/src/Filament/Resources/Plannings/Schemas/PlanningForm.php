@@ -47,28 +47,134 @@ class PlanningForm
                     ->label(trans('packages.planning_evaluation::planning.fields.details'))
                     ->default([
                         [
-                            'linh_vuc' => [['content' => '**Vận động**']],
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng tiền đề**'],
+                                ['content' => '- Chú ý'],
+                            ],
                             'muc_tieu' => [],
                             'hoat_dong' => [],
                             'phuong_tien' => [],
                             'muc_tieu_du_phong' => [],
                         ],
                         [
-                            'linh_vuc' => [['content' => '**Nhận thức**']],
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng tiền đề**'],
+                                ['content' => '- Bắt chước'],
+                            ],
                             'muc_tieu' => [],
                             'hoat_dong' => [],
                             'phuong_tien' => [],
                             'muc_tieu_du_phong' => [],
                         ],
                         [
-                            'linh_vuc' => [['content' => '**Ngôn ngữ - giao tiếp**']],
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng tiền đề**'],
+                                ['content' => '- Kỹ năng chơi'],
+                            ],
                             'muc_tieu' => [],
                             'hoat_dong' => [],
                             'phuong_tien' => [],
                             'muc_tieu_du_phong' => [],
                         ],
                         [
-                            'linh_vuc' => [['content' => '**Kỹ năng tình cảm – xã hội**']],
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng tiền đề**'],
+                                ['content' => '- Luân phiên - chờ'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Vận động**'],
+                                ['content' => '- Vận động tinh'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Vận động**'],
+                                ['content' => '- Vận động thô'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Nhận thức**'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng đọc – viết**'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Biểu tượng toán**'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Ngôn ngữ và giao tiếp**'],
+                                ['content' => '- Ngôn ngữ tiếp nhận'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Ngôn ngữ và giao tiếp**'],
+                                ['content' => '- Ngôn ngữ nói'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Cá nhân và xã hội**'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Kỹ năng tự phục vụ**'],
+                            ],
+                            'muc_tieu' => [],
+                            'hoat_dong' => [],
+                            'phuong_tien' => [],
+                            'muc_tieu_du_phong' => [],
+                        ],
+                        [
+                            'linh_vuc' => [
+                                ['content' => '**Cảm xúc**'],
+                            ],
                             'muc_tieu' => [],
                             'hoat_dong' => [],
                             'phuong_tien' => [],
