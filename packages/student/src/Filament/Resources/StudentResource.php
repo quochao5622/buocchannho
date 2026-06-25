@@ -114,6 +114,26 @@ class StudentResource extends Resource
         ]);
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        
+        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+            return $query;
+        }
+        
+        if (auth()->check()) {
+            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
+            if ($employee) {
+                return $query->whereHas('currentAssignment', function ($q) use ($employee) {
+                    $q->where('employee_id', $employee->id);
+                });
+            }
+        }
+        
+        return $query->whereRaw('1=0');
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -194,6 +214,7 @@ class StudentResource extends Resource
                     BulkAction::make('assign_teacher')
                         ->label(trans('packages.planning_evaluation::planning.assignment.assign_teacher_bulk'))
                         ->icon('heroicon-o-user-plus')
+                        ->visible(fn () => auth()->check() && auth()->user()->can('assign_students'))
                         ->form([
                             Select::make('employee_id')
                                 ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))
@@ -229,9 +250,13 @@ class StudentResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            \Quochao56\PlanningEvaluation\Filament\Resources\StudentAssignmentRelationManager::class,
-        ];
+        $relations = [];
+        
+        if (auth()->check() && auth()->user()->can('assign_students')) {
+            $relations[] = \Quochao56\PlanningEvaluation\Filament\Resources\StudentAssignmentRelationManager::class;
+        }
+        
+        return $relations;
     }
 
     public static function getPages(): array

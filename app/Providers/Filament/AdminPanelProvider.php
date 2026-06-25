@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Awcodes\ClockWidget\ClockWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Support\Enums\Width;
 use Quochao56\Employee\EmployeePlugin;
@@ -24,6 +23,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Quochao56\PlanningEvaluation\PlanningEvaluationPlugin;
 use Quochao56\Student\StudentPlugin;
 use Quochao56\Equipment\EquipmentPlugin;
+use Quochao56\Acl\AclPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -69,6 +69,14 @@ class AdminPanelProvider extends PanelProvider
                 StudentPlugin::make(),
                 PlanningEvaluationPlugin::make(),
                 EquipmentPlugin::make(),
+                AclPlugin::make(),
+                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
+            ])
+            ->navigationGroups([
+                trans('packages.student::student.navigation_group'),
+                trans('packages.planning_evaluation::planning.navigation_group'),
+                trans('packages.equipment::equipment.common.navigation_group'),
+                trans('filament-users::user.group'),
             ])
             ->spa()
             ->maxContentWidth(Width::Full)

@@ -32,6 +32,11 @@ class StudentProgressReport extends Page implements HasForms
 
     protected static ?int $navigationSort = 5;
 
+    public static function canAccess(): bool
+    {
+        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('view_progress_reports'));
+    }
+
     protected string $view = 'planning-evaluation::student-progress-report';
 
     public ?int $studentId = null;
@@ -43,7 +48,20 @@ class StudentProgressReport extends Page implements HasForms
                 Select::make('studentId')
                     ->label(trans('packages.planning_evaluation::planning.progress.select_student'))
                     ->placeholder(trans('packages.planning_evaluation::planning.progress.placeholder'))
-                    ->options(Student::query()->where('status', 'active')->pluck('name', 'id'))
+                    ->options(function () {
+                        $query = Student::query()->where('status', 'active');
+                        if (auth()->check() && !auth()->user()->isSuperAdmin()) {
+                            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
+                            if ($employee) {
+                                $query->whereHas('currentAssignment', function ($q) use ($employee) {
+                                    $q->where('employee_id', $employee->id);
+                                });
+                            } else {
+                                $query->whereRaw('1=0');
+                            }
+                        }
+                        return $query->pluck('name', 'id');
+                    })
                     ->required()
                     ->searchable()
                     ->live()

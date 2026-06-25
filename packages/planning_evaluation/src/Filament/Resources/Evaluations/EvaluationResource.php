@@ -44,6 +44,26 @@ class EvaluationResource extends Resource
         return trans('packages.planning_evaluation::evaluation.navigation_group');
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        
+        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+            return $query;
+        }
+        
+        if (auth()->check()) {
+            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
+            if ($employee) {
+                return $query->whereHas('planning.student.currentAssignment', function ($q) use ($employee) {
+                    $q->where('employee_id', $employee->id);
+                });
+            }
+        }
+        
+        return $query->whereRaw('1=0');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return EvaluationForm::configure($schema);
