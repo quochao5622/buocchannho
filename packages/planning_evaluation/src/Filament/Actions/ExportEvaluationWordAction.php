@@ -23,7 +23,7 @@ class ExportEvaluationWordAction extends Action
     {
         parent::setUp();
 
-        $this->label('Xuất Word');
+        $this->label(trans('packages.planning_evaluation::planning.actions.export_word'));
         $this->icon(Heroicon::OutlinedDocumentArrowDown);
         $this->color('info');
 

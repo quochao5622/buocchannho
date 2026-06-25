@@ -56,7 +56,9 @@ class EvaluationResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\EvaluationHistoryRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

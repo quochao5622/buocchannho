@@ -40,6 +40,16 @@ class Employee extends Model
         return $this->hasMany(\Quochao56\PlanningEvaluation\Models\Planning::class, 'employee_id');
     }
 
+    public function students()
+    {
+        return $this->belongsToMany(
+            \Quochao56\Student\Models\Student::class,
+            'student_assignments',
+            'employee_id',
+            'student_id'
+        )->whereNull('student_assignments.unassigned_at');
+    }
+
     public function setNameAttribute($value)
     {
         // strip tags and trim whitespace

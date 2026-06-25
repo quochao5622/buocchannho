@@ -21,6 +21,7 @@ return [
         'avatar' => 'Ảnh đại diện',
         'dob' => 'Ngày sinh',
         'gender' => 'Giới tính',
+        'students_count' => 'Số lượng học sinh',
     ],
     'employment_type' => [
         'full_time' => 'Toàn thời gian',

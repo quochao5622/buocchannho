@@ -5,6 +5,7 @@ namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Schemas;
 use App\Enum\BaseStatusEnum;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
+use Quochao56\Employee\Models\Employee;
 
 class PlanningForm
 {
@@ -20,11 +21,23 @@ class PlanningForm
                 \Filament\Forms\Components\Select::make('employee_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.employee'))
                     ->relationship('employee', 'name')
-                    ->default(4)
+                    ->default(function () {
+                        $studentId = request()->query('student_id');
+                        if ($studentId) {
+                            $student = \Quochao56\Student\Models\Student::find($studentId);
+                            return $student?->currentAssignment?->employee_id ?? 4;
+                        }
+                        $email = auth()->user()->email;
+                        if ($email) {
+                            return Employee::where('email', $email)->first()?->id;
+                        }
+                        return 4;
+                    })
                     ->searchable(),
                 \Filament\Forms\Components\Select::make('student_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
                     ->relationship('student', 'name')
+                    ->default(fn() => request()->query('student_id'))
                     ->searchable(),
                 \Filament\Forms\Components\DatePicker::make('start_date')
                     ->label(trans('packages.planning_evaluation::planning.fields.start_date'))
@@ -35,14 +48,14 @@ class PlanningForm
                     ->native(false)
                     ->displayFormat('d/m/Y'),
                 Select::make('status')
-                ->label(trans('packages.planning_evaluation::planning.fields.status'))
-                ->options([
-                    BaseStatusEnum::Published->value   => BaseStatusEnum::Published->getLabel(),
-                    BaseStatusEnum::Pending->value   => BaseStatusEnum::Pending->getLabel(),
-                    BaseStatusEnum::Draft->value   => BaseStatusEnum::Draft->getLabel(),
-                ])
-                ->default(BaseStatusEnum::Published->value)
-                ->required(),
+                    ->label(trans('packages.planning_evaluation::planning.fields.status'))
+                    ->options([
+                        BaseStatusEnum::Published->value   => BaseStatusEnum::Published->getLabel(),
+                        BaseStatusEnum::Pending->value   => BaseStatusEnum::Pending->getLabel(),
+                        BaseStatusEnum::Draft->value   => BaseStatusEnum::Draft->getLabel(),
+                    ])
+                    ->default(BaseStatusEnum::Published->value)
+                    ->required(),
                 \Filament\Forms\Components\Repeater::make('planning_details')
                     ->label(trans('packages.planning_evaluation::planning.fields.details'))
                     ->default([

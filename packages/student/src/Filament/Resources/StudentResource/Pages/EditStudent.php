@@ -13,6 +13,13 @@ class EditStudent extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('create_planning')
+                ->label(trans('packages.planning_evaluation::planning.actions.create_plan'))
+                ->icon('heroicon-o-document-plus')
+                ->color('success')
+                ->url(fn (): string => \Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource::getUrl('create', [
+                    'student_id' => $this->getRecord()->id
+                ])),
             DeleteAction::make(),
         ];
     }

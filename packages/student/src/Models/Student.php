@@ -33,6 +33,29 @@ class Student extends Model
     {
         return $this->hasMany(\Quochao56\PlanningEvaluation\Models\Planning::class, 'student_id');
     }
+
+    public function assignments()
+    {
+        return $this->hasMany(\Quochao56\PlanningEvaluation\Models\StudentAssignment::class, 'student_id');
+    }
+
+    public function currentAssignment()
+    {
+        return $this->hasOne(\Quochao56\PlanningEvaluation\Models\StudentAssignment::class, 'student_id')
+            ->whereNull('unassigned_at');
+    }
+
+    public function currentTeacher()
+    {
+        return $this->hasOneThrough(
+            \Quochao56\Employee\Models\Employee::class,
+            \Quochao56\PlanningEvaluation\Models\StudentAssignment::class,
+            'student_id',
+            'id',
+            'id',
+            'employee_id'
+        )->whereNull('student_assignments.unassigned_at');
+    }
     public function setNameAttribute($value)
     {
         // strip tags and trim whitespace

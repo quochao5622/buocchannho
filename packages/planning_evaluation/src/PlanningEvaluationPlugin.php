@@ -4,6 +4,8 @@ namespace Quochao56\PlanningEvaluation;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 
 class PlanningEvaluationPlugin implements Plugin
 {
@@ -15,8 +17,11 @@ class PlanningEvaluationPlugin implements Plugin
     public function register(Panel $panel): void
     {
         $panel->resources([
-            Filament\Resources\Plannings\PlanningResource::class,
-            Filament\Resources\Evaluations\EvaluationResource::class,
+            PlanningResource::class,
+            EvaluationResource::class,
+        ])->pages([
+            \Quochao56\PlanningEvaluation\Filament\Pages\PlanningEvaluationTracker::class,
+            \Quochao56\PlanningEvaluation\Filament\Pages\StudentProgressReport::class,
         ]);
     }
 

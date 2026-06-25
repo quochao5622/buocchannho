@@ -59,7 +59,7 @@ class EmployeeResource extends Resource
             TextInput::make('employee_code')
                 ->label(trans('packages.employee::employee.fields.employee_code'))
                 ->maxLength(50)
-                ->unique(ignoreRecord: true),
+                ->unique(table: 'employees', column: 'employee_code', ignoreRecord: true),
 
             TextInput::make('name')
                 ->label(trans('packages.employee::employee.fields.name'))
@@ -69,7 +69,7 @@ class EmployeeResource extends Resource
             TextInput::make('email')
                 ->label(trans('packages.employee::employee.fields.email'))
                 ->email()
-                ->unique(ignoreRecord: true)
+                ->unique(table: 'employees', column: 'email', ignoreRecord: true)
                 ->maxLength(255),
 
             Select::make('gender')
@@ -160,9 +160,6 @@ class EmployeeResource extends Resource
                 TextColumn::make('phone')
                     ->label(trans('packages.employee::employee.fields.phone')),
 
-                TextColumn::make('address')
-                    ->label(trans('packages.employee::employee.fields.address')),
-
 
                 TextColumn::make('position')
                     ->label(trans('packages.employee::employee.fields.position'))
@@ -171,6 +168,13 @@ class EmployeeResource extends Resource
                 TextColumn::make('employment_type')
                     ->label(trans('packages.employee::employee.fields.employment_type'))
                     ->badge()
+                    ->color(fn(?string $state): string => match ($state) {
+                        'full-time' => 'success',
+                        'part-time' => 'warning',
+                        'intern' => 'info',
+                        'contract' => 'gray',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn(?string $state): string => match ($state) {
                         'full-time' => trans('packages.employee::employee.employment_type.full_time'),
                         'part-time' => trans('packages.employee::employee.employment_type.part_time'),
@@ -179,21 +183,23 @@ class EmployeeResource extends Resource
                         default => $state ?? '-',
                     }),
 
+                TextColumn::make('students_count')
+                    ->counts('students')
+                    ->label(trans('packages.employee::employee.fields.students_count'))
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
+
                 TextColumn::make('hired_at')
                     ->label(trans('packages.employee::employee.fields.hired_at'))
                     ->date('d/m/Y')
                     ->sortable(),
 
-                TextColumn::make('probation_end_at')
-                    ->label(trans('packages.employee::employee.fields.probation_end_at'))
-                    ->date('d/m/Y')
-                    ->sortable(),
-
-
 
                 TextColumn::make('status')
                     ->label(trans('packages.employee::employee.fields.status'))
                     ->badge()
+                    ->color(fn ($state): string => $state instanceof BaseStatusEnum ? $state->getColor() : ($state === 'active' ? 'success' : 'danger')),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -221,6 +227,13 @@ class EmployeeResource extends Resource
                     DeleteBulkAction::make()
                 ])
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \Quochao56\PlanningEvaluation\Filament\Resources\StudentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

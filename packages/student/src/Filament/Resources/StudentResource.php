@@ -16,6 +16,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Actions\BulkAction;
+use App\Enum\BaseStatusEnum;
 use Quochao56\Student\Filament\Resources\StudentResource\Pages\CreateStudent;
 use Quochao56\Student\Filament\Resources\StudentResource\Pages\EditStudent;
 use Quochao56\Student\Filament\Resources\StudentResource\Pages\ListStudents;
@@ -58,7 +60,7 @@ class StudentResource extends Resource
             TextInput::make('student_code')
                 ->label(trans('packages.student::student.fields.student_code'))
                 ->maxLength(50)
-                ->unique(ignoreRecord: true),
+                ->unique(table: 'students', column: 'student_code', ignoreRecord: true),
             TextInput::make('name')
                 ->label(trans('packages.student::student.fields.name'))
                 ->required()
@@ -177,14 +179,59 @@ class StudentResource extends Resource
                     ])
             ])
             ->actions([
+                \Filament\Actions\Action::make('create_planning')
+                    ->label(trans('packages.planning_evaluation::planning.actions.create_plan'))
+                    ->icon('heroicon-o-document-plus')
+                    ->color('success')
+                    ->url(fn (Student $record) => \Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource::getUrl('create', [
+                        'student_id' => $record->id
+                    ])),
                 EditAction::make(),
                 DeleteAction::make()
             ])
             ->bulkActions([
                 ActionsBulkActionGroup::make([
+                    BulkAction::make('assign_teacher')
+                        ->label(trans('packages.planning_evaluation::planning.assignment.assign_teacher_bulk'))
+                        ->icon('heroicon-o-user-plus')
+                        ->form([
+                            Select::make('employee_id')
+                                ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))
+                                ->options(\Quochao56\Employee\Models\Employee::query()->where('status', BaseStatusEnum::Active->value ?? BaseStatusEnum::Active)->pluck('name', 'id'))
+                                ->required()
+                                ->searchable(),
+                            DatePicker::make('assigned_at')
+                                ->label(trans('packages.planning_evaluation::planning.assignment.assign_date'))
+                                ->default(now())
+                                ->native(false)
+                                ->displayFormat('d/m/Y')
+                                ->required(),
+                        ])
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
+                            foreach ($records as $student) {
+                                // 1. Close current active assignment
+                                $student->assignments()
+                                    ->whereNull('unassigned_at')
+                                    ->update(['unassigned_at' => $data['assigned_at']]);
+                                    
+                                // 2. Create new assignment
+                                $student->assignments()->create([
+                                    'employee_id' => $data['employee_id'],
+                                    'assigned_at' => $data['assigned_at'],
+                                ]);
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make()
                 ])
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \Quochao56\PlanningEvaluation\Filament\Resources\StudentAssignmentRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
