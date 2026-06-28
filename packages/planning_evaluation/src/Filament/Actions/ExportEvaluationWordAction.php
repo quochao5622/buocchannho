@@ -374,6 +374,7 @@ class ExportEvaluationWordAction extends Action
                     $cell->appendChild($dom->createElementNS($wNs, 'w:p'));
                 }
                 $tcPr->appendChild($vMerge);
+                $this->sortTableCellProperties($tcPr);
             }
         }
 
@@ -449,8 +450,56 @@ class ExportEvaluationWordAction extends Action
             $shd->setAttributeNS($wNs, 'w:color', 'auto');
             $shd->setAttributeNS($wNs, 'w:fill', 'F2F2F2');
             $tcPr->appendChild($shd);
+
+            $this->sortTableCellProperties($tcPr);
         }
 
-        $reflProp->setValue($tp, $dom->saveXML($dom->documentElement));
+        $reflProp->setValue($tp, $dom->saveXML());
+    }
+
+    /**
+     * Sort children of w:tcPr element to match the sequence required by the OpenXML schema.
+     */
+    protected function sortTableCellProperties(\DOMElement $tcPr): void
+    {
+        $order = [
+            'cnfStyle' => 1,
+            'tcW' => 2,
+            'gridSpan' => 3,
+            'hMerge' => 4,
+            'vMerge' => 5,
+            'tcBorders' => 6,
+            'shd' => 7,
+            'noWrap' => 8,
+            'tcMar' => 9,
+            'textDirection' => 10,
+            'tcFitText' => 11,
+            'vAlign' => 12,
+            'hideMark' => 13,
+            'tcPrChange' => 14,
+        ];
+
+        $children = [];
+        foreach ($tcPr->childNodes as $child) {
+            if ($child instanceof \DOMElement) {
+                $children[] = $child;
+            }
+        }
+
+        usort($children, function ($a, $b) use ($order) {
+            $aName = $a->localName;
+            $bName = $b->localName;
+            $aOrder = $order[$aName] ?? 999;
+            $bOrder = $order[$bName] ?? 999;
+            return $aOrder <=> $bOrder;
+        });
+
+        while ($tcPr->hasChildNodes()) {
+            $tcPr->removeChild($tcPr->firstChild);
+        }
+
+        foreach ($children as $child) {
+            $tcPr->appendChild($child);
+        }
     }
 }
