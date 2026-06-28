@@ -40,7 +40,13 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Quochao56\\Core\\": "packages/core/src/",
+            "Quochao56\\Acl\\": "packages/acl/src/",
+            "Quochao56\\Employee\\": "packages/employee/src/",
+            "Quochao56\\Equipment\\": "packages/equipment/src/",
+            "Quochao56\\PlanningEvaluation\\": "packages/planning_evaluation/src/",
+            "Quochao56\\Student\\": "packages/student/src/"
         }
     },
     "autoload-dev": {

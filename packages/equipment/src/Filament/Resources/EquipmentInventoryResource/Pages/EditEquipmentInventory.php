@@ -9,6 +9,8 @@ use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource;
 
 class EditEquipmentInventory extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = EquipmentInventoryResource::class;
 
     protected function getHeaderActions(): array

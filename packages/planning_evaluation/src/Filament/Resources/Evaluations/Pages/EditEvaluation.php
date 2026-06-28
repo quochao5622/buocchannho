@@ -12,6 +12,8 @@ use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 
 class EditEvaluation extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = EvaluationResource::class;
 
     public function getBreadcrumbs(): array

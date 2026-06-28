@@ -8,6 +8,8 @@ use Quochao56\Student\Filament\Resources\StudentResource;
 
 class EditStudent extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = StudentResource::class;
 
     protected function getHeaderActions(): array

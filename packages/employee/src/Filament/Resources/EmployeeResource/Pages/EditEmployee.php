@@ -8,6 +8,8 @@ use Quochao56\Employee\Filament\Resources\EmployeeResource;
 
 class EditEmployee extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = EmployeeResource::class;
 
     protected function getHeaderActions(): array

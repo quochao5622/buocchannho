@@ -8,6 +8,8 @@ use Quochao56\Equipment\Filament\Resources\EquipmentResource;
 
 class EditEquipment extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = EquipmentResource::class;
 
     protected function getHeaderActions(): array

@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditRole extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = RoleResource::class;
 
     protected function getHeaderActions(): array

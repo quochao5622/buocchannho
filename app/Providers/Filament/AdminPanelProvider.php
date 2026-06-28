@@ -73,10 +73,14 @@ class AdminPanelProvider extends PanelProvider
                 \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
             ])
             ->navigationGroups([
-                trans('packages.student::student.navigation_group'),
-                trans('packages.planning_evaluation::planning.navigation_group'),
-                trans('packages.equipment::equipment.common.navigation_group'),
-                trans('filament-users::user.group'),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label(trans('packages.student::student.navigation_group')),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label(trans('packages.planning_evaluation::planning.navigation_group')),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label(trans('packages.equipment::equipment.common.navigation_group')),
+                \Filament\Navigation\NavigationGroup::make()
+                    ->label(trans('filament-users::user.group')),
             ])
             ->spa()
             ->maxContentWidth(Width::Full)

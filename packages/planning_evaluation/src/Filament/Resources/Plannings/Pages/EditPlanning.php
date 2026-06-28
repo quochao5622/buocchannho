@@ -13,6 +13,8 @@ use Quochao56\PlanningEvaluation\Models\Evaluation;
 
 class EditPlanning extends EditRecord
 {
+    use \Quochao56\Core\Traits\HasAutoSave;
+
     protected static string $resource = PlanningResource::class;
 
     protected function getHeaderActions(): array
