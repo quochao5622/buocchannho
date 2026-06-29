@@ -2,6 +2,4 @@
 
 namespace Quochao56\PlanningEvaluation;
 
-class Planning {
-
-}
+class Planning {}

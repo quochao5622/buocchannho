@@ -2,7 +2,8 @@
 
 namespace Quochao56\Core\Traits;
 
-use Filament\Forms\Components\Placeholder;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\View;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 
@@ -20,14 +21,14 @@ trait HasAutoSave
         $this->dispatch('notificationSent', notification: $notification->toArray());
     }
 
-    public function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
+    public function form(Schema $schema): Schema
     {
         $schema = parent::form($schema);
 
         $components = $schema->getComponents();
 
         // Chèn trực tiếp view chứa wire:poll vào form
-        $components[] = \Filament\Schemas\Components\View::make('filament.autosave');
+        $components[] = View::make('filament.autosave');
 
         return $schema->components($components);
     }

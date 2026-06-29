@@ -2,28 +2,22 @@
 
 namespace Quochao56\Acl\Filament\Resources;
 
+use Spatie\Permission\PermissionRegistrar;
 use Quochao56\Acl\Filament\Resources\RoleResource\Pages;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\BulkActionGroup;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Builder;
+use Quochao56\Acl\Filament\Resources\RoleResource\Schemas\RoleForm;
+use Quochao56\Acl\Filament\Resources\RoleResource\Tables\RoleTable;
 
 class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
-    protected static ?int $navigationSort = 2;
 
+    protected static ?int $navigationSort = 2;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
@@ -50,13 +44,14 @@ class RoleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         self::syncPermissionsToDatabase();
+
         return parent::getEloquentQuery();
     }
 
     public static function syncPermissionsToDatabase(): void
     {
         // Clear cached permissions to avoid state issues
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $groups = config('permissions', []);
         $activePermissions = [];
@@ -77,84 +72,17 @@ class RoleResource extends Resource
             ->whereNotIn('name', $activePermissions)
             ->delete();
 
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 
     public static function form(Schema $schema): Schema
     {
-        // Sync config permissions to DB before rendering the form
-        self::syncPermissionsToDatabase();
-
-        $groups = config('permissions', []);
-        $sections = [];
-
-        foreach ($groups as $groupKey => $groupConfig) {
-            if (!isset($groupConfig['permissions'])) {
-                continue;
-            }
-
-            $options = $groupConfig['permissions'];
-            $statePathName = 'permissions_group_' . $groupKey;
-            $groupPermNames = array_map(fn($action) => "{$groupKey}.{$action}", array_keys($options));
-
-            $sections[] = Section::make($groupConfig['label'])
-                ->schema([
-                    CheckboxList::make($statePathName)
-                        ->options($options)
-                        ->hiddenLabel()
-                        ->columns(2)
-                        ->dehydrated(false)
-                        ->bulkToggleable()
-                        ->afterStateHydrated(function ($component, $state, ?\Illuminate\Database\Eloquent\Model $record) use ($groupKey, $groupPermNames) {
-                            if (! $record) {
-                                $component->state([]);
-                                return;
-                            }
-                            $selected = $record->permissions->pluck('name')->toArray();
-                            $groupSelected = array_intersect($selected, $groupPermNames);
-                            $actions = array_map(fn($perm) => substr($perm, strlen($groupKey) + 1), $groupSelected);
-                            $component->state(array_values($actions));
-                        }),
-                ])
-                ->collapsible();
-        }
-
-        return $schema
-            ->components(array_merge([
-                TextInput::make('name')
-                    ->label(trans('acl::rbac.fields.name'))
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->placeholder(trans('acl::rbac.fields.name_placeholder'))
-                    ->columnSpanFull(),
-            ], $sections))
-            ->columns(2);
+        return RoleForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(trans('acl::rbac.fields.name'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('permissions_count')
-                    ->label(trans('acl::rbac.fields.permissions_count'))
-                    ->counts('permissions'),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return RoleTable::configure($table);
     }
 
     public static function getRelations(): array

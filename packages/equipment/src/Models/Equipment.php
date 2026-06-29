@@ -2,6 +2,7 @@
 
 namespace Quochao56\Equipment\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,17 +37,21 @@ class Equipment extends Model
             'missing' => 'Mất tích',
         ];
     }
+
     public function setEquipmentCodeAttribute(string $value): void
     {
         $this->attributes['equipment_code'] = $this->generateCode();
     }
+
     public function generateCode(): string
     {
         if (empty($this->attributes['equipment_code'])) {
             $latestEquipment = static::latest()->first();
             $latestCode = $latestEquipment ? (int) str_replace('HC', '', $latestEquipment->equipment_code) : 0;
-            return 'HC' . str_pad($latestCode + 1, 5, '0', STR_PAD_LEFT);
+
+            return 'HC'.str_pad($latestCode + 1, 5, '0', STR_PAD_LEFT);
         }
+
         return $this->attributes['equipment_code'];
     }
 
@@ -54,7 +59,7 @@ class Equipment extends Model
     {
         static::deleting(function (Equipment $equipment) {
             if ($equipment->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($equipment->image);
+                Storage::disk('public')->delete($equipment->image);
             }
         });
 
@@ -62,7 +67,7 @@ class Equipment extends Model
             if ($equipment->isDirty('image')) {
                 $oldImage = $equipment->getOriginal('image');
                 if ($oldImage) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+                    Storage::disk('public')->delete($oldImage);
                 }
             }
         });

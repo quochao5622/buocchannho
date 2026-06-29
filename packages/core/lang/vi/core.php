@@ -10,9 +10,9 @@ return [
         ],
     ],
     'gender' => [
-        'male' => "Nam",
-        'female' => "Nữ",
-        'other' => "Khác",
+        'male' => 'Nam',
+        'female' => 'Nữ',
+        'other' => 'Khác',
     ],
     'messages' => [
         'autosaved' => 'Đã tự động lưu',

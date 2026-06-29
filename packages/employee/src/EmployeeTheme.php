@@ -18,7 +18,7 @@ class EmployeeTheme implements Plugin
     public function register(Panel $panel): void
     {
         FilamentAsset::register([
-            Theme::make('employee', __DIR__ . '/../resources/dist/employee.css'),
+            Theme::make('employee', __DIR__.'/../resources/dist/employee.css'),
         ]);
 
         $panel

@@ -29,4 +29,3 @@ return new class extends Migration
         Schema::dropIfExists('equipment_inventory_details');
     }
 };
-

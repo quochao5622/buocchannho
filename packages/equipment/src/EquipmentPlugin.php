@@ -34,4 +34,3 @@ class EquipmentPlugin implements Plugin
         return app(static::class);
     }
 }
-

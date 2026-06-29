@@ -1,4 +1,5 @@
 <?php
+
 namespace Quochao56\PlanningEvaluation\Models;
 
 use App\Enum\BaseStatusEnum;
@@ -47,12 +48,13 @@ class Evaluation extends Model
                 $array[$key] = str_replace("\t", ' ', $value);
             }
         }
+
         return $array;
     }
 
     public function planning()
     {
-        return $this->belongsTo(\Quochao56\PlanningEvaluation\Models\Planning::class, 'planning_id');
+        return $this->belongsTo(Planning::class, 'planning_id');
     }
 
     public function histories()

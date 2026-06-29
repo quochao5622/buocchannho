@@ -34,15 +34,15 @@ class ExportEvaluationWordAction extends Action
         $this->action(function (Model $record): BinaryFileResponse {
             $record->loadMissing(['planning.student']);
 
-            $planning   = $record->planning;
-            $student    = $planning?->student;
+            $planning = $record->planning;
+            $student = $planning?->student;
             $startMonth = $planning?->start_date?->format('n') ?? 'unknown';
-            $endMonth   = $planning?->end_date?->format('n') ?? 'unknown';
-            $timeRange  = "T{$startMonth}-T{$endMonth}";
+            $endMonth = $planning?->end_date?->format('n') ?? 'unknown';
+            $timeRange = "T{$startMonth}-T{$endMonth}";
             $studentName = mb_strtoupper($student?->name ?? 'unknown', 'UTF-8');
             $studentName = implode(' ', array_slice(explode(' ', $studentName), -2));
 
-            $outputFile = 'KQDG_' . $studentName . "_{$timeRange}_" . time() . '.docx';
+            $outputFile = 'KQDG_'.$studentName."_{$timeRange}_".time().'.docx';
 
             $path = $this->generateWordFile($record, $outputFile);
 
@@ -52,16 +52,16 @@ class ExportEvaluationWordAction extends Action
 
     protected function generateWordFile(Model $record, string $outputFile): string
     {
-        $templatePath = realpath(__DIR__ . '/../../../resources/templates/template_KQDG.docx');
+        $templatePath = realpath(__DIR__.'/../../../resources/templates/template_KQDG.docx');
 
-        if (! $templatePath || ! file_exists($templatePath)) {
-            throw new FileNotFoundException('Template not found at: ' . $templatePath);
+        if (!$templatePath || !file_exists($templatePath)) {
+            throw new FileNotFoundException('Template not found at: '.$templatePath);
         }
 
         $record->loadMissing(['planning.student', 'planning.employee']);
 
         $planning = $record->planning;
-        $student  = $planning?->student;
+        $student = $planning?->student;
         $employee = $planning?->employee;
 
         $genderMap = ['male' => 'Nam', 'female' => 'Nữ', 'other' => 'Khác'];
@@ -69,7 +69,7 @@ class ExportEvaluationWordAction extends Action
         $time = '';
         if ($planning?->start_date && $planning?->end_date) {
             $months = (int) $planning->end_date->format('n') - (int) $planning->start_date->format('n') + 1;
-            $time   = $months . ' tháng';
+            $time = $months.' tháng';
         }
 
         $templateProcessor = new TemplateProcessor($templatePath);
@@ -81,9 +81,9 @@ class ExportEvaluationWordAction extends Action
         $templateProcessor->setValue('employee_name', (string) ($employee?->name ?? ''));
         $templateProcessor->setValue('time',          $time);
 
-        $details  = $record->evaluation_details ?? [];
+        $details = $record->evaluation_details ?? [];
         $flatRows = $this->buildFlatRows($details);
-        $total    = count($flatRows);
+        $total = count($flatRows);
 
         if ($total > 0) {
             $templateProcessor->cloneRow('linh_vuc', $total);
@@ -92,7 +92,7 @@ class ExportEvaluationWordAction extends Action
             $this->applyCellMerges($templateProcessor, $flatRows);
 
             foreach ($flatRows as $i => $row) {
-                $n       = $i + 1;
+                $n = $i + 1;
                 $danhGia = $row['danh_gia'] ?? null;
 
                 if ($row['type'] === 'subheader') {
@@ -106,9 +106,9 @@ class ExportEvaluationWordAction extends Action
                     $templateProcessor->setComplexValue("linh_vuc#{$n}", $this->buildTextRunFromMarkdown((string) $row['linh_vuc']));
                     $templateProcessor->setComplexValue("muc_tieu#{$n}", $this->buildTextRunFromMarkdown((string) $row['content']));
                     $templateProcessor->setComplexValue("nhan_xet#{$n}", $this->buildTextRunFromMarkdown((string) ($row['nhan_xet'] ?? '')));
-                    $templateProcessor->setValue("danh_gia_1#{$n}", $danhGia === '+'   ? '+' : '');
+                    $templateProcessor->setValue("danh_gia_1#{$n}", $danhGia === '+' ? '+' : '');
                     $templateProcessor->setValue("danh_gia_2#{$n}", $danhGia === '+/-' ? '+/-' : '');
-                    $templateProcessor->setValue("danh_gia_3#{$n}", $danhGia === '-'   ? '-' : '');
+                    $templateProcessor->setValue("danh_gia_3#{$n}", $danhGia === '-' ? '-' : '');
                 }
             }
         } else {
@@ -117,17 +117,17 @@ class ExportEvaluationWordAction extends Action
             }
         }
 
-        $disk      = Storage::disk('local');
+        $disk = Storage::disk('local');
         $directory = 'exports/evaluations';
 
-        if (! $disk->exists($directory)) {
+        if (!$disk->exists($directory)) {
             $disk->makeDirectory($directory);
         }
 
-        $relativePath = $directory . '/' . $outputFile;
+        $relativePath = $directory.'/'.$outputFile;
         $templateProcessor->saveAs($disk->path($relativePath));
 
-        if (! $disk->exists($relativePath)) {
+        if (!$disk->exists($relativePath)) {
             throw new FileNotFoundException($relativePath);
         }
 
@@ -144,7 +144,7 @@ class ExportEvaluationWordAction extends Action
         foreach ($details as $detail) {
             $linhVuc = (string) ($detail['linh_vuc'] ?? '');
             $mucList = (array) ($detail['muc_tieu'] ?? []);
-            $count   = count($mucList);
+            $count = count($mucList);
 
             $lines = explode("\n", $linhVuc);
             $parentCategory = '';
@@ -172,7 +172,7 @@ class ExportEvaluationWordAction extends Action
                     'parent_category' => $parentCategory,
                     'sub_category' => $cleanSubCategory,
                     'linh_vuc' => $parentCategory,
-                    'content' => '*' . $cleanSubCategory . '*',
+                    'content' => '*'.$cleanSubCategory.'*',
                     'danh_gia' => null,
                     'nhan_xet' => '',
                 ];
@@ -221,7 +221,7 @@ class ExportEvaluationWordAction extends Action
 
     protected function buildTextRunFromMarkdown(string $text): TextRun
     {
-        $textRun = new TextRun();
+        $textRun = new TextRun;
         $hasContent = false;
 
         foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [] as $line) {
@@ -244,7 +244,7 @@ class ExportEvaluationWordAction extends Action
             $hasContent = true;
         }
 
-        if (! $hasContent) {
+        if (!$hasContent) {
             $textRun->addText('', $this->defaultTextStyle());
         }
 
@@ -309,7 +309,7 @@ class ExportEvaluationWordAction extends Action
         $dom->loadXML($xml);
         libxml_clear_errors();
 
-        $wNs   = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+        $wNs = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
         $xpath = new \DOMXPath($dom);
         $xpath->registerNamespace('w', $wNs);
 
@@ -491,6 +491,7 @@ class ExportEvaluationWordAction extends Action
             $bName = $b->localName;
             $aOrder = $order[$aName] ?? 999;
             $bOrder = $order[$bName] ?? 999;
+
             return $aOrder <=> $bOrder;
         });
 

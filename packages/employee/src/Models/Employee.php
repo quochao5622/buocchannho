@@ -2,6 +2,8 @@
 
 namespace Quochao56\Employee\Models;
 
+use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\Student\Models\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enum\BaseStatusEnum;
@@ -37,13 +39,13 @@ class Employee extends Model
 
     public function plannings()
     {
-        return $this->hasMany(\Quochao56\PlanningEvaluation\Models\Planning::class, 'employee_id');
+        return $this->hasMany(Planning::class, 'employee_id');
     }
 
     public function students()
     {
         return $this->belongsToMany(
-            \Quochao56\Student\Models\Student::class,
+            Student::class,
             'student_assignments',
             'employee_id',
             'student_id'

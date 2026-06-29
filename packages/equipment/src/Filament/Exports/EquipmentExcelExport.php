@@ -41,7 +41,7 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
 
             $row = $index + 2;
 
-            $drawing = new Drawing();
+            $drawing = new Drawing;
             $drawing->setPath($resizedPath);
             $drawing->setCoordinates("A{$row}");
             $drawing->setHeight(130);
@@ -137,6 +137,7 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
         $dstImg = @imagecreatetruecolor($targetWidth, $targetHeight);
         if (!$dstImg) {
             @imagedestroy($srcImg);
+
             return $originalPath;
         }
 
@@ -150,6 +151,7 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
         if (!@imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height)) {
             @imagedestroy($srcImg);
             @imagedestroy($dstImg);
+
             return $originalPath;
         }
 
@@ -158,12 +160,14 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
             if (@imagejpeg($dstImg, $tempPath, 75)) {
                 @imagedestroy($srcImg);
                 @imagedestroy($dstImg);
+
                 return $tempPath;
             }
         }
 
         @imagedestroy($srcImg);
         @imagedestroy($dstImg);
+
         return $originalPath;
     }
 }

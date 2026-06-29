@@ -2,6 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Quochao56\Employee\Models\Employee;
 use App\Enum\BaseStatusEnum;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -17,7 +19,7 @@ class StudentAssignmentRelationManager extends RelationManager
 
     protected static ?string $title = null;
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return trans('packages.planning_evaluation::planning.assignment.title');
     }
@@ -27,7 +29,7 @@ class StudentAssignmentRelationManager extends RelationManager
         return $schema->components([
             Select::make('employee_id')
                 ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))
-                ->options(\Quochao56\Employee\Models\Employee::query()->pluck('name', 'id'))
+                ->options(Employee::query()->pluck('name', 'id'))
                 ->required()
                 ->searchable(),
             DateTimePicker::make('assigned_at')
@@ -70,7 +72,7 @@ class StudentAssignmentRelationManager extends RelationManager
                     ->form([
                         Select::make('employee_id')
                             ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))
-                            ->options(\Quochao56\Employee\Models\Employee::query()->where('status', BaseStatusEnum::Active->value ?? BaseStatusEnum::Active)->pluck('name', 'id'))
+                            ->options(Employee::query()->where('status', BaseStatusEnum::Active->value ?? BaseStatusEnum::Active)->pluck('name', 'id'))
                             ->required()
                             ->searchable(),
                         DateTimePicker::make('assigned_at')
@@ -82,12 +84,12 @@ class StudentAssignmentRelationManager extends RelationManager
                     ])
                     ->action(function (array $data): void {
                         $student = $this->getOwnerRecord();
-                        
+
                         // 1. Close current active assignment
                         $student->assignments()
                             ->whereNull('unassigned_at')
                             ->update(['unassigned_at' => $data['assigned_at']]);
-                            
+
                         // 2. Create new assignment
                         $student->assignments()->create([
                             'employee_id' => $data['employee_id'],

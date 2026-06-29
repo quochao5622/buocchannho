@@ -2,6 +2,11 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Schemas;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Grid;
 use App\Enum\BaseStatusEnum;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -11,19 +16,19 @@ class EvaluationForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            \Filament\Forms\Components\TextInput::make('name')
+            TextInput::make('name')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.name'))
                 ->required(),
-            \Filament\Forms\Components\Textarea::make('description')
+            Textarea::make('description')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.description')),
-            \Filament\Forms\Components\Select::make('planning_id')
+            Select::make('planning_id')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.planning_id'))
                 ->relationship('planning', 'name')
                 ->disabled()
                 ->dehydrated(false)
                 ->required()
                 ->searchable(),
-            \Filament\Forms\Components\Select::make('status')
+            Select::make('status')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                 ->options([
                     BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
@@ -32,23 +37,23 @@ class EvaluationForm
                 ])
                 ->default(BaseStatusEnum::Draft->value)
                 ->required(),
-            \Filament\Forms\Components\Repeater::make('evaluation_details')
+            Repeater::make('evaluation_details')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.evaluation_details'))
                 ->schema([
-                    \Filament\Schemas\Components\Grid::make(2)
+                    Grid::make(2)
                         ->schema([
-                            \Filament\Forms\Components\Textarea::make('linh_vuc')
+                            Textarea::make('linh_vuc')
                                 ->label(trans('packages.planning_evaluation::evaluation.fields.linh_vuc'))
                                 ->disabled()
                                 ->dehydrated(),
-                            \Filament\Forms\Components\Repeater::make('muc_tieu')
+                            Repeater::make('muc_tieu')
                                 ->label(trans('packages.planning_evaluation::evaluation.fields.muc_tieu'))
                                 ->schema([
-                                    \Filament\Forms\Components\Textarea::make('content')
+                                    Textarea::make('content')
                                         ->label(trans('packages.planning_evaluation::evaluation.fields.content'))
                                         ->rows(3)
                                         ->dehydrated(),
-                                    \Filament\Forms\Components\Select::make('danh_gia')
+                                    Select::make('danh_gia')
                                         ->label(trans('packages.planning_evaluation::evaluation.fields.danh_gia'))
                                         ->required(fn (Get $get): bool => ($get('../../../../status') === BaseStatusEnum::Published->value))
                                         ->validationMessages([
@@ -59,7 +64,7 @@ class EvaluationForm
                                             '+/-' => '+/-',
                                             '-' => '-',
                                         ]),
-                                    \Filament\Forms\Components\Textarea::make('nhan_xet')
+                                    Textarea::make('nhan_xet')
                                         ->label(trans('packages.planning_evaluation::evaluation.fields.nhan_xet'))
                                         ->rows(4),
                                 ])

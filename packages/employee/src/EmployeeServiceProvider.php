@@ -60,10 +60,10 @@ class EmployeeServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        if (is_dir(__DIR__ . '/../lang')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.employee');
+        if (is_dir(__DIR__.'/../lang')) {
+            $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.employee');
         }
     }
 
@@ -85,7 +85,7 @@ class EmployeeServiceProvider extends PackageServiceProvider
 
         // Handle Stubs
         if (app()->runningInConsole()) {
-            foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
+            foreach (app(Filesystem::class)->files(__DIR__.'/../stubs/') as $file) {
                 $this->publishes([
                     $file->getRealPath() => base_path("stubs/employee/{$file->getFilename()}"),
                 ], 'employee-stubs');

@@ -2,10 +2,12 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings;
 
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\CreatePlanning;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\EditPlanning;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\ListPlannings;
-use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\RelationManagers\EvaluationRelationManager;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Schemas\PlanningForm;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Tables\PlanningsTable;
 use Quochao56\PlanningEvaluation\Models\Planning;
@@ -18,15 +20,16 @@ use Filament\Tables\Table;
 class PlanningResource extends Resource
 {
     protected static ?string $model = Planning::class;
+
     protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
-        return static::$navigationIcon;;
+        return static::$navigationIcon;
     }
 
     public static function getNavigationLabel(): string
@@ -48,7 +51,8 @@ class PlanningResource extends Resource
     {
         return trans('packages.planning_evaluation::planning.navigation_group');
     }
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+
+    public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
 
@@ -57,7 +61,7 @@ class PlanningResource extends Resource
         }
 
         if (auth()->check()) {
-            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
+            $employee = Employee::where('email', auth()->user()->email)->first();
             if ($employee) {
                 return $query->whereHas('student.currentAssignment', function ($q) use ($employee) {
                     $q->where('employee_id', $employee->id);

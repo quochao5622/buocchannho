@@ -11,12 +11,12 @@ class CreateStudent extends CreateRecord
 {
     protected static string $resource = StudentResource::class;
 
-    
     protected function handleRecordCreation(array $data): Model
     {
         if (empty($data['student_code'])) {
-            $data['student_code'] = (new Student())->generateStudentCode();
+            $data['student_code'] = (new Student)->generateStudentCode();
         }
+
         return static::getModel()::create($data);
     }
 }

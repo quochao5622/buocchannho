@@ -2,6 +2,7 @@
 
 namespace Quochao56\Equipment\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,17 +53,19 @@ class EquipmentInventory extends Model
         if (empty($this->attributes['inventory_code'])) {
             $latestInventory = static::latest()->first();
             $latestCode = $latestInventory ? (int) str_replace('INV', '', $latestInventory->inventory_code) : 0;
-            return 'INV' . str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
+
+            return 'INV'.str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
         }
+
         return $this->attributes['inventory_code'];
     }
 
     /**
-     * @return BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function inspector(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'inspector_id');
+        return $this->belongsTo(User::class, 'inspector_id');
     }
 
     /**
@@ -89,7 +92,7 @@ class EquipmentInventory extends Model
 
             foreach ($this->details as $detail) {
                 $equipment = Equipment::query()->find($detail->equipment_id);
-                if (! $equipment) {
+                if (!$equipment) {
                     continue;
                 }
 
@@ -103,4 +106,3 @@ class EquipmentInventory extends Model
         });
     }
 }
-

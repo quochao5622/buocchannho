@@ -15,7 +15,7 @@ class CreateEvaluation extends CreateRecord
     {
         return [
             ...parent::getRules(),
-            'data.evaluation_details.*.muc_tieu.*.danh_gia' => ['nullable', 'required_if:data.status,' . BaseStatusEnum::Published->value],
+            'data.evaluation_details.*.muc_tieu.*.danh_gia' => ['nullable', 'required_if:data.status,'.BaseStatusEnum::Published->value],
         ];
     }
 
@@ -54,7 +54,7 @@ class CreateEvaluation extends CreateRecord
             }
         }
 
-        if (! empty($messages)) {
+        if (!empty($messages)) {
             throw ValidationException::withMessages($messages);
         }
     }

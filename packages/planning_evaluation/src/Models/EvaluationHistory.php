@@ -2,6 +2,7 @@
 
 namespace Quochao56\PlanningEvaluation\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class EvaluationHistory extends Model
@@ -23,6 +24,6 @@ class EvaluationHistory extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'saved_by');
+        return $this->belongsTo(User::class, 'saved_by');
     }
 }

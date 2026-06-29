@@ -18,7 +18,7 @@ class StudentTheme implements Plugin
     public function register(Panel $panel): void
     {
         FilamentAsset::register([
-            Theme::make('student', __DIR__ . '/../resources/dist/student.css'),
+            Theme::make('student', __DIR__.'/../resources/dist/student.css'),
         ]);
 
         $panel

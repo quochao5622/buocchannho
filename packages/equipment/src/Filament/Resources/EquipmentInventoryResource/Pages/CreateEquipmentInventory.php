@@ -28,4 +28,3 @@ class CreateEquipmentInventory extends CreateRecord
         $inventory->details()->createMany($details);
     }
 }
-

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
 
             $table->foreignId('employee_id')->nullable()->constrained('employees')->nullOnDelete();
-            
+
             $table->foreignId('student_id')->nullable()->constrained('students')->nullOnDelete();
 
             $table->json('planning_details')->nullable();

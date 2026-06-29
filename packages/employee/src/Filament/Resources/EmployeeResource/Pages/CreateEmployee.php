@@ -11,12 +11,12 @@ class CreateEmployee extends CreateRecord
 {
     protected static string $resource = EmployeeResource::class;
 
-
     protected function handleRecordCreation(array $data): Model
     {
         if (empty($data['employee_code'])) {
-            $data['employee_code'] = (new Employee())->generateCode();
+            $data['employee_code'] = (new Employee)->generateCode();
         }
+
         return static::getModel()::create($data);
     }
 }

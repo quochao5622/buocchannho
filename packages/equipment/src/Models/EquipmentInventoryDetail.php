@@ -20,6 +20,7 @@ class EquipmentInventoryDetail extends Model
         'status',
         'notes',
     ];
+
     /**
      * @return array<string, string>
      */
@@ -44,4 +45,3 @@ class EquipmentInventoryDetail extends Model
         return $this->belongsTo(Equipment::class, 'equipment_id');
     }
 }
-

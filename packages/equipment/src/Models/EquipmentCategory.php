@@ -43,6 +43,7 @@ class EquipmentCategory extends Model
             $depth++;
             $parentId = self::$allCategoriesMap[$parentId];
         }
+
         return $depth;
     }
 
@@ -56,8 +57,8 @@ class EquipmentCategory extends Model
                 if ($exceptId && $category->id === $exceptId) {
                     continue;
                 }
-                $options[$category->id] = $prefix . $category->name;
-                $traverse($category->children, $prefix . '— ');
+                $options[$category->id] = $prefix.$category->name;
+                $traverse($category->children, $prefix.'— ');
             }
         };
 
@@ -105,8 +106,10 @@ class EquipmentCategory extends Model
         if (empty($this->attributes['code'])) {
             $latestCategory = static::latest()->first();
             $latestCode = $latestCategory ? (int) str_replace('DM', '', $latestCategory->code) : 0;
-            return 'DM' . str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
+
+            return 'DM'.str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
         }
+
         return $this->attributes['code'];
     }
 }

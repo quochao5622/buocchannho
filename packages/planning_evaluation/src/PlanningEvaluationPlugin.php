@@ -2,6 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation;
 
+use Quochao56\PlanningEvaluation\Filament\Pages\PlanningEvaluationTracker;
+use Quochao56\PlanningEvaluation\Filament\Pages\StudentProgressReport;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
@@ -20,8 +22,8 @@ class PlanningEvaluationPlugin implements Plugin
             PlanningResource::class,
             EvaluationResource::class,
         ])->pages([
-            \Quochao56\PlanningEvaluation\Filament\Pages\PlanningEvaluationTracker::class,
-            \Quochao56\PlanningEvaluation\Filament\Pages\StudentProgressReport::class,
+            PlanningEvaluationTracker::class,
+            StudentProgressReport::class,
         ]);
     }
 

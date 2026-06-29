@@ -24,6 +24,9 @@ use Quochao56\PlanningEvaluation\PlanningEvaluationPlugin;
 use Quochao56\Student\StudentPlugin;
 use Quochao56\Equipment\EquipmentPlugin;
 use Quochao56\Acl\AclPlugin;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\HtmlString;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -85,5 +88,14 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop(true);
+    }
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SCRIPTS_AFTER,
+            fn(): string => new HtmlString('
+        <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
+            '),
+        );
     }
 }

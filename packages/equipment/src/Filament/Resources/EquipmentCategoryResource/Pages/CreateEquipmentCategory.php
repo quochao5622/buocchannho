@@ -9,4 +9,3 @@ class CreateEquipmentCategory extends CreateRecord
 {
     protected static string $resource = EquipmentCategoryResource::class;
 }
-

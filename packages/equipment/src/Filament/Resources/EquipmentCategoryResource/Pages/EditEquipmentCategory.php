@@ -5,10 +5,11 @@ namespace Quochao56\Equipment\Filament\Resources\EquipmentCategoryResource\Pages
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Quochao56\Equipment\Filament\Resources\EquipmentCategoryResource;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditEquipmentCategory extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = EquipmentCategoryResource::class;
 
@@ -19,4 +20,3 @@ class EditEquipmentCategory extends EditRecord
         ];
     }
 }
-

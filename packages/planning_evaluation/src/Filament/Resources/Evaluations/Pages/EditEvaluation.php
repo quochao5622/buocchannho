@@ -9,10 +9,11 @@ use Illuminate\Validation\ValidationException;
 use Quochao56\PlanningEvaluation\Filament\Actions\ExportEvaluationWordAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditEvaluation extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = EvaluationResource::class;
 
@@ -28,14 +29,14 @@ class EditEvaluation extends EditRecord
         ];
     }
 
-
     public function getRules(): array
     {
         return [
             ...parent::getRules(),
-            'data.evaluation_details.*.muc_tieu.*.danh_gia' => ['nullable', 'required_if:data.status,' . BaseStatusEnum::Published->value],
+            'data.evaluation_details.*.muc_tieu.*.danh_gia' => ['nullable', 'required_if:data.status,'.BaseStatusEnum::Published->value],
         ];
     }
+
     protected function getValidationMessages(): array
     {
         return [
@@ -56,9 +57,9 @@ class EditEvaluation extends EditRecord
             ExportEvaluationWordAction::make(),
             $this->getSaveFormAction()
                 ->submit(null)
-                ->action(fn() => $this->save())
+                ->action(fn () => $this->save())
                 ->keyBindings(['mod+s']),
-                DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 
@@ -83,9 +84,8 @@ class EditEvaluation extends EditRecord
             }
         }
 
-        if (! empty($messages)) {
+        if (!empty($messages)) {
             throw ValidationException::withMessages($messages);
         }
     }
-
 }

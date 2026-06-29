@@ -1,21 +1,21 @@
 <?php
 
+use Quochao56\PlanningEvaluation\Tests\TestCase;
 use Quochao56\Student\Models\Student;
 use Quochao56\Employee\Models\Employee;
-use Quochao56\PlanningEvaluation\Models\StudentAssignment;
 
-uses(\Quochao56\PlanningEvaluation\Tests\TestCase::class);
+uses(TestCase::class);
 
 it('manages student assignments and maintains history correctly', function () {
-    $student = new Student();
+    $student = new Student;
     $student->name = 'Student';
     $student->save();
 
-    $teacherA = new Employee();
+    $teacherA = new Employee;
     $teacherA->name = 'Teacher A';
     $teacherA->save();
 
-    $teacherB = new Employee();
+    $teacherB = new Employee;
     $teacherB->name = 'Teacher B';
     $teacherB->save();
 

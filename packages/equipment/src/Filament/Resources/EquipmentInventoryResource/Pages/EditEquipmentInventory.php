@@ -6,10 +6,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Quochao56\Equipment\Filament\Actions\ApproveAction;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditEquipmentInventory extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = EquipmentInventoryResource::class;
 
@@ -19,10 +20,9 @@ class EditEquipmentInventory extends EditRecord
             ApproveAction::make(),
             $this->getSaveFormAction()
                 ->submit(null)
-                ->action(fn() => $this->save())
+                ->action(fn () => $this->save())
                 ->keyBindings(['mod+s']),
             DeleteAction::make(),
         ];
     }
 }
-

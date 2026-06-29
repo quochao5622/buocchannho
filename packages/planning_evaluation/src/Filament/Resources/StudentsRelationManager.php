@@ -2,6 +2,9 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\Action;
+use Quochao56\Student\Filament\Resources\StudentResource;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -15,7 +18,7 @@ class StudentsRelationManager extends RelationManager
 
     protected static ?string $title = null;
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return trans('packages.planning_evaluation::planning.assignment.students_list') ?? 'Học sinh đang phụ trách';
     }
@@ -50,16 +53,16 @@ class StudentsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->label(trans('packages.student::student.fields.status'))
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'active'   => 'success',
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
                         'inactive' => 'danger',
-                        default    => 'gray',
+                        default => 'gray',
                     })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'active'   => trans('packages.student::student.status.active'),
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => trans('packages.student::student.status.active'),
                         'inactive' => trans('packages.student::student.status.inactive'),
-                        default    => $state,
-                    })
+                        default => $state,
+                    }),
             ])
             ->filters([
                 //
@@ -68,11 +71,11 @@ class StudentsRelationManager extends RelationManager
                 //
             ])
             ->actions([
-                \Filament\Actions\Action::make('view_student')
+                Action::make('view_student')
                     ->label(trans('packages.planning_evaluation::planning.tracker.view_detail'))
                     ->icon('heroicon-o-eye')
-                    ->url(fn (Student $record) => \Quochao56\Student\Filament\Resources\StudentResource::getUrl('edit', [
-                        'record' => $record->id
+                    ->url(fn (Student $record) => StudentResource::getUrl('edit', [
+                        'record' => $record->id,
                     ])),
             ])
             ->bulkActions([

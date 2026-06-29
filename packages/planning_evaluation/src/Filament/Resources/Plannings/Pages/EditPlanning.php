@@ -2,6 +2,11 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages;
 
+use Filament\Forms\Components\Select;
+use Quochao56\Student\Models\Student;
+use Filament\Forms\Components\DatePicker;
+use Quochao56\Employee\Models\Employee;
+use Filament\Notifications\Notification;
 use App\Enum\BaseStatusEnum;
 use Filament\Actions\Action;
 use Quochao56\PlanningEvaluation\Filament\Actions\ExportPlanningWordAction;
@@ -10,10 +15,11 @@ use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditPlanning extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = PlanningResource::class;
 
@@ -37,18 +43,18 @@ class EditPlanning extends EditRecord
                 ->icon('heroicon-o-document-duplicate')
                 ->color('info')
                 ->form([
-                    \Filament\Forms\Components\Select::make('student_id')
+                    Select::make('student_id')
                         ->label(trans('packages.planning_evaluation::planning.clone.student'))
-                        ->options(\Quochao56\Student\Models\Student::query()->pluck('name', 'id'))
+                        ->options(Student::query()->pluck('name', 'id'))
                         ->required()
                         ->searchable(),
-                    \Filament\Forms\Components\DatePicker::make('start_date')
+                    DatePicker::make('start_date')
                         ->label(trans('packages.planning_evaluation::planning.clone.start_date'))
                         ->native(false)
                         ->default(now())
                         ->displayFormat('d/m/Y')
                         ->required(),
-                    \Filament\Forms\Components\DatePicker::make('end_date')
+                    DatePicker::make('end_date')
                         ->label(trans('packages.planning_evaluation::planning.clone.end_date'))
                         ->native(false)
                         ->default(now()->addMonths(3))
@@ -61,21 +67,21 @@ class EditPlanning extends EditRecord
                     $cloned->student_id = $data['student_id'];
                     $cloned->start_date = $data['start_date'];
                     $cloned->end_date = $data['end_date'];
-                    $cloned->name = $record->name . trans('packages.planning_evaluation::planning.clone.suffix');
-                    
-                    $newStudent = \Quochao56\Student\Models\Student::find($data['student_id']);
+                    $cloned->name = $record->name.trans('packages.planning_evaluation::planning.clone.suffix');
+
+                    $newStudent = Student::find($data['student_id']);
                     $employeeId = null;
                     if (auth()->check()) {
-                        $employeeId = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first()?->id;
+                        $employeeId = Employee::where('email', auth()->user()->email)->first()?->id;
                     }
-                    $cloned->employee_id = $newStudent?->currentAssignment?->employee_id 
-                        ?? $employeeId 
+                    $cloned->employee_id = $newStudent?->currentAssignment?->employee_id
+                        ?? $employeeId
                         ?? $record->employee_id;
 
                     $cloned->status = BaseStatusEnum::Draft;
                     $cloned->save();
 
-                    \Filament\Notifications\Notification::make()
+                    Notification::make()
                         ->success()
                         ->title(trans('packages.planning_evaluation::planning.clone.success'))
                         ->send();
@@ -86,7 +92,7 @@ class EditPlanning extends EditRecord
             DeleteAction::make(),
             $this->getSaveFormAction()
                 ->submit(null)
-                ->action(fn() => $this->save())
+                ->action(fn () => $this->save())
                 ->keyBindings(['mod+s']),
             $this->getCancelFormAction(),
         ];

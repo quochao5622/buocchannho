@@ -2,6 +2,13 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Schemas;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Quochao56\Student\Models\Student;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\MarkdownEditor;
 use App\Enum\BaseStatusEnum;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
@@ -13,50 +20,52 @@ class PlanningForm
     {
         return $schema
             ->components([
-                \Filament\Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label(trans('packages.planning_evaluation::planning.fields.name'))
                     ->required(),
-                \Filament\Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->label(trans('packages.planning_evaluation::planning.fields.description')),
-                \Filament\Forms\Components\Select::make('employee_id')
+                Select::make('employee_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.employee'))
                     ->relationship('employee', 'name')
                     ->default(function () {
                         $studentId = request()->query('student_id');
                         if ($studentId) {
-                            $student = \Quochao56\Student\Models\Student::find($studentId);
+                            $student = Student::find($studentId);
+
                             return $student?->currentAssignment?->employee_id ?? 4;
                         }
                         $email = auth()->user()->email;
                         if ($email) {
                             return Employee::where('email', $email)->first()?->id;
                         }
+
                         return 4;
                     })
                     ->searchable(),
-                \Filament\Forms\Components\Select::make('student_id')
+                Select::make('student_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
                     ->relationship('student', 'name')
-                    ->default(fn() => request()->query('student_id'))
+                    ->default(fn () => request()->query('student_id'))
                     ->searchable(),
-                \Filament\Forms\Components\DatePicker::make('start_date')
+                DatePicker::make('start_date')
                     ->label(trans('packages.planning_evaluation::planning.fields.start_date'))
                     ->native(false)
                     ->displayFormat('d/m/Y'),
-                \Filament\Forms\Components\DatePicker::make('end_date')
+                DatePicker::make('end_date')
                     ->label(trans('packages.planning_evaluation::planning.fields.end_date'))
                     ->native(false)
                     ->displayFormat('d/m/Y'),
                 Select::make('status')
                     ->label(trans('packages.planning_evaluation::planning.fields.status'))
                     ->options([
-                        BaseStatusEnum::Published->value   => BaseStatusEnum::Published->getLabel(),
-                        BaseStatusEnum::Pending->value   => BaseStatusEnum::Pending->getLabel(),
-                        BaseStatusEnum::Draft->value   => BaseStatusEnum::Draft->getLabel(),
+                        BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
+                        BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                        BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
                     ])
                     ->default(BaseStatusEnum::Published->value)
                     ->required(),
-                \Filament\Forms\Components\Repeater::make('planning_details')
+                Repeater::make('planning_details')
                     ->label(trans('packages.planning_evaluation::planning.fields.details'))
                     ->default([
                         [
@@ -195,12 +204,12 @@ class PlanningForm
                         ],
                     ])
                     ->schema([
-                        \Filament\Schemas\Components\Grid::make(5)
+                        Grid::make(5)
                             ->schema([
-                                \Filament\Forms\Components\Repeater::make('linh_vuc')
+                                Repeater::make('linh_vuc')
                                     ->label(trans('packages.planning_evaluation::planning.fields.linh_vuc'))
                                     ->schema([
-                                        \Filament\Forms\Components\MarkdownEditor::make('content')
+                                        MarkdownEditor::make('content')
                                             ->label(trans('packages.planning_evaluation::planning.fields.noi_dung'))
                                             ->toolbarButtons([
                                                 'bold',
@@ -211,10 +220,10 @@ class PlanningForm
                                     ->createItemButtonLabel(trans('packages.planning_evaluation::planning.actions.add_linh_vuc_item'))
                                     ->collapsible(),
 
-                                \Filament\Forms\Components\Repeater::make('muc_tieu')
+                                Repeater::make('muc_tieu')
                                     ->label(trans('packages.planning_evaluation::planning.fields.muc_tieu'))
                                     ->schema([
-                                        \Filament\Forms\Components\MarkdownEditor::make('content')
+                                        MarkdownEditor::make('content')
                                             ->label(trans('packages.planning_evaluation::planning.fields.noi_dung'))
                                             ->toolbarButtons([
                                                 'bold',
@@ -225,10 +234,10 @@ class PlanningForm
                                     ->createItemButtonLabel(trans('packages.planning_evaluation::planning.actions.add_muc_tieu'))
                                     ->collapsible(),
 
-                                \Filament\Forms\Components\Repeater::make('hoat_dong')
+                                Repeater::make('hoat_dong')
                                     ->label(trans('packages.planning_evaluation::planning.fields.hoat_dong'))
                                     ->schema([
-                                        \Filament\Forms\Components\MarkdownEditor::make('content')
+                                        MarkdownEditor::make('content')
                                             ->label(trans('packages.planning_evaluation::planning.fields.noi_dung'))
                                             ->toolbarButtons([
                                                 'bold',
@@ -239,10 +248,10 @@ class PlanningForm
                                     ->createItemButtonLabel(trans('packages.planning_evaluation::planning.actions.add_hoat_dong'))
                                     ->collapsible(),
 
-                                \Filament\Forms\Components\Repeater::make('phuong_tien')
+                                Repeater::make('phuong_tien')
                                     ->label(trans('packages.planning_evaluation::planning.fields.phuong_tien'))
                                     ->schema([
-                                        \Filament\Forms\Components\MarkdownEditor::make('content')
+                                        MarkdownEditor::make('content')
                                             ->label(trans('packages.planning_evaluation::planning.fields.noi_dung'))
                                             ->toolbarButtons([
                                                 'bold',
@@ -253,10 +262,10 @@ class PlanningForm
                                     ->createItemButtonLabel(trans('packages.planning_evaluation::planning.actions.add_phuong_tien'))
                                     ->collapsible(),
 
-                                \Filament\Forms\Components\Repeater::make('muc_tieu_du_phong')
+                                Repeater::make('muc_tieu_du_phong')
                                     ->label(trans('packages.planning_evaluation::planning.fields.muc_tieu_du_phong'))
                                     ->schema([
-                                        \Filament\Forms\Components\MarkdownEditor::make('content')
+                                        MarkdownEditor::make('content')
                                             ->label(trans('packages.planning_evaluation::planning.fields.noi_dung'))
                                             ->toolbarButtons([
                                                 'bold',

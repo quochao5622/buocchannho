@@ -30,21 +30,21 @@ class AclServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         // 1. Merge configuration
-        if (file_exists(__DIR__ . '/../config/permissions.php')) {
-            $this->mergeConfigFrom(__DIR__ . '/../config/permissions.php', 'permissions');
+        if (file_exists(__DIR__.'/../config/permissions.php')) {
+            $this->mergeConfigFrom(__DIR__.'/../config/permissions.php', 'permissions');
         }
 
         // 2. Load package translations
-        if (is_dir(__DIR__ . '/../lang')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'acl');
+        if (is_dir(__DIR__.'/../lang')) {
+            $this->loadTranslationsFrom(__DIR__.'/../lang', 'acl');
         }
     }
 
     public function packageBooted(): void
     {
         // 1. Override filament-users translations first to ensure subsequent label resolves are translated
-        if (is_dir(__DIR__ . '/../lang/filament-users')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang/filament-users', 'filament-users');
+        if (is_dir(__DIR__.'/../lang/filament-users')) {
+            $this->loadTranslationsFrom(__DIR__.'/../lang/filament-users', 'filament-users');
 
             // Force reload translations by clearing translator's internal loaded cache
             try {

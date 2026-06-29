@@ -5,10 +5,11 @@ namespace Quochao56\Employee\Filament\Resources\EmployeeResource\Pages;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Quochao56\Employee\Filament\Resources\EmployeeResource;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditEmployee extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = EmployeeResource::class;
 

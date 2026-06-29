@@ -5,10 +5,11 @@ namespace Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 use Quochao56\Acl\Filament\Resources\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Quochao56\Core\Traits\HasAutoSave;
 
 class EditRole extends EditRecord
 {
-    use \Quochao56\Core\Traits\HasAutoSave;
+    use HasAutoSave;
 
     protected static string $resource = RoleResource::class;
 
@@ -31,11 +32,11 @@ class EditRole extends EditRecord
                 }
             }
         }
-        
+
         $currentPermissions = $this->record->permissions->pluck('name')->toArray();
         sort($allPermissions);
         sort($currentPermissions);
-        
+
         if ($allPermissions !== $currentPermissions) {
             $this->record->syncPermissions($allPermissions);
         }

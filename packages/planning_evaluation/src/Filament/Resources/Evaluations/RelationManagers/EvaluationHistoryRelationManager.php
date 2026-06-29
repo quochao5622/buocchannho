@@ -2,6 +2,7 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\RelationManagers;
 
+use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Actions\ViewAction;
@@ -14,7 +15,7 @@ class EvaluationHistoryRelationManager extends RelationManager
 
     protected static ?string $title = null;
 
-    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return trans('packages.planning_evaluation::planning.history.title');
     }

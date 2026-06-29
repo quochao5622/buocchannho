@@ -29,6 +29,6 @@ return [
         'published_required_badge' => 'Bắt buộc khi Đã xuất bản',
     ],
     'status' => [
-    
+
     ],
 ];

@@ -2,6 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation\Models;
 
+use Quochao56\Student\Models\Student;
+use Quochao56\Employee\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAssignment extends Model
@@ -22,11 +24,11 @@ class StudentAssignment extends Model
 
     public function student()
     {
-        return $this->belongsTo(\Quochao56\Student\Models\Student::class, 'student_id');
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
     public function employee()
     {
-        return $this->belongsTo(\Quochao56\Employee\Models\Employee::class, 'employee_id');
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
 }

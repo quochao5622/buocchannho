@@ -20,8 +20,8 @@ class CoreServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        if (is_dir(__DIR__ . '/../lang')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.core');
+        if (is_dir(__DIR__.'/../lang')) {
+            $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.core');
         }
     }
 }

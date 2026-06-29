@@ -2,6 +2,7 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Pages;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -23,7 +24,7 @@ class StudentProgressReport extends Page implements HasForms
         return trans('packages.planning_evaluation::planning.progress.nav_label');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return trans('packages.planning_evaluation::planning.progress.title');
     }
@@ -43,17 +44,19 @@ class StudentProgressReport extends Page implements HasForms
     protected string $view = 'planning-evaluation::student-progress-report';
 
     public ?int $studentId = null;
+
     public ?string $dateFrom = null;
-    public ?string $dateTo   = null;
+
+    public ?string $dateTo = null;
 
     public function mount(): void
     {
         $this->dateFrom = now()->startOfYear()->format('Y-m-d');
-        $this->dateTo   = now()->endOfYear()->format('Y-m-d');
+        $this->dateTo = now()->endOfYear()->format('Y-m-d');
 
         $this->form->fill([
             'dateFrom' => $this->dateFrom,
-            'dateTo'   => $this->dateTo,
+            'dateTo' => $this->dateTo,
         ]);
     }
 
@@ -87,7 +90,7 @@ class StudentProgressReport extends Page implements HasForms
                     })
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(fn($state) => $this->studentId = $state),
+                    ->afterStateUpdated(fn ($state) => $this->studentId = $state),
 
                 Grid::make(2)->schema([
                     DatePicker::make('dateFrom')
@@ -96,7 +99,7 @@ class StudentProgressReport extends Page implements HasForms
                         ->displayFormat('d/m/Y')
                         ->default(now()->startOfYear())
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->dateFrom = $state),
+                        ->afterStateUpdated(fn ($state) => $this->dateFrom = $state),
 
                     DatePicker::make('dateTo')
                         ->label('Đến ngày')
@@ -104,7 +107,7 @@ class StudentProgressReport extends Page implements HasForms
                         ->displayFormat('d/m/Y')
                         ->default(now()->endOfYear())
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->dateTo = $state),
+                        ->afterStateUpdated(fn ($state) => $this->dateTo = $state),
                 ]),
             ]);
     }

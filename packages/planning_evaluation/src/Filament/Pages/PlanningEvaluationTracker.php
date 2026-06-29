@@ -2,6 +2,10 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Pages;
 
+use Illuminate\Contracts\Support\Htmlable;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use App\Enum\BaseStatusEnum;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -31,7 +35,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
         return trans('packages.planning_evaluation::planning.tracker.nav_label');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return trans('packages.planning_evaluation::planning.tracker.title');
     }
@@ -95,14 +99,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                             $exists = Evaluation::query()
                                 ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                     $q->where('student_id', $record->id)
-                                      ->where(function ($sq) use ($fromDate, $toDate) {
-                                          if ($fromDate) {
-                                              $sq->where('end_date', '>=', $fromDate);
-                                          }
-                                          if ($toDate) {
-                                              $sq->where('start_date', '<=', $toDate);
-                                          }
-                                      });
+                                        ->where(function ($sq) use ($fromDate, $toDate) {
+                                            if ($fromDate) {
+                                                $sq->where('end_date', '>=', $fromDate);
+                                            }
+                                            if ($toDate) {
+                                                $sq->where('start_date', '<=', $toDate);
+                                            }
+                                        });
                                 })->exists();
                         }
 
@@ -136,14 +140,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                             $evaluation = Evaluation::query()
                                 ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                     $q->where('student_id', $record->id)
-                                      ->where(function ($sq) use ($fromDate, $toDate) {
-                                          if ($fromDate) {
-                                              $sq->where('end_date', '>=', $fromDate);
-                                          }
-                                          if ($toDate) {
-                                              $sq->where('start_date', '<=', $toDate);
-                                          }
-                                      });
+                                        ->where(function ($sq) use ($fromDate, $toDate) {
+                                            if ($fromDate) {
+                                                $sq->where('end_date', '>=', $fromDate);
+                                            }
+                                            if ($toDate) {
+                                                $sq->where('start_date', '<=', $toDate);
+                                            }
+                                        });
                                 })->first();
 
                             return $evaluation?->planning?->employee?->name ?? '-';
@@ -160,14 +164,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                     ->default('planning')
                     ->selectablePlaceholder(false)
                     ->query(fn ($query) => $query),
-                \Filament\Tables\Filters\Filter::make('time_range')
+                Filter::make('time_range')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('from_date')
+                        DatePicker::make('from_date')
                             ->label(trans('packages.planning_evaluation::planning.clone.start_date'))
                             ->native(false)
                             ->displayFormat('d/m/Y')
                             ->default(now()->startOfMonth()),
-                        \Filament\Forms\Components\DatePicker::make('to_date')
+                        DatePicker::make('to_date')
                             ->label(trans('packages.planning_evaluation::planning.clone.end_date'))
                             ->native(false)
                             ->displayFormat('d/m/Y')
@@ -176,7 +180,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
                     ->query(fn ($query) => $query),
                 SelectFilter::make('managing_teacher')
                     ->label(trans('packages.planning_evaluation::planning.tracker.managing_teacher'))
-                    ->options(Employee::query()->where('status', \App\Enum\BaseStatusEnum::Active->value ?? \App\Enum\BaseStatusEnum::Active)->pluck('name', 'id'))
+                    ->options(Employee::query()->where('status', BaseStatusEnum::Active->value ?? BaseStatusEnum::Active)->pluck('name', 'id'))
                     ->query(function ($query, array $data) {
                         if (empty($data['value'])) {
                             return;
@@ -234,14 +238,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                             $evaluation = Evaluation::query()
                                 ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                     $q->where('student_id', $record->id)
-                                      ->where(function ($sq) use ($fromDate, $toDate) {
-                                          if ($fromDate) {
-                                              $sq->where('end_date', '>=', $fromDate);
-                                          }
-                                          if ($toDate) {
-                                              $sq->where('start_date', '<=', $toDate);
-                                          }
-                                      });
+                                        ->where(function ($sq) use ($fromDate, $toDate) {
+                                            if ($fromDate) {
+                                                $sq->where('end_date', '>=', $fromDate);
+                                            }
+                                            if ($toDate) {
+                                                $sq->where('start_date', '<=', $toDate);
+                                            }
+                                        });
                                 })->first();
 
                             return $evaluation ? EvaluationResource::getUrl('edit', [
@@ -273,14 +277,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                             return Evaluation::query()
                                 ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                     $q->where('student_id', $record->id)
-                                      ->where(function ($sq) use ($fromDate, $toDate) {
-                                          if ($fromDate) {
-                                              $sq->where('end_date', '>=', $fromDate);
-                                          }
-                                          if ($toDate) {
-                                              $sq->where('start_date', '<=', $toDate);
-                                          }
-                                      });
+                                        ->where(function ($sq) use ($fromDate, $toDate) {
+                                            if ($fromDate) {
+                                                $sq->where('end_date', '>=', $fromDate);
+                                            }
+                                            if ($toDate) {
+                                                $sq->where('start_date', '<=', $toDate);
+                                            }
+                                        });
                                 })->exists();
                         }
                     }),
@@ -335,6 +339,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
 
                         if ($plan) {
                             $evaluation = Evaluation::upsertFromPlanning($plan);
+
                             return redirect(EvaluationResource::getUrl('edit', [
                                 'planning' => $plan->id,
                                 'record' => $evaluation->id,
@@ -370,14 +375,14 @@ class PlanningEvaluationTracker extends Page implements HasTable
                         return !Evaluation::query()
                             ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                 $q->where('student_id', $record->id)
-                                  ->where(function ($sq) use ($fromDate, $toDate) {
-                                      if ($fromDate) {
-                                          $sq->where('end_date', '>=', $fromDate);
-                                      }
-                                      if ($toDate) {
-                                          $sq->where('start_date', '<=', $toDate);
-                                      }
-                                  });
+                                    ->where(function ($sq) use ($fromDate, $toDate) {
+                                        if ($fromDate) {
+                                            $sq->where('end_date', '>=', $fromDate);
+                                        }
+                                        if ($toDate) {
+                                            $sq->where('start_date', '<=', $toDate);
+                                        }
+                                    });
                             })->exists();
                     }),
             ])
@@ -387,7 +392,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
                     ->exports([
                         ExcelExport::make()
                             ->fromTable()
-                            ->withFilename('Bao_cao_nop_KH_DG_' . now()->format('Ymd_His')),
+                            ->withFilename('Bao_cao_nop_KH_DG_'.now()->format('Ymd_His')),
                     ]),
             ]);
     }

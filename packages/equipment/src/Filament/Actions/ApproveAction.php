@@ -19,25 +19,25 @@ class ApproveAction extends Action
     public function handle(EquipmentInventory $record): void
     {
         try {
-            
+
             DB::transaction(function () use ($record) {
                 $record->loadMissing('details');
-    
+
                 foreach ($record->details as $detail) {
                     $equipment = Equipment::query()->find($detail->equipment_id);
-                    if (! $equipment) {
+                    if (!$equipment) {
                         continue;
                     }
-    
+
                     $equipment->update([
                         'quantity' => (int) $detail->quantity_actual,
                         'status' => (string) $detail->status,
                     ]);
                 }
-    
+
                 $record->update(['status' => 'approved']);
             });
-    
+
             Notification::make()
                 ->title(trans('packages.equipment::equipment_inventory.approve.success'))
                 ->success()
@@ -49,7 +49,7 @@ class ApproveAction extends Action
                 ->send();
             Log::error($th);
         }
-        
+
     }
 
     protected function setUp(): void

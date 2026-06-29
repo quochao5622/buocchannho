@@ -17,4 +17,3 @@ class ListEquipmentCategories extends ListRecords
         ];
     }
 }
-

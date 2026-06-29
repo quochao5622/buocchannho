@@ -36,10 +36,10 @@ class EquipmentServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        if (is_dir(__DIR__ . '/../lang')) {
-            $this->loadTranslationsFrom(__DIR__ . '/../lang', 'packages.equipment');
+        if (is_dir(__DIR__.'/../lang')) {
+            $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.equipment');
         }
     }
 

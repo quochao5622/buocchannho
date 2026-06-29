@@ -12,6 +12,7 @@ class RolePolicy
         if ($user->isSuperAdmin()) {
             return true;
         }
+
         return null;
     }
 

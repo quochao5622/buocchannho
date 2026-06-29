@@ -27,7 +27,7 @@ class ExportPlanningWordAction extends Action
         $this->color('info');
 
         $this->hidden(static function (Model $record): bool {
-            if (! method_exists($record, 'trashed')) {
+            if (!method_exists($record, 'trashed')) {
                 return false;
             }
 
@@ -40,7 +40,7 @@ class ExportPlanningWordAction extends Action
             $timeRange = "T{$startMonth}-T{$endMonth}";
             $studentName = mb_strtoupper($record->student?->name ?? 'unknown', 'UTF-8');
             $studentName = implode(' ', array_slice(explode(' ', $studentName), -2));
-            $outputFile = "KHCN_" . $studentName . "_" . $timeRange . "_" . time() . ".docx";
+            $outputFile = 'KHCN_'.$studentName.'_'.$timeRange.'_'.time().'.docx';
             $path = $this->generateWordFile($record, $outputFile);
 
             return response()->download(
@@ -53,22 +53,22 @@ class ExportPlanningWordAction extends Action
     protected function generateWordFile(Model $record, string $outputFile): string
     {
         $templatePath = realpath(
-            __DIR__ . '/../../../resources/templates/template_KHCN.docx'
+            __DIR__.'/../../../resources/templates/template_KHCN.docx'
         );
 
-        if (! $templatePath || ! file_exists($templatePath)) {
-            throw new FileNotFoundException('Template not found at: ' . $templatePath);
+        if (!$templatePath || !file_exists($templatePath)) {
+            throw new FileNotFoundException('Template not found at: '.$templatePath);
         }
 
         $record->loadMissing(['employee', 'student']);
 
-        $student  = $record->student;
+        $student = $record->student;
         $employee = $record->employee;
 
         $genderMap = [
-            'male'   => 'Nam',
+            'male' => 'Nam',
             'female' => 'Nữ',
-            'other'  => 'Khác',
+            'other' => 'Khác',
         ];
 
         // Determine time range string example T9-T10 then time is 2 months, if start or end date is missing, use 'unknown' and leave time empty.
@@ -76,9 +76,8 @@ class ExportPlanningWordAction extends Action
         if ($record->start_date && $record->end_date) {
             $startMonth = $record->start_date->format('n');
             $endMonth = $record->end_date->format('n');
-            $time = ($endMonth - $startMonth + 1) . ' tháng';
+            $time = ($endMonth - $startMonth + 1).' tháng';
         }
-
 
         $templateProcessor = new TemplateProcessor($templatePath);
 
@@ -92,7 +91,7 @@ class ExportPlanningWordAction extends Action
         // Fill table rows from planning_details using complex values to preserve inline styling.
         $details = $record->planning_details ?? [];
 
-        if (! empty($details)) {
+        if (!empty($details)) {
             $tableRows = [];
             foreach ($details as $detail) {
                 $linhVucItems = $detail['linh_vuc'] ?? [];
@@ -133,7 +132,7 @@ class ExportPlanningWordAction extends Action
                         'parent_category' => $parentCategory,
                         'sub_category' => $cleanSubCategory,
                         'linh_vuc' => [['content' => $parentCategory]],
-                        'muc_tieu' => [['content' => '*' . $cleanSubCategory . '*']],
+                        'muc_tieu' => [['content' => '*'.$cleanSubCategory.'*']],
                         'hoat_dong' => [],
                         'phuong_tien' => [],
                         'muc_tieu_du_phong' => [],
@@ -192,18 +191,18 @@ class ExportPlanningWordAction extends Action
             $templateProcessor->setValue('muc_tieu_du_phong', '');
         }
 
-        $disk      = Storage::disk('local');
+        $disk = Storage::disk('local');
         $directory = 'exports/plannings';
 
-        if (! $disk->exists($directory)) {
+        if (!$disk->exists($directory)) {
             $disk->makeDirectory($directory);
         }
 
-        $relativePath = $directory . '/' . $outputFile;
+        $relativePath = $directory.'/'.$outputFile;
 
         $templateProcessor->saveAs($disk->path($relativePath));
 
-        if (! $disk->exists($relativePath)) {
+        if (!$disk->exists($relativePath)) {
             throw new FileNotFoundException($relativePath);
         }
 
@@ -217,7 +216,7 @@ class ExportPlanningWordAction extends Action
      */
     protected function buildCellTextRun(array $items): TextRun
     {
-        $textRun = new TextRun();
+        $textRun = new TextRun;
         $hasContent = false;
 
         foreach ($items as $item) {
@@ -244,7 +243,7 @@ class ExportPlanningWordAction extends Action
             }
         }
 
-        if (! $hasContent) {
+        if (!$hasContent) {
             $textRun->addText('', $this->defaultTextStyle());
         }
 
@@ -309,7 +308,7 @@ class ExportPlanningWordAction extends Action
         $dom->loadXML($xml);
         libxml_clear_errors();
 
-        $wNs   = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+        $wNs = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
         $xpath = new \DOMXPath($dom);
         $xpath->registerNamespace('w', $wNs);
 
@@ -496,6 +495,7 @@ class ExportPlanningWordAction extends Action
             $bName = $b->localName;
             $aOrder = $order[$aName] ?? 999;
             $bOrder = $order[$bName] ?? 999;
+
             return $aOrder <=> $bOrder;
         });
 

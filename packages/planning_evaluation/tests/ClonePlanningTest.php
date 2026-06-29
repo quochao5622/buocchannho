@@ -1,26 +1,27 @@
 <?php
 
+use Quochao56\PlanningEvaluation\Tests\TestCase;
 use Quochao56\PlanningEvaluation\Models\Planning;
 use Quochao56\Student\Models\Student;
 use Quochao56\Employee\Models\Employee;
 use App\Enum\BaseStatusEnum;
 
-uses(\Quochao56\PlanningEvaluation\Tests\TestCase::class);
+uses(TestCase::class);
 
 it('clones a planning successfully and forces status to draft', function () {
-    $student = new Student();
+    $student = new Student;
     $student->name = 'Original Student';
     $student->save();
 
-    $newStudent = new Student();
+    $newStudent = new Student;
     $newStudent->name = 'Cloned Student';
     $newStudent->save();
 
-    $employee = new Employee();
+    $employee = new Employee;
     $employee->name = 'Teacher';
     $employee->save();
 
-    $planning = new Planning();
+    $planning = new Planning;
     $planning->name = 'Original Planning';
     $planning->student_id = $student->id;
     $planning->employee_id = $employee->id;
@@ -32,14 +33,14 @@ it('clones a planning successfully and forces status to draft', function () {
             'hoat_dong' => [],
             'phuong_tien' => [],
             'muc_tieu_du_phong' => [],
-        ]
+        ],
     ];
     $planning->save();
 
     // Perform clone/replicate logic
     $cloned = $planning->replicate();
     $cloned->student_id = $newStudent->id;
-    $cloned->name = $planning->name . ' (Nhân bản)';
+    $cloned->name = $planning->name.' (Nhân bản)';
     $cloned->status = BaseStatusEnum::Draft;
     $cloned->save();
 

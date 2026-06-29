@@ -2,6 +2,7 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\RelationManagers;
 
+use Filament\Forms\Components\Select;
 use App\Enum\BaseStatusEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -29,7 +30,7 @@ class EvaluationRelationManager extends RelationManager
                 ->label(trans('packages.planning_evaluation::evaluation.fields.description')),
             Textarea::make('evaluation_details')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.evaluation_details')),
-            \Filament\Forms\Components\Select::make('status')
+            Select::make('status')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
                 ->options([
                     BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),

@@ -21,7 +21,7 @@ class CreateRole extends CreateRecord
                 }
             }
         }
-        
+
         $this->record->syncPermissions($allPermissions);
     }
 }

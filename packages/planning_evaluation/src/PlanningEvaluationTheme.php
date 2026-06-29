@@ -18,7 +18,7 @@ class PlanningEvaluationTheme implements Plugin
     public function register(Panel $panel): void
     {
         FilamentAsset::register([
-            Theme::make('planning-evaluation', __DIR__ . '/../resources/dist/planning-evaluation.css'),
+            Theme::make('planning-evaluation', __DIR__.'/../resources/dist/planning-evaluation.css'),
         ]);
 
         $panel

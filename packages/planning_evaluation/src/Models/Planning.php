@@ -1,6 +1,9 @@
 <?php
+
 namespace Quochao56\PlanningEvaluation\Models;
 
+use Quochao56\Employee\Models\Employee;
+use Quochao56\Student\Models\Student;
 use App\Enum\BaseStatusEnum;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -51,21 +54,23 @@ class Planning extends Model
                 $array[$key] = str_replace("\t", ' ', $value);
             }
         }
+
         return $array;
     }
 
     public function employee()
     {
-        return $this->belongsTo(\Quochao56\Employee\Models\Employee::class, 'employee_id');
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
+
     public function student()
     {
-        return $this->belongsTo(\Quochao56\Student\Models\Student::class, 'student_id');
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
     public function evaluation()
     {
-        return $this->hasOne(\Quochao56\PlanningEvaluation\Models\Evaluation::class, 'planning_id');
+        return $this->hasOne(Evaluation::class, 'planning_id');
     }
 
     public function histories()

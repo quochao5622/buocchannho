@@ -2,6 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations;
 
+use Illuminate\Database\Eloquent\Builder;
+use Quochao56\Employee\Models\Employee;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -22,7 +24,7 @@ class EvaluationResource extends Resource
 
     protected static ?int $navigationSort = 30;
 
-    protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     public static function getNavigationLabel(): string
     {
@@ -44,7 +46,7 @@ class EvaluationResource extends Resource
         return trans('packages.planning_evaluation::evaluation.navigation_group');
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
 
@@ -53,7 +55,7 @@ class EvaluationResource extends Resource
         }
 
         if (auth()->check()) {
-            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
+            $employee = Employee::where('email', auth()->user()->email)->first();
             if ($employee) {
                 return $query->whereHas('planning.student.currentAssignment', function ($q) use ($employee) {
                     $q->where('employee_id', $employee->id);
