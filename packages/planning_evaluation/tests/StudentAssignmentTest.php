@@ -1,8 +1,8 @@
 <?php
 
+use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Tests\TestCase;
 use Quochao56\Student\Models\Student;
-use Quochao56\Employee\Models\Employee;
 
 uses(TestCase::class);
 

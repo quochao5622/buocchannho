@@ -2,15 +2,17 @@
 
 namespace Quochao56\Equipment\Models;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Equipment extends Model
+class Equipment extends Model implements AuditableContract
 {
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $table = 'equipments';
 

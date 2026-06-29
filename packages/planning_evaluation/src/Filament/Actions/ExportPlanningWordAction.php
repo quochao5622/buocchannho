@@ -27,7 +27,7 @@ class ExportPlanningWordAction extends Action
         $this->color('info');
 
         $this->hidden(static function (Model $record): bool {
-            if (!method_exists($record, 'trashed')) {
+            if (! method_exists($record, 'trashed')) {
                 return false;
             }
 
@@ -56,7 +56,7 @@ class ExportPlanningWordAction extends Action
             __DIR__.'/../../../resources/templates/template_KHCN.docx'
         );
 
-        if (!$templatePath || !file_exists($templatePath)) {
+        if (! $templatePath || ! file_exists($templatePath)) {
             throw new FileNotFoundException('Template not found at: '.$templatePath);
         }
 
@@ -81,17 +81,17 @@ class ExportPlanningWordAction extends Action
 
         $templateProcessor = new TemplateProcessor($templatePath);
 
-        $templateProcessor->setValue('name',          (string) ($record->name ?? ''));
-        $templateProcessor->setValue('student_name',  (string) ($student?->name ?? ''));
-        $templateProcessor->setValue('student_dob',   $student?->dob ? $student->dob->format('d/m/Y') : '');
-        $templateProcessor->setValue('gender',        $genderMap[$student?->gender ?? ''] ?? '');
+        $templateProcessor->setValue('name', (string) ($record->name ?? ''));
+        $templateProcessor->setValue('student_name', (string) ($student?->name ?? ''));
+        $templateProcessor->setValue('student_dob', $student?->dob ? $student->dob->format('d/m/Y') : '');
+        $templateProcessor->setValue('gender', $genderMap[$student?->gender ?? ''] ?? '');
         $templateProcessor->setValue('employee_name', (string) ($employee?->name ?? ''));
         $templateProcessor->setValue('time', (string) ($time ?? ''));
 
         // Fill table rows from planning_details using complex values to preserve inline styling.
         $details = $record->planning_details ?? [];
 
-        if (!empty($details)) {
+        if (! empty($details)) {
             $tableRows = [];
             foreach ($details as $detail) {
                 $linhVucItems = $detail['linh_vuc'] ?? [];
@@ -194,7 +194,7 @@ class ExportPlanningWordAction extends Action
         $disk = Storage::disk('local');
         $directory = 'exports/plannings';
 
-        if (!$disk->exists($directory)) {
+        if (! $disk->exists($directory)) {
             $disk->makeDirectory($directory);
         }
 
@@ -202,7 +202,7 @@ class ExportPlanningWordAction extends Action
 
         $templateProcessor->saveAs($disk->path($relativePath));
 
-        if (!$disk->exists($relativePath)) {
+        if (! $disk->exists($relativePath)) {
             throw new FileNotFoundException($relativePath);
         }
 
@@ -243,7 +243,7 @@ class ExportPlanningWordAction extends Action
             }
         }
 
-        if (!$hasContent) {
+        if (! $hasContent) {
             $textRun->addText('', $this->defaultTextStyle());
         }
 

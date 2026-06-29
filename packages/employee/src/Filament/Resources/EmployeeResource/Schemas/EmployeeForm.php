@@ -2,12 +2,12 @@
 
 namespace Quochao56\Employee\Filament\Resources\EmployeeResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use App\Enum\BaseStatusEnum;
+use Filament\Schemas\Schema;
+use Quochao56\Core\Enum\BaseStatusEnum;
 
 class EmployeeForm
 {
@@ -40,6 +40,7 @@ class EmployeeForm
 
             DatePicker::make('dob')
                 ->label(trans('packages.employee::employee.fields.dob'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             TextInput::make('phone')
@@ -66,10 +67,12 @@ class EmployeeForm
 
             DatePicker::make('hired_at')
                 ->label(trans('packages.employee::employee.fields.hired_at'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             DatePicker::make('probation_end_at')
                 ->label(trans('packages.employee::employee.fields.probation_end_at'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             FileUpload::make('avatar')

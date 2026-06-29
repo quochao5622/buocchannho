@@ -10,10 +10,10 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use Quochao56\PlanningEvaluation\Testing\TestsPlanningEvaluation;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Quochao56\PlanningEvaluation\Testing\TestsPlanningEvaluation;
 
 class PlanningEvaluationServiceProvider extends PackageServiceProvider
 {

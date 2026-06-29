@@ -3,11 +3,11 @@
 namespace Quochao56\Student\Filament\Resources\StudentResource\Pages;
 
 use Filament\Actions\Action;
-use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Quochao56\Student\Filament\Resources\StudentResource;
 use Quochao56\Core\Traits\HasAutoSave;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
+use Quochao56\Student\Filament\Resources\StudentResource;
 
 class EditStudent extends EditRecord
 {

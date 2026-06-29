@@ -1,19 +1,23 @@
 <?php
 
-use App\Models\User;
-use Quochao56\Student\Models\Student;
-use Quochao56\Employee\Models\Employee;
-use Quochao56\PlanningEvaluation\Models\StudentAssignment;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
+use Quochao56\Acl\Filament\Resources\RoleResource;
+use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\Core\Models\User;
+use Quochao56\Employee\Models\Employee;
+use Quochao56\Equipment\Models\Equipment;
+use Quochao56\PlanningEvaluation\Models\StudentAssignment;
+use Quochao56\Student\Filament\Resources\StudentResource;
+use Quochao56\Student\Models\Student;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Sync permissions from config
-    \Quochao56\Acl\Filament\Resources\RoleResource::syncPermissionsToDatabase();
+    RoleResource::syncPermissionsToDatabase();
 
     // Create roles
     $this->teacherRole = Role::findOrCreate('teacher', 'web');
@@ -26,7 +30,7 @@ beforeEach(function () {
 
     // Create Teachers
     $this->teacherA = User::factory()->create([
-        'email' => 'teacherA@example.com'
+        'email' => 'teacherA@example.com',
     ]);
     $this->teacherA->assignRole($this->teacherRole);
     $this->teacherA->syncPermissions(['plannings.index', 'plannings.progress', 'students.index']);
@@ -40,13 +44,13 @@ beforeEach(function () {
         'position' => 'Teacher',
         'employment_type' => 'full-time',
         'hired_at' => now(),
-        'status' => \App\Enum\BaseStatusEnum::Active->value ?? \App\Enum\BaseStatusEnum::Active ?? 'active',
+        'status' => BaseStatusEnum::Active->value ?? BaseStatusEnum::Active ?? 'active',
         'dob' => '1990-01-01',
         'gender' => 'male',
     ]);
 
     $this->teacherB = User::factory()->create([
-        'email' => 'teacherB@example.com'
+        'email' => 'teacherB@example.com',
     ]);
     $this->teacherB->assignRole($this->teacherRole);
     $this->teacherB->syncPermissions(['plannings.index', 'plannings.progress', 'students.index']);
@@ -60,7 +64,7 @@ beforeEach(function () {
         'position' => 'Teacher',
         'employment_type' => 'full-time',
         'hired_at' => now(),
-        'status' => \App\Enum\BaseStatusEnum::Active->value ?? \App\Enum\BaseStatusEnum::Active ?? 'active',
+        'status' => BaseStatusEnum::Active->value ?? BaseStatusEnum::Active ?? 'active',
         'dob' => '1990-01-01',
         'gender' => 'male',
     ]);
@@ -97,7 +101,7 @@ it('scopes students query for teachers to only their assigned students', functio
     // When logged in as Teacher A
     $this->actingAs($this->teacherA);
 
-    $scopedStudents = \Quochao56\Student\Filament\Resources\StudentResource::getEloquentQuery()->pluck('id')->toArray();
+    $scopedStudents = StudentResource::getEloquentQuery()->pluck('id')->toArray();
 
     expect($scopedStudents)->toContain($this->student1->id);
     expect($scopedStudents)->not->toContain($this->student2->id);
@@ -105,7 +109,7 @@ it('scopes students query for teachers to only their assigned students', functio
     // When logged in as Teacher B
     $this->actingAs($this->teacherB);
 
-    $scopedStudents = \Quochao56\Student\Filament\Resources\StudentResource::getEloquentQuery()->pluck('id')->toArray();
+    $scopedStudents = StudentResource::getEloquentQuery()->pluck('id')->toArray();
 
     expect($scopedStudents)->toContain($this->student2->id);
     expect($scopedStudents)->not->toContain($this->student1->id);
@@ -114,7 +118,7 @@ it('scopes students query for teachers to only their assigned students', functio
 it('allows superadmin to see all students', function () {
     $this->actingAs($this->superadmin);
 
-    $scopedStudents = \Quochao56\Student\Filament\Resources\StudentResource::getEloquentQuery()->pluck('id')->toArray();
+    $scopedStudents = StudentResource::getEloquentQuery()->pluck('id')->toArray();
 
     expect($scopedStudents)->toContain($this->student1->id);
     expect($scopedStudents)->toContain($this->student2->id);
@@ -123,9 +127,9 @@ it('allows superadmin to see all students', function () {
 it('enforces equipments.index permission to control access to equipment policy', function () {
     // Teacher A does not have 'equipments.index' permission
     $this->actingAs($this->teacherA);
-    expect(Gate::allows('viewAny', \Quochao56\Equipment\Models\Equipment::class))->toBeFalse();
+    expect(Gate::allows('viewAny', Equipment::class))->toBeFalse();
 
     // Superadmin has all permissions
     $this->actingAs($this->superadmin);
-    expect(Gate::allows('viewAny', \Quochao56\Equipment\Models\Equipment::class))->toBeTrue();
+    expect(Gate::allows('viewAny', Equipment::class))->toBeTrue();
 });

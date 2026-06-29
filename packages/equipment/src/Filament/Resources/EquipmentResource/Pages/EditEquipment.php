@@ -4,8 +4,8 @@ namespace Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Quochao56\Equipment\Filament\Resources\EquipmentResource;
 use Quochao56\Core\Traits\HasAutoSave;
+use Quochao56\Equipment\Filament\Resources\EquipmentResource;
 
 class EditEquipment extends EditRecord
 {

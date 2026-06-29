@@ -2,12 +2,12 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentCategoryResource\Tables;
 
-use Filament\Tables\Table;
 use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Quochao56\Equipment\Models\EquipmentCategory;
 
 class EquipmentCategoryTable
@@ -40,7 +40,7 @@ class EquipmentCategoryTable
             ->modifyQueryUsing(function ($query) {
                 if (empty($query->getQuery()->orders)) {
                     $orderedIds = EquipmentCategory::getTreeIds();
-                    if (!empty($orderedIds)) {
+                    if (! empty($orderedIds)) {
                         $query->orderByRaw('FIELD(id, '.implode(',', $orderedIds).')');
                     }
                 }

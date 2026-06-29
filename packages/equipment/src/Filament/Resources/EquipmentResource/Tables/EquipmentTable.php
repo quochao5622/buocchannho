@@ -2,7 +2,6 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentResource\Tables;
 
-use Filament\Tables\Table;
 use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -10,13 +9,14 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Maatwebsite\Excel\Excel;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Columns\Column;
 use Quochao56\Core\Support\VietnameseSearch;
 use Quochao56\Equipment\Filament\Exports\EquipmentExcelExport;
 use Quochao56\Equipment\Models\Equipment;
 use Quochao56\Equipment\Models\EquipmentCategory;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Columns\Column;
 
 class EquipmentTable
 {

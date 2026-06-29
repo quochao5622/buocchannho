@@ -2,17 +2,17 @@
 
 namespace Quochao56\Equipment\Filament\Resources;
 
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Pages\CreateEquipmentInventory;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Pages\EditEquipmentInventory;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Pages\ListEquipmentInventories;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\RelationManagers\DetailsRelationManager;
-use Quochao56\Equipment\Models\EquipmentInventory;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Schemas\EquipmentInventoryForm;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Tables\EquipmentInventoryTable;
+use Quochao56\Equipment\Models\EquipmentInventory;
 
 class EquipmentInventoryResource extends Resource
 {

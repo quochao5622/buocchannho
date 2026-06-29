@@ -2,35 +2,36 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Tables;
 
-use Quochao56\Employee\Models\Employee;
-use Filament\Forms\Components\Select;
-use Quochao56\Student\Models\Student;
-use Filament\Notifications\Notification;
-use App\Enum\BaseStatusEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use Filament\Tables\Filters\Filter; // Thêm class Filter
-use Filament\Forms\Components\DatePicker; // Thêm class DatePicker
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Table; // Thêm class Filter
+use Illuminate\Database\Eloquent\Builder; // Thêm class DatePicker
+use Illuminate\Support\Facades\Auth;
+use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
 use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\Student\Models\Student;
 
 class PlanningsTable
 {
     public static function configure(Table $table): Table
     {
         $currentEmployeeId = null;
-        if (auth()->check()) {
-            $currentEmployeeId = Employee::where('email', auth()->user()->email)->first()?->id;
+        if (Auth::check()) {
+            $currentEmployeeId = Employee::where('email', Auth::user()->email)->first()?->id;
         }
 
         return $table
@@ -129,13 +130,13 @@ class PlanningsTable
                             ->options(Student::query()->pluck('name', 'id'))
                             ->required()
                             ->searchable(),
-                        FilamentFormsComponentsDatePicker::make('start_date')
+                        DatePicker::make('start_date')
                             ->label(trans('packages.planning_evaluation::planning.clone.start_date'))
                             ->native(false)
                             ->default(now())
                             ->displayFormat('d/m/Y')
                             ->required(),
-                        FilamentFormsComponentsDatePicker::make('end_date')
+                        DatePicker::make('end_date')
                             ->label(trans('packages.planning_evaluation::planning.clone.end_date'))
                             ->native(false)
                             ->default(now()->addMonths(3))
@@ -151,8 +152,8 @@ class PlanningsTable
 
                         $newStudent = Student::find($data['student_id']);
                         $employeeId = null;
-                        if (auth()->check()) {
-                            $employeeId = Employee::where('email', auth()->user()->email)->first()?->id;
+                        if (Auth::check()) {
+                            $employeeId = Employee::where('email', Auth::user()->email)->first()?->id;
                         }
                         $cloned->employee_id = $newStudent?->currentAssignment?->employee_id
                             ?? $employeeId

@@ -2,11 +2,11 @@
 
 namespace Quochao56\Student\Filament\Resources\StudentResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 class StudentForm
 {
@@ -34,6 +34,7 @@ class StudentForm
                 ]),
             DatePicker::make('dob')
                 ->label(trans('packages.student::student.fields.dob'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
             TextInput::make('father_name')
                 ->label(trans('packages.student::student.fields.father_name'))

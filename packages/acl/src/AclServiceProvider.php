@@ -2,23 +2,27 @@
 
 namespace Quochao56\Acl;
 
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TernaryFilter;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Lab404\Impersonate\Events\LeaveImpersonation;
+use Lab404\Impersonate\Events\TakeImpersonation;
+use Quochao56\Acl\Filament\Resources\Users\Schemas\UserForm;
+use Quochao56\Acl\Listeners\LogSuccessfulLogin;
+use Quochao56\Acl\Listeners\LogSuccessfulLogout;
+use Quochao56\Acl\Policies\RolePolicy;
+use Quochao56\Acl\Policies\UserPolicy;
+use Quochao56\Core\Models\User;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
-use Quochao56\Acl\Policies\RolePolicy;
-use Quochao56\Acl\Policies\UserPolicy;
-use Illuminate\Support\Facades\Gate;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components\Roles as UserRolesField;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Columns\Roles as UserRolesColumn;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserFilters;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Filters\Roles as UserRolesFilter;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserFilters;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable;
 
 class AclServiceProvider extends PackageServiceProvider
 {
@@ -62,31 +66,39 @@ class AclServiceProvider extends PackageServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(User::class, UserPolicy::class);
 
+        // Fix Impersonate Leave/Take logout issue in Laravel 11/12
+        Event::listen(LeaveImpersonation::class, function (LeaveImpersonation $event) {
+            app('request')->setUserResolver(function () use ($event) {
+                return $event->impersonator;
+            });
+        });
+
+        Event::listen(TakeImpersonation::class, function (TakeImpersonation $event) {
+            app('request')->setUserResolver(function () use ($event) {
+                return $event->impersonated;
+            });
+        });
+
+        Event::listen(Login::class, LogSuccessfulLogin::class);
+        Event::listen(Logout::class, LogSuccessfulLogout::class);
+
         // 3. Register Spatie Role field and filters into tomatophp/filament-users
         if (class_exists(UserForm::class)) {
-            UserForm::register([
-                UserRolesField::make(),
-                Checkbox::make('is_super_admin')
-                    ->label('Superadmin'),
-                Toggle::make('is_active')
-                    ->label('Trạng thái hoạt động')
-                    ->default(true),
-            ]);
             UsersTable::register([
                 UserRolesColumn::make(),
                 IconColumn::make('is_super_admin')
-                    ->label('Superadmin')
+                    ->label(trans('acl::user.fields.super_admin'))
                     ->boolean()
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Hoạt động')
+                    ->label(trans('acl::user.fields.active'))
                     ->boolean()
                     ->sortable(),
             ]);
             UserFilters::register([
                 UserRolesFilter::make(),
                 TernaryFilter::make('is_active')
-                    ->label('Trạng thái hoạt động'),
+                    ->label(trans('acl::user.fields.is_active')),
             ]);
         }
     }

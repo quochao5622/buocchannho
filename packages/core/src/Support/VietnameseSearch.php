@@ -69,7 +69,7 @@ class VietnameseSearch
     /**
      * Áp dụng search không dấu cho một hoặc nhiều cột (MySQL query).
      *
-     * @param string[] $columns  Tên cột (chỉ hỗ trợ cột local, không hỗ trợ dot-notation)
+     * @param  string[]  $columns  Tên cột (chỉ hỗ trợ cột local, không hỗ trợ dot-notation)
      */
     public static function apply(Builder $query, string $search, array $columns): Builder
     {
@@ -91,7 +91,7 @@ class VietnameseSearch
     /**
      * Tạo closure dùng cho ->searchable(query: ...) của Filament TextColumn.
      *
-     * @param string $column  Tên cột trong DB (không có dot-notation)
+     * @param  string  $column  Tên cột trong DB (không có dot-notation)
      */
     public static function column(string $column): \Closure
     {

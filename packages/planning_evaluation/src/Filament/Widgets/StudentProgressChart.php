@@ -20,7 +20,7 @@ class StudentProgressChart extends ChartWidget
 
     protected function getData(): array
     {
-        if (!$this->studentId) {
+        if (! $this->studentId) {
             return ['datasets' => [], 'labels' => []];
         }
 

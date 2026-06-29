@@ -2,8 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Quochao56\Core\Models\User;
 
 class EvaluationHistory extends Model
 {

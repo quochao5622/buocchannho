@@ -4,9 +4,9 @@ namespace Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Page
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Quochao56\Core\Traits\HasAutoSave;
 use Quochao56\Equipment\Filament\Actions\ApproveAction;
 use Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource;
-use Quochao56\Core\Traits\HasAutoSave;
 
 class EditEquipmentInventory extends EditRecord
 {

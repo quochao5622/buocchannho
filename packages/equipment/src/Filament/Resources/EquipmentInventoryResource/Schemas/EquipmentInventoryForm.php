@@ -2,12 +2,12 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Quochao56\Equipment\Models\EquipmentInventory;
 
@@ -30,6 +30,7 @@ class EquipmentInventoryForm
                 ->label(trans('packages.equipment::equipment_inventory.fields.inventory_date'))
                 ->native(false)
                 ->default(now())
+                ->displayFormat('d/m/Y')
                 ->required(),
 
             Select::make('status')

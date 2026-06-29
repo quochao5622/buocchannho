@@ -2,16 +2,18 @@
 
 namespace Quochao56\Equipment\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Models\User;
 
-class EquipmentInventory extends Model
+class EquipmentInventory extends Model implements AuditableContract
 {
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $table = 'equipment_inventories';
 
@@ -92,7 +94,7 @@ class EquipmentInventory extends Model
 
             foreach ($this->details as $detail) {
                 $equipment = Equipment::query()->find($detail->equipment_id);
-                if (!$equipment) {
+                if (! $equipment) {
                     continue;
                 }
 

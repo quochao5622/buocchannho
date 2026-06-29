@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'active'    => 'Active',
-    'inactive'  => 'Inactive',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
     'published' => 'Published',
-    'draft'     => 'Draft',
-    'pending'   => 'Pending',
+    'draft' => 'Draft',
+    'pending' => 'Pending',
 ];

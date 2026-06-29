@@ -2,8 +2,8 @@
 
 namespace Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 
-use Quochao56\Acl\Filament\Resources\RoleResource;
 use Filament\Resources\Pages\CreateRecord;
+use Quochao56\Acl\Filament\Resources\RoleResource;
 
 class CreateRole extends CreateRecord
 {

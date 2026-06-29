@@ -2,9 +2,9 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages;
 
-use App\Enum\BaseStatusEnum;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Validation\ValidationException;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 
 class CreateEvaluation extends CreateRecord
@@ -54,7 +54,7 @@ class CreateEvaluation extends CreateRecord
             }
         }
 
-        if (!empty($messages)) {
+        if (! empty($messages)) {
             throw ValidationException::withMessages($messages);
         }
     }

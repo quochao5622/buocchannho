@@ -2,16 +2,16 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Tables;
 
-use Filament\Tables\Table;
 use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Quochao56\Core\Support\VietnameseSearch;
 use Quochao56\Equipment\Filament\Actions\ApproveAction;
 use Quochao56\Equipment\Models\EquipmentInventory;
-use Quochao56\Core\Support\VietnameseSearch;
 
 class EquipmentInventoryTable
 {

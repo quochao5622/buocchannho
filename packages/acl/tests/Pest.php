@@ -1,0 +1,5 @@
+<?php
+
+use Quochao56\Acl\Tests\TestCase;
+
+uses(TestCase::class)->in(__DIR__);
