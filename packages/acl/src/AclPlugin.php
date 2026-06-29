@@ -4,6 +4,7 @@ namespace Quochao56\Acl;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Quochao56\Acl\Filament\Pages\EditProfile;
 use Quochao56\Acl\Filament\Resources\RoleResource;
 
 class AclPlugin implements Plugin
@@ -15,9 +16,11 @@ class AclPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->resources([
-            RoleResource::class,
-        ]);
+        $panel
+            ->resources([
+                RoleResource::class,
+            ])
+            ->profile(EditProfile::class, isSimple: false);
     }
 
     public function boot(Panel $panel): void

@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use AchyutN\FilamentLogViewer\FilamentLogViewer;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Support\Enums\Width;
 use Quochao56\Employee\EmployeePlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -27,6 +29,9 @@ use Quochao56\Acl\AclPlugin;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
+
+use Tapp\FilamentAuditing\FilamentAuditingPlugin;
+use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -73,20 +78,25 @@ class AdminPanelProvider extends PanelProvider
                 PlanningEvaluationPlugin::make(),
                 EquipmentPlugin::make(),
                 AclPlugin::make(),
-                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
+                FilamentUsersPlugin::make(),
+                FilamentLogViewer::make()
+                    ->navigationGroup('Hệ thống')
+                    ->authorize(fn(): bool => auth()->check() && auth()->user()->can('logs.index')),
+                FilamentAuditingPlugin::make(),
             ])
             ->navigationGroups([
-                \Filament\Navigation\NavigationGroup::make()
+                NavigationGroup::make()
                     ->label(trans('packages.student::student.navigation_group')),
-                \Filament\Navigation\NavigationGroup::make()
+                NavigationGroup::make()
                     ->label(trans('packages.planning_evaluation::planning.navigation_group')),
-                \Filament\Navigation\NavigationGroup::make()
+                NavigationGroup::make()
                     ->label(trans('packages.equipment::equipment.common.navigation_group')),
-                \Filament\Navigation\NavigationGroup::make()
+                NavigationGroup::make()
                     ->label('Hệ thống'),
             ])
             ->spa()
             ->maxContentWidth(Width::Full)
+
             ->sidebarCollapsibleOnDesktop(true);
     }
     public function boot(): void

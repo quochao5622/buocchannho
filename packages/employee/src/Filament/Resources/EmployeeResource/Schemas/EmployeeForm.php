@@ -40,6 +40,7 @@ class EmployeeForm
 
             DatePicker::make('dob')
                 ->label(trans('packages.employee::employee.fields.dob'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             TextInput::make('phone')
@@ -66,10 +67,12 @@ class EmployeeForm
 
             DatePicker::make('hired_at')
                 ->label(trans('packages.employee::employee.fields.hired_at'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             DatePicker::make('probation_end_at')
                 ->label(trans('packages.employee::employee.fields.probation_end_at'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
 
             FileUpload::make('avatar')

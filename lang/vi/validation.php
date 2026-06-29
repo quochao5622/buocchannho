@@ -111,6 +111,14 @@ return [
     'unique'               => 'Trường :attribute đã có trong cơ sở dữ liệu.',
     'uploaded'             => 'Trường :attribute tải lên thất bại.',
     'url'                  => 'Trường :attribute không giống với định dạng một URL.',
+    'current_password'     => 'Mật khẩu hiện tại không đúng.',
+    'password'             => [
+        'letters'       => 'Trường :attribute phải chứa ít nhất một chữ cái.',
+        'mixed'         => 'Trường :attribute phải chứa ít nhất một chữ hoa và một chữ thường.',
+        'numbers'       => 'Trường :attribute phải chứa ít nhất một số.',
+        'symbols'       => 'Trường :attribute phải chứa ít nhất một ký tự đặc biệt.',
+        'uncompromised' => 'Trường :attribute đã bị lộ trong dữ liệu bị rò rỉ. Vui lòng chọn mật khẩu khác.',
+    ],
 
     /*
     |--------------------------------------------------------------------------

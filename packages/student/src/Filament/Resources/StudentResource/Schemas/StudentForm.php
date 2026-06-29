@@ -34,6 +34,7 @@ class StudentForm
                 ]),
             DatePicker::make('dob')
                 ->label(trans('packages.student::student.fields.dob'))
+                ->displayFormat('d/m/Y')
                 ->native(false),
             TextInput::make('father_name')
                 ->label(trans('packages.student::student.fields.father_name'))

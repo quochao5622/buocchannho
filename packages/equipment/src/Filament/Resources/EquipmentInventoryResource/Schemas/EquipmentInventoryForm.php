@@ -21,15 +21,16 @@ class EquipmentInventoryForm
                 ->required()
                 ->maxLength(50)
                 ->unique(ignoreRecord: true)
-                ->default(fn () => (new EquipmentInventory)->generateCode()),
+                ->default(fn() => (new EquipmentInventory)->generateCode()),
 
             Hidden::make('inspector_id')
-                ->default(fn () => Auth::id()),
+                ->default(fn() => Auth::id()),
 
             DatePicker::make('inventory_date')
                 ->label(trans('packages.equipment::equipment_inventory.fields.inventory_date'))
                 ->native(false)
                 ->default(now())
+                ->displayFormat('d/m/Y')
                 ->required(),
 
             Select::make('status')

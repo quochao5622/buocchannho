@@ -9,7 +9,7 @@ use App\Models\User;
 use Quochao56\Acl\Policies\RolePolicy;
 use Quochao56\Acl\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
-use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
+use Quochao56\Acl\Filament\Resources\Users\Schemas\UserForm;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components\Roles as UserRolesField;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Columns\Roles as UserRolesColumn;

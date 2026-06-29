@@ -5,9 +5,12 @@ namespace Quochao56\PlanningEvaluation\Models;
 use App\Enum\BaseStatusEnum;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Evaluation extends Model
+class Evaluation extends Model implements AuditableContract
 {
+    use Auditable;
     protected $fillable = [
         'name',
         'description',

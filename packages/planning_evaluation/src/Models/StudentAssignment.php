@@ -5,9 +5,12 @@ namespace Quochao56\PlanningEvaluation\Models;
 use Quochao56\Student\Models\Student;
 use Quochao56\Employee\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class StudentAssignment extends Model
+class StudentAssignment extends Model implements AuditableContract
 {
+    use Auditable;
     protected $table = 'student_assignments';
 
     protected $fillable = [

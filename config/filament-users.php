@@ -25,7 +25,7 @@ return [
      * ---------------------------------------------
      * The navigation sort of the resource.
      */
-    'navigation_sort' => 1,
+    'navigation_sort' => 9,
 
     /**
      * ---------------------------------------------
@@ -141,11 +141,11 @@ return [
         'table' => [
             'class' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable::class,
             'filters' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserFilters::class,
-            'actions' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserActions::class,
+            'actions' => \Quochao56\Acl\Filament\Resources\Users\Tables\UserActions::class,
             'bulkActions' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserBulkActions::class,
         ],
         'form' => [
-            'class' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm::class,
+            'class' => \Quochao56\Acl\Filament\Resources\Users\Schemas\UserForm::class,
         ],
         'infolist' => [
             'class' => \TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserInfolist::class,

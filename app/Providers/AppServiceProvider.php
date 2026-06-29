@@ -3,6 +3,24 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use Quochao56\Student\Models\Student;
+use App\Policies\StudentPolicy;
+use Quochao56\PlanningEvaluation\Models\Planning;
+use App\Policies\PlanningPolicy;
+use Quochao56\PlanningEvaluation\Models\Evaluation;
+use App\Policies\EvaluationPolicy;
+use Quochao56\Equipment\Models\Equipment;
+use App\Policies\EquipmentPolicy;
+use Quochao56\Equipment\Models\EquipmentCategory;
+use App\Policies\EquipmentCategoryPolicy;
+use Quochao56\Equipment\Models\EquipmentInventory;
+use App\Policies\EquipmentInventoryPolicy;
+use Quochao56\Employee\Models\Employee;
+use App\Policies\EmployeePolicy;
+use OwenIt\Auditing\Models\Audit;
+use Tapp\FilamentAuditing\Models\Audit as TappAudit;
+use App\Policies\AuditPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,18 +34,20 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+        Gate::before(function ($user, $ability) {
             if ($user->isSuperAdmin()) {
                 return true;
             }
         });
 
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\Student\Models\Student::class, \App\Policies\StudentPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\PlanningEvaluation\Models\Planning::class, \App\Policies\PlanningPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\PlanningEvaluation\Models\Evaluation::class, \App\Policies\EvaluationPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\Equipment\Models\Equipment::class, \App\Policies\EquipmentPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\Equipment\Models\EquipmentCategory::class, \App\Policies\EquipmentCategoryPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\Equipment\Models\EquipmentInventory::class, \App\Policies\EquipmentInventoryPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\Quochao56\Employee\Models\Employee::class, \App\Policies\EmployeePolicy::class);
+        Gate::policy(Student::class, StudentPolicy::class);
+        Gate::policy(Planning::class, PlanningPolicy::class);
+        Gate::policy(Evaluation::class, EvaluationPolicy::class);
+        Gate::policy(Equipment::class, EquipmentPolicy::class);
+        Gate::policy(EquipmentCategory::class, EquipmentCategoryPolicy::class);
+        Gate::policy(EquipmentInventory::class, EquipmentInventoryPolicy::class);
+        Gate::policy(Employee::class, EmployeePolicy::class);
+        Gate::policy(Audit::class, AuditPolicy::class);
+        Gate::policy(TappAudit::class, AuditPolicy::class);
     }
 }

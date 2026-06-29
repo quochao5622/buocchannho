@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class EquipmentCategory extends Model
-{
-    use HasFactory;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
+class EquipmentCategory extends Model implements AuditableContract
+{
+    use HasFactory, Auditable;
     protected $table = 'equipment_categories';
 
     protected $fillable = [
@@ -57,8 +59,8 @@ class EquipmentCategory extends Model
                 if ($exceptId && $category->id === $exceptId) {
                     continue;
                 }
-                $options[$category->id] = $prefix.$category->name;
-                $traverse($category->children, $prefix.'— ');
+                $options[$category->id] = $prefix . $category->name;
+                $traverse($category->children, $prefix . '— ');
             }
         };
 
@@ -107,7 +109,7 @@ class EquipmentCategory extends Model
             $latestCategory = static::latest()->first();
             $latestCode = $latestCategory ? (int) str_replace('DM', '', $latestCategory->code) : 0;
 
-            return 'DM'.str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
+            return 'DM' . str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
         }
 
         return $this->attributes['code'];

@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class EquipmentInventory extends Model
+class EquipmentInventory extends Model implements AuditableContract
 {
-    use HasFactory;
-
+    use HasFactory, Auditable;
     protected $table = 'equipment_inventories';
 
     protected $fillable = [
@@ -54,7 +55,7 @@ class EquipmentInventory extends Model
             $latestInventory = static::latest()->first();
             $latestCode = $latestInventory ? (int) str_replace('INV', '', $latestInventory->inventory_code) : 0;
 
-            return 'INV'.str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
+            return 'INV' . str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
         }
 
         return $this->attributes['inventory_code'];

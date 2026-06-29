@@ -10,10 +10,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "achyutn/filament-log-viewer": "^2.3",
         "bensampo/laravel-enum": "^6.12",
         "filament/filament": "5.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "owen-it/laravel-auditing": "^14.0",
         "pxlrbt/filament-excel": "^3.6",
         "quochao56/acl": "*@dev",
         "quochao56/core": "*@dev",
@@ -22,6 +24,7 @@
         "quochao56/planning-evaluation": "*@dev",
         "quochao56/student": "*@dev",
         "spatie/laravel-permission": "^8.0",
+        "tapp/filament-auditing": "4.*",
         "tomatophp/filament-users": "^5.0"
     },
     "require-dev": {
@@ -112,7 +115,8 @@
             "php-http/discovery": true
         },
         "audit": {
-            "ignore": ["PKSA-5bdf-2x61-v43c"]
+            "ignore": ["PKSA-5bdf-2x61-v43c"],
+            "block-insecure": false
         }
     },
     "minimum-stability": "dev",

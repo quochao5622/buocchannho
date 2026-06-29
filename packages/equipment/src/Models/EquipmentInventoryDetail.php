@@ -5,11 +5,12 @@ namespace Quochao56\Equipment\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class EquipmentInventoryDetail extends Model
+class EquipmentInventoryDetail extends Model implements AuditableContract
 {
-    use HasFactory;
-
+    use HasFactory, Auditable;
     protected $table = 'equipment_inventory_details';
 
     protected $fillable = [
