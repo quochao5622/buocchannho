@@ -17,26 +17,26 @@ class EmployeePolicy
 
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('employees.index');
     }
 
     public function view(User $user, Employee $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('employees.show');
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('employees.create');
     }
 
     public function update(User $user, Employee $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('employees.edit');
     }
 
     public function delete(User $user, Employee $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('employees.destroy');
     }
 }

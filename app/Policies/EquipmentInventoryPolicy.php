@@ -17,26 +17,26 @@ class EquipmentInventoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_inventories.index');
     }
 
     public function view(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_inventories.show');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_inventories.create');
     }
 
     public function update(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_inventories.edit');
     }
 
     public function delete(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_inventories.destroy');
     }
 }

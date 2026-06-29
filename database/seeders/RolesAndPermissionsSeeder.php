@@ -18,22 +18,12 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // 2. Create default roles
-        $superadminRole = Role::findOrCreate('superadmin', 'web');
         $teacherRole = Role::findOrCreate('teacher', 'web');
 
-        // Superadmin gets all permissions in the system
-        $categories = config('permissions.categories', []);
-        $allPermissions = [];
-        foreach ($categories as $perms) {
-            $allPermissions = array_merge($allPermissions, array_keys($perms));
-        }
-        $superadminRole->syncPermissions($allPermissions);
-
-        // 3. Assign Roles to default Users
-        // Admin user (test@example.com) -> superadmin
-        $adminUser = User::where('email', 'dtquynhnhu1026@gmail.com')->first();
+        // 3. Setup default Super Admin
+        $adminUser = User::where('email', 'thomaszen63@gmail.com')->first();
         if ($adminUser) {
-            $adminUser->assignRole($superadminRole);
+            $adminUser->update(['is_super_admin' => true]);
         }
 
         // Teacher 1 (teacher1@example.com) -> teacher with all permissions (Teacher A)

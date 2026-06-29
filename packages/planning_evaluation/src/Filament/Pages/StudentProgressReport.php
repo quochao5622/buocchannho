@@ -2,11 +2,14 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Pages;
 
+use Filament\Forms\Components\DatePicker;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Filament\Pages\Page;
+use Quochao56\Employee\Models\Employee;
 use Quochao56\Student\Models\Student;
 
 class StudentProgressReport extends Page implements HasForms
@@ -30,16 +33,29 @@ class StudentProgressReport extends Page implements HasForms
         return trans('packages.planning_evaluation::planning.navigation_group');
     }
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 3;
 
     public static function canAccess(): bool
     {
-        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('view_progress_reports'));
+        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('plannings.progress'));
     }
 
     protected string $view = 'planning-evaluation::student-progress-report';
 
     public ?int $studentId = null;
+    public ?string $dateFrom = null;
+    public ?string $dateTo   = null;
+
+    public function mount(): void
+    {
+        $this->dateFrom = now()->startOfYear()->format('Y-m-d');
+        $this->dateTo   = now()->endOfYear()->format('Y-m-d');
+
+        $this->form->fill([
+            'dateFrom' => $this->dateFrom,
+            'dateTo'   => $this->dateTo,
+        ]);
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -50,22 +66,46 @@ class StudentProgressReport extends Page implements HasForms
                     ->placeholder(trans('packages.planning_evaluation::planning.progress.placeholder'))
                     ->options(function () {
                         $query = Student::query()->where('status', 'active');
+
                         if (auth()->check() && !auth()->user()->isSuperAdmin()) {
-                            $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
-                            if ($employee) {
-                                $query->whereHas('currentAssignment', function ($q) use ($employee) {
-                                    $q->where('employee_id', $employee->id);
-                                });
-                            } else {
-                                $query->whereRaw('1=0');
+                            $canManageAll = auth()->user()->hasPermissionTo('employees.index')
+                                || auth()->user()->hasPermissionTo('employees.edit');
+
+                            if (!$canManageAll) {
+                                $employee = Employee::where('email', auth()->user()->email)->first();
+                                if ($employee) {
+                                    $query->whereHas('currentAssignment', function ($q) use ($employee) {
+                                        $q->where('employee_id', $employee->id);
+                                    });
+                                } else {
+                                    $query->whereRaw('1=0');
+                                }
                             }
                         }
-                        return $query->pluck('name', 'id');
+
+                        return $query->orderBy('name')->pluck('name', 'id');
                     })
-                    ->required()
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(fn ($state) => $this->studentId = $state),
+                    ->afterStateUpdated(fn($state) => $this->studentId = $state),
+
+                Grid::make(2)->schema([
+                    DatePicker::make('dateFrom')
+                        ->label('Từ ngày')
+                        ->native(false)
+                        ->displayFormat('d/m/Y')
+                        ->default(now()->startOfYear())
+                        ->live()
+                        ->afterStateUpdated(fn($state) => $this->dateFrom = $state),
+
+                    DatePicker::make('dateTo')
+                        ->label('Đến ngày')
+                        ->native(false)
+                        ->displayFormat('d/m/Y')
+                        ->default(now()->endOfYear())
+                        ->live()
+                        ->afterStateUpdated(fn($state) => $this->dateTo = $state),
+                ]),
             ]);
     }
 }

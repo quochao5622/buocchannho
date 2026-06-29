@@ -50,6 +50,24 @@ class Equipment extends Model
         return $this->attributes['equipment_code'];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Equipment $equipment) {
+            if ($equipment->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($equipment->image);
+            }
+        });
+
+        static::updating(function (Equipment $equipment) {
+            if ($equipment->isDirty('image')) {
+                $oldImage = $equipment->getOriginal('image');
+                if ($oldImage) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+                }
+            }
+        });
+    }
+
     /**
      * @return BelongsTo<EquipmentCategory, $this>
      */

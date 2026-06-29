@@ -17,26 +17,26 @@ class EquipmentCategoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_categories.index');
     }
 
     public function view(User $user, EquipmentCategory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_categories.show');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_categories.create');
     }
 
     public function update(User $user, EquipmentCategory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_categories.edit');
     }
 
     public function delete(User $user, EquipmentCategory $record): bool
     {
-        return $user->hasPermissionTo('check_equipment');
+        return $user->hasPermissionTo('equipment_categories.destroy');
     }
 }

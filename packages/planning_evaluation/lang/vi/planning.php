@@ -60,7 +60,7 @@ return [
         'assign_new' => 'Gán giáo viên mới',
         'assign_heading' => 'Gán giáo viên phụ trách mới',
         'assign_date' => 'Thời điểm gán',
-        'assign_teacher_bulk' => 'Gán giáo viên chủ quản',
+        'assign_teacher_bulk' => 'Gán giáo viên phụ trách',
         'students_list' => 'Học sinh đang phụ trách',
     ],
     'clone' => [
@@ -90,7 +90,7 @@ return [
         'student_code' => 'Mã học sinh',
         'student_name' => 'Học sinh',
         'nickname' => 'Biệt danh',
-        'managing_teacher' => 'Giáo viên chủ quản',
+        'managing_teacher' => 'Giáo viên phụ trách',
         'status' => 'Trạng thái nộp',
         'actual_teacher' => 'Giáo viên thực hiện',
         'type' => 'Loại theo dõi',

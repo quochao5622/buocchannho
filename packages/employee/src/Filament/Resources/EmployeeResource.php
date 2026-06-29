@@ -199,7 +199,7 @@ class EmployeeResource extends Resource
                 TextColumn::make('status')
                     ->label(trans('packages.employee::employee.fields.status'))
                     ->badge()
-                    ->color(fn ($state): string => $state instanceof BaseStatusEnum ? $state->getColor() : ($state === 'active' ? 'success' : 'danger')),
+                    ->color(fn($state): string => $state instanceof BaseStatusEnum ? $state->getColor() : ($state === 'active' ? 'success' : 'danger')),
             ])
             ->filters([
                 SelectFilter::make('status')

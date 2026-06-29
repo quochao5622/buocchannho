@@ -17,26 +17,26 @@ class EvaluationPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_plans_evaluations');
+        return $user->hasPermissionTo('evaluations.index');
     }
 
     public function view(User $user, Evaluation $record): bool
     {
-        return $user->hasPermissionTo('manage_plans_evaluations');
+        return $user->hasPermissionTo('evaluations.show');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_plans_evaluations');
+        return $user->hasPermissionTo('evaluations.create');
     }
 
     public function update(User $user, Evaluation $record): bool
     {
-        return $user->hasPermissionTo('manage_plans_evaluations');
+        return $user->hasPermissionTo('evaluations.edit');
     }
 
     public function delete(User $user, Evaluation $record): bool
     {
-        return $user->hasPermissionTo('manage_plans_evaluations');
+        return $user->hasPermissionTo('evaluations.destroy');
     }
 }

@@ -27,7 +27,7 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationIcon(): string | \BackedEnum  | \Illuminate\Contracts\Support\Htmlable  | null
     {
@@ -117,11 +117,11 @@ class StudentResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery();
-        
-        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+
+        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('students.view_all'))) {
             return $query;
         }
-        
+
         if (auth()->check()) {
             $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
             if ($employee) {
@@ -130,7 +130,7 @@ class StudentResource extends Resource
                 });
             }
         }
-        
+
         return $query->whereRaw('1=0');
     }
 
@@ -157,6 +157,10 @@ class StudentResource extends Resource
                 TextColumn::make('nickname')
                     ->label(trans('packages.student::student.fields.nickname'))
                     ->searchable(),
+
+                TextColumn::make('currentTeacher.name')
+                    ->label('Giáo viên phụ trách')
+                    ->placeholder('Chưa gán'),
 
                 TextColumn::make('father_name')
                     ->label(trans('packages.student::student.fields.father_name'))
@@ -203,7 +207,7 @@ class StudentResource extends Resource
                     ->label(trans('packages.planning_evaluation::planning.actions.create_plan'))
                     ->icon('heroicon-o-document-plus')
                     ->color('success')
-                    ->url(fn (Student $record) => \Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource::getUrl('create', [
+                    ->url(fn(Student $record) => \Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource::getUrl('create', [
                         'student_id' => $record->id
                     ])),
                 EditAction::make(),
@@ -214,7 +218,7 @@ class StudentResource extends Resource
                     BulkAction::make('assign_teacher')
                         ->label(trans('packages.planning_evaluation::planning.assignment.assign_teacher_bulk'))
                         ->icon('heroicon-o-user-plus')
-                        ->visible(fn () => auth()->check() && auth()->user()->can('assign_students'))
+                        ->visible(fn() => auth()->check() && auth()->user()->can('students.assign'))
                         ->form([
                             Select::make('employee_id')
                                 ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))
@@ -234,7 +238,7 @@ class StudentResource extends Resource
                                 $student->assignments()
                                     ->whereNull('unassigned_at')
                                     ->update(['unassigned_at' => $data['assigned_at']]);
-                                    
+
                                 // 2. Create new assignment
                                 $student->assignments()->create([
                                     'employee_id' => $data['employee_id'],
@@ -251,11 +255,11 @@ class StudentResource extends Resource
     public static function getRelations(): array
     {
         $relations = [];
-        
-        if (auth()->check() && auth()->user()->can('assign_students')) {
+
+        if (auth()->check() && auth()->user()->can('students.assign')) {
             $relations[] = \Quochao56\PlanningEvaluation\Filament\Resources\StudentAssignmentRelationManager::class;
         }
-        
+
         return $relations;
     }
 

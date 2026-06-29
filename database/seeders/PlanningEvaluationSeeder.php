@@ -162,7 +162,7 @@ class PlanningEvaluationSeeder extends Seeder
             );
         }
 
-        // 4. Phân công Giáo viên chủ quản (StudentAssignment)
+        // 4. Phân công Giáo viên phụ trách (StudentAssignment)
         // HS001 -> Admin Teacher (test@example.com), gán từ 3 tháng trước
         StudentAssignment::query()->firstOrCreate(
             ['student_id' => $students[0]->id, 'unassigned_at' => null],

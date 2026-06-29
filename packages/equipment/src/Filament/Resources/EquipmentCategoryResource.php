@@ -22,7 +22,7 @@ class EquipmentCategoryResource extends Resource
 {
     protected static ?string $model = EquipmentCategory::class;
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 1;
 
     public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
     {

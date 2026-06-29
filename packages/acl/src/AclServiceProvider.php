@@ -9,6 +9,16 @@ use App\Models\User;
 use Quochao56\Acl\Policies\RolePolicy;
 use Quochao56\Acl\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components\Roles as UserRolesField;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Columns\Roles as UserRolesColumn;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserFilters;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Filters\Roles as UserRolesFilter;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TernaryFilter;
 
 class AclServiceProvider extends PackageServiceProvider
 {
@@ -53,15 +63,30 @@ class AclServiceProvider extends PackageServiceProvider
         Gate::policy(User::class, UserPolicy::class);
 
         // 3. Register Spatie Role field and filters into tomatophp/filament-users
-        if (class_exists(\TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm::class)) {
-            \TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\UserForm::register([
-                \TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components\Roles::make(),
+        if (class_exists(UserForm::class)) {
+            UserForm::register([
+                UserRolesField::make(),
+                Checkbox::make('is_super_admin')
+                    ->label('Superadmin'),
+                Toggle::make('is_active')
+                    ->label('Trạng thái hoạt động')
+                    ->default(true),
             ]);
-            \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UsersTable::register([
-                \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Columns\Roles::make(),
+            UsersTable::register([
+                UserRolesColumn::make(),
+                IconColumn::make('is_super_admin')
+                    ->label('Superadmin')
+                    ->boolean()
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->label('Hoạt động')
+                    ->boolean()
+                    ->sortable(),
             ]);
-            \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\UserFilters::register([
-                \TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Filters\Roles::make(),
+            UserFilters::register([
+                UserRolesFilter::make(),
+                TernaryFilter::make('is_active')
+                    ->label('Trạng thái hoạt động'),
             ]);
         }
     }

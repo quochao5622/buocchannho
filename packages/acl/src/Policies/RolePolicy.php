@@ -17,26 +17,26 @@ class RolePolicy
 
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('roles.index');
     }
 
     public function view(User $user, Role $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('roles.show');
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('roles.create');
     }
 
     public function update(User $user, Role $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('roles.edit');
     }
 
     public function delete(User $user, Role $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('roles.destroy');
     }
 }

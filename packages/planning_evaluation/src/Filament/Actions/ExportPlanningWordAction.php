@@ -261,7 +261,7 @@ class ExportPlanningWordAction extends Action
 
         foreach ($matches[0] as [$token, $position]) {
             if ($position > $offset) {
-                $textRun->addText(substr($text, $offset, $position - $offset), $this->defaultTextStyle());
+                $textRun->addText(htmlspecialchars(substr($text, $offset, $position - $offset), ENT_QUOTES, 'UTF-8'), $this->defaultTextStyle());
             }
 
             $style = $this->defaultTextStyle();
@@ -276,14 +276,14 @@ class ExportPlanningWordAction extends Action
             }
 
             if ($content !== '') {
-                $textRun->addText($content, $style);
+                $textRun->addText(htmlspecialchars($content, ENT_QUOTES, 'UTF-8'), $style);
             }
 
             $offset = $position + strlen($token);
         }
 
         if ($offset < strlen($text)) {
-            $textRun->addText(substr($text, $offset), $this->defaultTextStyle());
+            $textRun->addText(htmlspecialchars(substr($text, $offset), ENT_QUOTES, 'UTF-8'), $this->defaultTextStyle());
         }
     }
 

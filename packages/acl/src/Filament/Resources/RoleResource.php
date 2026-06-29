@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
 class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
+    protected static ?int $navigationSort = 2;
+
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
@@ -56,13 +58,25 @@ class RoleResource extends Resource
         // Clear cached permissions to avoid state issues
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $categories = config('permissions.categories', []);
-        foreach ($categories as $group => $permissions) {
-            foreach ($permissions as $name => $labelKey) {
-                Permission::findOrCreate($name, 'web');
+        $groups = config('permissions', []);
+        $activePermissions = [];
+
+        foreach ($groups as $groupKey => $groupConfig) {
+            if (!isset($groupConfig['permissions'])) {
+                continue;
+            }
+            foreach (array_keys($groupConfig['permissions']) as $action) {
+                $permName = "{$groupKey}.{$action}";
+                Permission::findOrCreate($permName, 'web');
+                $activePermissions[] = $permName;
             }
         }
-        
+
+        // Clean up any stale permissions not in the config
+        Permission::where('guard_name', 'web')
+            ->whereNotIn('name', $activePermissions)
+            ->delete();
+
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 
@@ -71,22 +85,36 @@ class RoleResource extends Resource
         // Sync config permissions to DB before rendering the form
         self::syncPermissionsToDatabase();
 
-        $categories = config('permissions.categories', []);
+        $groups = config('permissions', []);
         $sections = [];
 
-        foreach ($categories as $group => $permissions) {
-            $translatedOptions = [];
-            foreach ($permissions as $name => $labelKey) {
-                $translatedOptions[$name] = trans($labelKey);
+        foreach ($groups as $groupKey => $groupConfig) {
+            if (!isset($groupConfig['permissions'])) {
+                continue;
             }
 
-            $sections[] = Section::make(trans($group))
+            $options = $groupConfig['permissions'];
+            $statePathName = 'permissions_group_' . $groupKey;
+            $groupPermNames = array_map(fn($action) => "{$groupKey}.{$action}", array_keys($options));
+
+            $sections[] = Section::make($groupConfig['label'])
                 ->schema([
-                    CheckboxList::make('permissions')
-                        ->relationship('permissions', 'name')
-                        ->options($translatedOptions)
-                        ->label(trans('acl::rbac.fields.permissions'))
-                        ->columns(2),
+                    CheckboxList::make($statePathName)
+                        ->options($options)
+                        ->hiddenLabel()
+                        ->columns(2)
+                        ->dehydrated(false)
+                        ->bulkToggleable()
+                        ->afterStateHydrated(function ($component, $state, ?\Illuminate\Database\Eloquent\Model $record) use ($groupKey, $groupPermNames) {
+                            if (! $record) {
+                                $component->state([]);
+                                return;
+                            }
+                            $selected = $record->permissions->pluck('name')->toArray();
+                            $groupSelected = array_intersect($selected, $groupPermNames);
+                            $actions = array_map(fn($perm) => substr($perm, strlen($groupKey) + 1), $groupSelected);
+                            $component->state(array_values($actions));
+                        }),
                 ])
                 ->collapsible();
         }
@@ -97,8 +125,10 @@ class RoleResource extends Resource
                     ->label(trans('acl::rbac.fields.name'))
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->placeholder(trans('acl::rbac.fields.name_placeholder')),
-            ], $sections));
+                    ->placeholder(trans('acl::rbac.fields.name_placeholder'))
+                    ->columnSpanFull(),
+            ], $sections))
+            ->columns(2);
     }
 
     public static function table(Table $table): Table

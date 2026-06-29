@@ -18,4 +18,26 @@ class EditRole extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $allPermissions = [];
+        $formState = $this->data;
+        foreach ($formState as $key => $values) {
+            if (str_starts_with($key, 'permissions_group_') && is_array($values)) {
+                $groupName = substr($key, strlen('permissions_group_'));
+                foreach ($values as $action) {
+                    $allPermissions[] = "{$groupName}.{$action}";
+                }
+            }
+        }
+        
+        $currentPermissions = $this->record->permissions->pluck('name')->toArray();
+        sort($allPermissions);
+        sort($currentPermissions);
+        
+        if ($allPermissions !== $currentPermissions) {
+            $this->record->syncPermissions($allPermissions);
+        }
+    }
 }

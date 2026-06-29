@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 class PlanningResource extends Resource
 {
     protected static ?string $model = Planning::class;
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -51,11 +51,11 @@ class PlanningResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery();
-        
-        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+
+        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('plannings.view_all'))) {
             return $query;
         }
-        
+
         if (auth()->check()) {
             $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
             if ($employee) {
@@ -64,7 +64,7 @@ class PlanningResource extends Resource
                 });
             }
         }
-        
+
         return $query->whereRaw('1=0');
     }
 

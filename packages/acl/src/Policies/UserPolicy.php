@@ -16,26 +16,26 @@ class UserPolicy
 
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('users.index');
     }
 
     public function view(User $user, User $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('users.show');
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('users.create');
     }
 
     public function update(User $user, User $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('users.edit');
     }
 
     public function delete(User $user, User $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('users.destroy');
     }
 }

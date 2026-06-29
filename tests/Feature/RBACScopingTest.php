@@ -16,24 +16,20 @@ beforeEach(function () {
     \Quochao56\Acl\Filament\Resources\RoleResource::syncPermissionsToDatabase();
 
     // Create roles
-    $this->superadminRole = Role::findOrCreate('superadmin', 'web');
     $this->teacherRole = Role::findOrCreate('teacher', 'web');
-
-    // Give all permissions to superadmin
-    $this->superadminRole->syncPermissions(Permission::all());
 
     // Create Superadmin User
     $this->superadmin = User::factory()->create([
-        'email' => 'superadmin@example.com'
+        'email' => 'superadmin@example.com',
+        'is_super_admin' => true,
     ]);
-    $this->superadmin->assignRole($this->superadminRole);
 
     // Create Teachers
     $this->teacherA = User::factory()->create([
         'email' => 'teacherA@example.com'
     ]);
     $this->teacherA->assignRole($this->teacherRole);
-    $this->teacherA->syncPermissions(['manage_plans_evaluations', 'view_progress_reports']);
+    $this->teacherA->syncPermissions(['plannings.index', 'plannings.progress', 'students.index']);
 
     $this->employeeA = Employee::create([
         'email' => 'teacherA@example.com',
@@ -53,7 +49,7 @@ beforeEach(function () {
         'email' => 'teacherB@example.com'
     ]);
     $this->teacherB->assignRole($this->teacherRole);
-    $this->teacherB->syncPermissions(['manage_plans_evaluations', 'view_progress_reports']);
+    $this->teacherB->syncPermissions(['plannings.index', 'plannings.progress', 'students.index']);
 
     $this->employeeB = Employee::create([
         'email' => 'teacherB@example.com',
@@ -124,8 +120,8 @@ it('allows superadmin to see all students', function () {
     expect($scopedStudents)->toContain($this->student2->id);
 });
 
-it('enforces check_equipment permission to control access to equipment policy', function () {
-    // Teacher A does not have 'check_equipment' permission
+it('enforces equipments.index permission to control access to equipment policy', function () {
+    // Teacher A does not have 'equipments.index' permission
     $this->actingAs($this->teacherA);
     expect(Gate::allows('viewAny', \Quochao56\Equipment\Models\Equipment::class))->toBeFalse();
 

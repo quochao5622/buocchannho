@@ -80,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
                 \Filament\Navigation\NavigationGroup::make()
                     ->label(trans('packages.equipment::equipment.common.navigation_group')),
                 \Filament\Navigation\NavigationGroup::make()
-                    ->label(trans('filament-users::user.group')),
+                    ->label('Hệ thống'),
             ])
             ->spa()
             ->maxContentWidth(Width::Full)

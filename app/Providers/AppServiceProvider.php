@@ -16,6 +16,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if ($user->isSuperAdmin()) {
+                return true;
+            }
+        });
+
         \Illuminate\Support\Facades\Gate::policy(\Quochao56\Student\Models\Student::class, \App\Policies\StudentPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\Quochao56\PlanningEvaluation\Models\Planning::class, \App\Policies\PlanningPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\Quochao56\PlanningEvaluation\Models\Evaluation::class, \App\Policies\EvaluationPolicy::class);

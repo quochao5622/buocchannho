@@ -36,7 +36,7 @@ class EquipmentInventoryResource extends Resource
 {
     protected static ?string $model = EquipmentInventory::class;
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 3;
 
     public static function getNavigationIcon(): string|\BackedEnum|\Illuminate\Contracts\Support\Htmlable|null
     {

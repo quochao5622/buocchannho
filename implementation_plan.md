@@ -5,7 +5,7 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 2. **Nhân bản kế hoạch (Clone Plan Action)** để tái sử dụng khung kế hoạch nhanh chóng.
 3. **Báo cáo Tiến độ Học sinh (Progress Report Page & Chart Widget)** bằng biểu đồ trực quan hóa dữ liệu đánh giá.
 4. **Trang Theo dõi gửi Kế hoạch & Đánh giá (Submission Tracker)** kèm chức năng **Xuất file Excel** báo cáo.
-5. **Tính năng Ghép nhóm Giáo viên - Học sinh (Teacher-Student Assignment)**: Quản lý phân công giáo viên chủ quản cho học sinh, lưu lịch sử phân công, và lọc kế hoạch/đánh giá theo giáo viên phụ trách.
+5. **Tính năng Ghép nhóm Giáo viên - Học sinh (Teacher-Student Assignment)**: Quản lý phân công giáo viên phụ trách cho học sinh, lưu lịch sử phân công, và lọc kế hoạch/đánh giá theo giáo viên phụ trách.
 
 ---
 
@@ -20,9 +20,9 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 >   * Giao diện gồm các bộ lọc ở trên cùng (`AboveContent`):
 >     1. **Loại theo dõi** (Kế hoạch / Đánh giá)
 >     2. **Thời gian** (Tháng/Năm)
->     3. **Giáo viên chủ quản** (Select từ danh sách Giáo viên) - Mặc định hiển thị toàn bộ giáo viên và học sinh. Nếu chọn một giáo viên cụ thể, bảng sẽ chỉ lọc danh sách học sinh thuộc quyền quản lý của giáo viên đó.
+>     3. **Giáo viên phụ trách** (Select từ danh sách Giáo viên) - Mặc định hiển thị toàn bộ giáo viên và học sinh. Nếu chọn một giáo viên cụ thể, bảng sẽ chỉ lọc danh sách học sinh thuộc quyền quản lý của giáo viên đó.
 >     4. **Chỉ xem học sinh của tôi** (Toggle) - Tự động lọc học sinh theo giáo viên đang đăng nhập (khớp email User và Employee).
->   * Bảng hiển thị danh sách học sinh. Cột: Mã học sinh, Tên học sinh, Biệt danh (Nickname), Trạng thái (Đã có / Chưa có), Giáo viên phụ trách (người lập KH/ĐG thực tế), Giáo viên chủ quản (người được giao quản lý bé hiện tại).
+>   * Bảng hiển thị danh sách học sinh. Cột: Mã học sinh, Tên học sinh, Biệt danh (Nickname), Trạng thái (Đã có / Chưa có), Giáo viên phụ trách (người lập KH/ĐG thực tế), Giáo viên phụ trách (người được giao quản lý bé hiện tại).
 >   * Hành động (Row Action): Nút "Xem chi tiết" chuyển hướng sang trang chỉnh sửa Kế hoạch/Đánh giá.
 >   * **Nút Export Excel:** Thêm nút xuất file Excel toàn bộ bảng dữ liệu hiện tại theo bộ lọc đang chọn (sử dụng Laravel Excel / Spatie Simple Excel).
 > * **Ghép nhóm Giáo viên - Học sinh:**
@@ -88,7 +88,7 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 
 #### [MODIFY] [PlanningsTable.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/src/Filament/Resources/Plannings/Tables/PlanningsTable.php)
 * Bổ sung Action `clone` vào dòng bảng và Header Action trang chỉnh sửa.
-* Thêm Table Filter "Giáo viên chủ quản" để lọc các kế hoạch có học sinh đang được quản lý bởi giáo viên được chọn.
+* Thêm Table Filter "Giáo viên phụ trách" để lọc các kế hoạch có học sinh đang được quản lý bởi giáo viên được chọn.
 
 #### [MODIFY] [EditPlanning.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/src/Filament/Resources/Plannings/Pages/EditPlanning.php)
 * Bổ sung Header Action `clone`.
@@ -101,14 +101,14 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 
 #### [NEW] [PlanningEvaluationTracker.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/src/Filament/Pages/PlanningEvaluationTracker.php)
 * Trang theo dõi nộp KH & ĐG. Hiển thị danh sách học sinh.
-* Tích hợp bộ lọc trên đầu bảng: Loại (KH/ĐG), Tháng/Năm, Giáo viên chủ quản (nếu trống sẽ hiển thị tất cả), Chỉ xem học sinh của tôi (khớp email user đăng nhập).
+* Tích hợp bộ lọc trên đầu bảng: Loại (KH/ĐG), Tháng/Năm, Giáo viên phụ trách (nếu trống sẽ hiển thị tất cả), Chỉ xem học sinh của tôi (khớp email user đăng nhập).
 * Thêm nút Export Excel: Sử dụng Laravel Excel / Spatie Simple Excel để kết xuất danh sách học sinh đang hiển thị trên bảng ra file Excel kèm trạng thái và thông tin giáo viên.
 
 #### [MODIFY] [PlanningEvaluationPlugin.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/src/PlanningEvaluationPlugin.php)
 * Đăng ký trang báo cáo `StudentProgressReport::class` và trang theo dõi `PlanningEvaluationTracker::class` trong Filament panel.
 
 #### [MODIFY] [planning.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/lang/vi/planning.php)
-* Bổ sung các chuỗi dịch cần thiết cho phân công giáo viên chủ quản, lịch sử gán, và các bộ lọc nộp kế hoạch.
+* Bổ sung các chuỗi dịch cần thiết cho phân công giáo viên phụ trách, lịch sử gán, và các bộ lọc nộp kế hoạch.
 
 #### [MODIFY] [evaluation.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/planning_evaluation/lang/vi/evaluation.php)
 * Bổ sung dịch nghĩa tiếng Việt liên quan đến lịch sử đánh giá.
@@ -117,13 +117,13 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 
 #### [MODIFY] [StudentResource.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/packages/student/src/Filament/Resources/StudentResource.php)
 * Đăng ký `StudentAssignmentRelationManager::class` trong hàm `getRelations()` để quản trị viên có thể gán giáo viên ngay tại trang chi tiết học sinh.
-* Thêm Table Bulk Action `assign_teacher` để gán giáo viên chủ quản hàng loạt cho các học sinh được chọn.
+* Thêm Table Bulk Action `assign_teacher` để gán giáo viên phụ trách hàng loạt cho các học sinh được chọn.
 
 #### [NEW] [PlanningEvaluationSeeder.php](file:///d:/haolq/laravel/opsgreat/gitlab/buocchannho/database/seeders/PlanningEvaluationSeeder.php)
 * Tạo lớp Seeder để khởi tạo dữ liệu mẫu cho hệ thống Kế hoạch & Đánh giá:
   * Tạo tài khoản người dùng (`User`) và hồ sơ giáo viên (`Employee`) tương ứng để phục vụ kiểm thử tính năng lọc theo giáo viên đăng nhập.
   * Tạo danh sách Học sinh mẫu.
-  * Phân công Giáo viên chủ quản cho học sinh (cả bản ghi hiện tại và lịch sử đã kết thúc).
+  * Phân công Giáo viên phụ trách cho học sinh (cả bản ghi hiện tại và lịch sử đã kết thúc).
   * Lập Kế hoạch mẫu với nội dung chi tiết mục tiêu (JSON) và các Đánh giá tương ứng qua các mốc thời gian để vẽ biểu đồ tiến độ.
 
 ---
@@ -139,7 +139,7 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
 ### Manual Verification
 1. **Kiểm tra Phân công Giáo viên Hàng loạt (Bulk Action):**
    * Truy cập danh sách Học sinh (`StudentResource` Index).
-   * Chọn nhiều học sinh bằng Checkbox, bấm vào nút Hành động hàng loạt -> Chọn "Gán giáo viên chủ quản".
+   * Chọn nhiều học sinh bằng Checkbox, bấm vào nút Hành động hàng loạt -> Chọn "Gán giáo viên phụ trách".
    * Chọn giáo viên và thời điểm gán. Lưu lại và xác nhận dữ liệu cập nhật chính xác cho toàn bộ học sinh được chọn.
 2. **Kiểm tra Phân công Giáo viên (StudentAssignment UI):**
    * Truy cập trang chỉnh sửa Học sinh. Xem mục "Lịch sử giáo viên phụ trách".
@@ -147,7 +147,7 @@ Tài liệu này chi tiết kế hoạch kỹ thuật để thực hiện 5 tín
    * Gán giáo viên khác, kiểm tra xem dòng gán cũ có tự động điền Ngày kết thúc.
 3. **Kiểm tra Trang Theo dõi gửi KH & ĐG và Bộ lọc Giáo viên:**
    * Truy cập trang "Theo dõi nộp KH & ĐG".
-   * Chọn bộ lọc "Giáo viên chủ quản". Xác nhận chỉ hiển thị các học sinh được gán cho giáo viên đó.
+   * Chọn bộ lọc "Giáo viên phụ trách". Xác nhận chỉ hiển thị các học sinh được gán cho giáo viên đó.
    * Nhấn nút Export Excel, mở file tải về kiểm tra cột trạng thái và danh sách học sinh khớp hoàn toàn với màn hình.
 4. **Kiểm tra Lịch sử thay đổi & Nhân bản:**
    * Thực hiện các thao tác sửa kế hoạch để lưu history và bấm nhân bản để kiểm tra.

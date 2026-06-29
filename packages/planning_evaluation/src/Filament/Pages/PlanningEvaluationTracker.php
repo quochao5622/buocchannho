@@ -41,11 +41,11 @@ class PlanningEvaluationTracker extends Page implements HasTable
         return trans('packages.planning_evaluation::planning.navigation_group');
     }
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
     public static function canAccess(): bool
     {
-        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('view_global_tracker'));
+        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('plannings.tracker'));
     }
 
     protected string $view = 'planning-evaluation::tracker';

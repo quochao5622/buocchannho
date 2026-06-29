@@ -20,7 +20,7 @@ class EvaluationResource extends Resource
 
     protected static ?string $parentResource = PlanningResource::class;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 30;
 
     protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
@@ -47,11 +47,11 @@ class EvaluationResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery();
-        
-        if (auth()->check() && auth()->user()->isSuperAdmin()) {
+
+        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('evaluations.view_all'))) {
             return $query;
         }
-        
+
         if (auth()->check()) {
             $employee = \Quochao56\Employee\Models\Employee::where('email', auth()->user()->email)->first();
             if ($employee) {
@@ -60,7 +60,7 @@ class EvaluationResource extends Resource
                 });
             }
         }
-        
+
         return $query->whereRaw('1=0');
     }
 

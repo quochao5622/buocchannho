@@ -17,26 +17,26 @@ class StudentPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('teacher');
+        return $user->hasPermissionTo('students.index');
     }
 
     public function view(User $user, Student $record): bool
     {
-        return $user->hasRole('teacher');
+        return $user->hasPermissionTo('students.show');
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('students.create');
     }
 
     public function update(User $user, Student $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('students.edit');
     }
 
     public function delete(User $user, Student $record): bool
     {
-        return false;
+        return $user->hasPermissionTo('students.destroy');
     }
 }
