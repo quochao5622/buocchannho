@@ -2,25 +2,25 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Quochao56\Student\Models\Student;
-use App\Policies\StudentPolicy;
-use Quochao56\PlanningEvaluation\Models\Planning;
-use App\Policies\PlanningPolicy;
-use Quochao56\PlanningEvaluation\Models\Evaluation;
-use App\Policies\EvaluationPolicy;
-use Quochao56\Equipment\Models\Equipment;
-use App\Policies\EquipmentPolicy;
-use Quochao56\Equipment\Models\EquipmentCategory;
-use App\Policies\EquipmentCategoryPolicy;
-use Quochao56\Equipment\Models\EquipmentInventory;
-use App\Policies\EquipmentInventoryPolicy;
-use Quochao56\Employee\Models\Employee;
-use App\Policies\EmployeePolicy;
+use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
+use Quochao56\Core\Policies\AuditPolicy;
+use Quochao56\Employee\Models\Employee;
+use Quochao56\Employee\Policies\EmployeePolicy;
+use Quochao56\Equipment\Models\Equipment;
+use Quochao56\Equipment\Models\EquipmentCategory;
+use Quochao56\Equipment\Models\EquipmentInventory;
+use Quochao56\Equipment\Policies\EquipmentCategoryPolicy;
+use Quochao56\Equipment\Policies\EquipmentInventoryPolicy;
+use Quochao56\Equipment\Policies\EquipmentPolicy;
+use Quochao56\PlanningEvaluation\Models\Evaluation;
+use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\PlanningEvaluation\Policies\EvaluationPolicy;
+use Quochao56\PlanningEvaluation\Policies\PlanningPolicy;
+use Quochao56\Student\Models\Student;
+use Quochao56\Student\Policies\StudentPolicy;
 use Tapp\FilamentAuditing\Models\Audit as TappAudit;
-use App\Policies\AuditPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {

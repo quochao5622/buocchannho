@@ -2,12 +2,12 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\RelationManagers;
 
-use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class EvaluationHistoryRelationManager extends RelationManager
 {

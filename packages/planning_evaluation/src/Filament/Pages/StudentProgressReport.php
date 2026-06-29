@@ -2,14 +2,14 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\DatePicker;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Schema;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Student\Models\Student;
 
@@ -70,11 +70,11 @@ class StudentProgressReport extends Page implements HasForms
                     ->options(function () {
                         $query = Student::query()->where('status', 'active');
 
-                        if (auth()->check() && !auth()->user()->isSuperAdmin()) {
+                        if (auth()->check() && ! auth()->user()->isSuperAdmin()) {
                             $canManageAll = auth()->user()->hasPermissionTo('employees.index')
                                 || auth()->user()->hasPermissionTo('employees.edit');
 
-                            if (!$canManageAll) {
+                            if (! $canManageAll) {
                                 $employee = Employee::where('email', auth()->user()->email)->first();
                                 if ($employee) {
                                     $query->whereHas('currentAssignment', function ($q) use ($employee) {

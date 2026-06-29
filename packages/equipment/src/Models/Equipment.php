@@ -2,18 +2,18 @@
 
 namespace Quochao56\Equipment\Models;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Equipment extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
+
     protected $table = 'equipments';
 
     protected $fillable = [
@@ -51,7 +51,7 @@ class Equipment extends Model implements AuditableContract
             $latestEquipment = static::latest()->first();
             $latestCode = $latestEquipment ? (int) str_replace('HC', '', $latestEquipment->equipment_code) : 0;
 
-            return 'HC' . str_pad($latestCode + 1, 5, '0', STR_PAD_LEFT);
+            return 'HC'.str_pad($latestCode + 1, 5, '0', STR_PAD_LEFT);
         }
 
         return $this->attributes['equipment_code'];

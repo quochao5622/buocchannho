@@ -2,9 +2,9 @@
 
 namespace Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 
-use Quochao56\Acl\Filament\Resources\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Quochao56\Acl\Filament\Resources\RoleResource;
 
 class ListRoles extends ListRecords
 {

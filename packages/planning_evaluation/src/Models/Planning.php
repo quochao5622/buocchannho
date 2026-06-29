@@ -2,17 +2,18 @@
 
 namespace Quochao56\PlanningEvaluation\Models;
 
-use Quochao56\Employee\Models\Employee;
-use Quochao56\Student\Models\Student;
-use App\Enum\BaseStatusEnum;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\Employee\Models\Employee;
+use Quochao56\Student\Models\Student;
 
 class Planning extends Model implements AuditableContract
 {
     use Auditable;
+
     protected $fillable = [
         'name',
         'description',

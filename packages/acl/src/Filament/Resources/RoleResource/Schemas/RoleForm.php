@@ -2,11 +2,11 @@
 
 namespace Quochao56\Acl\Filament\Resources\RoleResource\Schemas;
 
-use Illuminate\Database\Eloquent\Model;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Quochao56\Acl\Filament\Resources\RoleResource;
 
 class RoleForm
@@ -20,7 +20,7 @@ class RoleForm
         $sections = [];
 
         foreach ($groups as $groupKey => $groupConfig) {
-            if (!isset($groupConfig['permissions'])) {
+            if (! isset($groupConfig['permissions'])) {
                 continue;
             }
 
@@ -37,7 +37,7 @@ class RoleForm
                         ->dehydrated(false)
                         ->bulkToggleable()
                         ->afterStateHydrated(function ($component, $state, ?Model $record) use ($groupKey, $groupPermNames) {
-                            if (!$record) {
+                            if (! $record) {
                                 $component->state([]);
 
                                 return;

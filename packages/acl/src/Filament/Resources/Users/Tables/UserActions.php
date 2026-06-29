@@ -2,6 +2,7 @@
 
 namespace Quochao56\Acl\Filament\Resources\Users\Tables;
 
+use Filament\Actions\Action;
 use Quochao56\Acl\Filament\Resources\Users\Tables\Actions\ChangePassword;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Tables\Actions;
 
@@ -16,12 +17,18 @@ class UserActions
 
     private static function getDefaultActions(): array
     {
-        return [
+        $actions = [
             Actions\ViewAction::make(),
             Actions\EditAction::make(),
             ChangePassword::make(),          // ← bcrypt()
             Actions\DeleteAction::make(),
         ];
+
+        if (config('filament-users.impersonate.enabled')) {
+            $actions[] = Actions\ImpersonateAction::make();
+        }
+
+        return $actions;
     }
 
     private static function getActions(): array
@@ -29,11 +36,11 @@ class UserActions
         return array_merge(static::getDefaultActions(), static::$actions);
     }
 
-    public static function register(\Filament\Actions\Action|array $action): void
+    public static function register(Action|array $action): void
     {
         if (is_array($action)) {
             foreach ($action as $item) {
-                if (! $item instanceof \Filament\Actions\Action) {
+                if (! $item instanceof Action) {
                     continue;
                 }
                 static::$actions[] = $item;

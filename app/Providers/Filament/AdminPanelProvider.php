@@ -4,8 +4,6 @@ namespace App\Providers\Filament;
 
 use AchyutN\FilamentLogViewer\FilamentLogViewer;
 use Filament\Http\Middleware\Authenticate;
-use Filament\Support\Enums\Width;
-use Quochao56\Employee\EmployeePlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -14,6 +12,9 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -21,15 +22,13 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Quochao56\Acl\AclPlugin;
+use Quochao56\Employee\EmployeePlugin;
+use Quochao56\Equipment\EquipmentPlugin;
 use Quochao56\PlanningEvaluation\PlanningEvaluationPlugin;
 use Quochao56\Student\StudentPlugin;
-use Quochao56\Equipment\EquipmentPlugin;
-use Quochao56\Acl\AclPlugin;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-
 use Tapp\FilamentAuditing\FilamentAuditingPlugin;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
 
@@ -81,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentUsersPlugin::make(),
                 FilamentLogViewer::make()
                     ->navigationGroup('Hệ thống')
-                    ->authorize(fn(): bool => auth()->check() && auth()->user()->can('logs.index')),
+                    ->authorize(fn (): bool => auth()->check() && auth()->user()->can('logs.index')),
                 FilamentAuditingPlugin::make(),
             ])
             ->navigationGroups([
@@ -99,11 +98,12 @@ class AdminPanelProvider extends PanelProvider
 
             ->sidebarCollapsibleOnDesktop(true);
     }
+
     public function boot(): void
     {
         FilamentView::registerRenderHook(
             PanelsRenderHook::SCRIPTS_AFTER,
-            fn(): string => new HtmlString('
+            fn (): string => new HtmlString('
         <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
             '),
         );

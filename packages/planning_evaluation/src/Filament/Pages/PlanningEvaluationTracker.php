@@ -2,21 +2,21 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
-use App\Enum\BaseStatusEnum;
-use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
@@ -303,7 +303,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
                         $fromDate = $timeRange['from_date'] ?? null;
                         $toDate = $timeRange['to_date'] ?? null;
 
-                        return !Planning::query()
+                        return ! Planning::query()
                             ->where('student_id', $record->id)
                             ->where(function ($q) use ($fromDate, $toDate) {
                                 if ($fromDate) {
@@ -368,11 +368,11 @@ class PlanningEvaluationTracker extends Page implements HasTable
                             })
                             ->exists();
 
-                        if (!$planExists) {
+                        if (! $planExists) {
                             return false;
                         }
 
-                        return !Evaluation::query()
+                        return ! Evaluation::query()
                             ->whereHas('planning', function ($q) use ($record, $fromDate, $toDate) {
                                 $q->where('student_id', $record->id)
                                     ->where(function ($sq) use ($fromDate, $toDate) {

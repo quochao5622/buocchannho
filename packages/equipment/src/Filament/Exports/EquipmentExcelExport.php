@@ -94,7 +94,7 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
     private function resizeImageToTemp(string $originalPath): string
     {
         $info = @getimagesize($originalPath);
-        if (!$info) {
+        if (! $info) {
             return $originalPath;
         }
 
@@ -130,12 +130,12 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
                 $srcImg = false;
         }
 
-        if (!$srcImg) {
+        if (! $srcImg) {
             return $originalPath;
         }
 
         $dstImg = @imagecreatetruecolor($targetWidth, $targetHeight);
-        if (!$dstImg) {
+        if (! $dstImg) {
             @imagedestroy($srcImg);
 
             return $originalPath;
@@ -148,7 +148,7 @@ class EquipmentExcelExport extends ExcelExport implements WithDrawings
             @imagefilledrectangle($dstImg, 0, 0, $targetWidth, $targetHeight, $transparent);
         }
 
-        if (!@imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height)) {
+        if (! @imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height)) {
             @imagedestroy($srcImg);
             @imagedestroy($dstImg);
 

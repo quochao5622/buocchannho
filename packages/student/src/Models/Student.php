@@ -2,18 +2,17 @@
 
 namespace Quochao56\Student\Models;
 
-use App\Models\User;
-use Quochao56\PlanningEvaluation\Models\Planning;
-use Quochao56\PlanningEvaluation\Models\StudentAssignment;
-use Quochao56\Employee\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Employee\Models\Employee;
+use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\PlanningEvaluation\Models\StudentAssignment;
 
 class Student extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected $table = 'students';
 

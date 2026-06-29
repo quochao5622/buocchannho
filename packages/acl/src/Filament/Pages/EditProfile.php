@@ -17,14 +17,14 @@ class EditProfile extends BaseEditProfile
     {
         return $schema
             ->components([
-                Section::make('Thông tin cá nhân')
+                Section::make(trans('acl::profile.sections.personal_info'))
                     ->schema([
                         $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
                     ]),
 
-                Section::make('Đổi mật khẩu')
-                    ->description('Để trống nếu không muốn thay đổi mật khẩu')
+                Section::make(trans('acl::profile.sections.change_password'))
+                    ->description(trans('acl::profile.descriptions.leave_empty_to_keep'))
                     ->schema([
                         $this->getCurrentPasswordFormComponent(),
                         $this->getPasswordFormComponent(),

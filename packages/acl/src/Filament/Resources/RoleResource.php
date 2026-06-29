@@ -2,16 +2,16 @@
 
 namespace Quochao56\Acl\Filament\Resources;
 
-use Spatie\Permission\PermissionRegistrar;
-use Quochao56\Acl\Filament\Resources\RoleResource\Pages;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Builder;
+use Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 use Quochao56\Acl\Filament\Resources\RoleResource\Schemas\RoleForm;
 use Quochao56\Acl\Filament\Resources\RoleResource\Tables\RoleTable;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleResource extends Resource
 {
@@ -57,7 +57,7 @@ class RoleResource extends Resource
         $activePermissions = [];
 
         foreach ($groups as $groupKey => $groupConfig) {
-            if (!isset($groupConfig['permissions'])) {
+            if (! isset($groupConfig['permissions'])) {
                 continue;
             }
             foreach (array_keys($groupConfig['permissions']) as $action) {

@@ -2,12 +2,12 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Quochao56\Equipment\Models\EquipmentInventory;
 
@@ -21,10 +21,10 @@ class EquipmentInventoryForm
                 ->required()
                 ->maxLength(50)
                 ->unique(ignoreRecord: true)
-                ->default(fn() => (new EquipmentInventory)->generateCode()),
+                ->default(fn () => (new EquipmentInventory)->generateCode()),
 
             Hidden::make('inspector_id')
-                ->default(fn() => Auth::id()),
+                ->default(fn () => Auth::id()),
 
             DatePicker::make('inventory_date')
                 ->label(trans('packages.equipment::equipment_inventory.fields.inventory_date'))

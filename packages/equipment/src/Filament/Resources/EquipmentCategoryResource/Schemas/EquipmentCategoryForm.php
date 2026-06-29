@@ -2,10 +2,10 @@
 
 namespace Quochao56\Equipment\Filament\Resources\EquipmentCategoryResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Quochao56\Equipment\Models\EquipmentCategory;
 
 class EquipmentCategoryForm

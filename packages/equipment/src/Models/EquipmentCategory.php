@@ -5,13 +5,13 @@ namespace Quochao56\Equipment\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class EquipmentCategory extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
+
     protected $table = 'equipment_categories';
 
     protected $fillable = [
@@ -59,8 +59,8 @@ class EquipmentCategory extends Model implements AuditableContract
                 if ($exceptId && $category->id === $exceptId) {
                     continue;
                 }
-                $options[$category->id] = $prefix . $category->name;
-                $traverse($category->children, $prefix . '— ');
+                $options[$category->id] = $prefix.$category->name;
+                $traverse($category->children, $prefix.'— ');
             }
         };
 
@@ -109,7 +109,7 @@ class EquipmentCategory extends Model implements AuditableContract
             $latestCategory = static::latest()->first();
             $latestCode = $latestCategory ? (int) str_replace('DM', '', $latestCategory->code) : 0;
 
-            return 'DM' . str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
+            return 'DM'.str_pad($latestCode + 1, 3, '0', STR_PAD_LEFT);
         }
 
         return $this->attributes['code'];

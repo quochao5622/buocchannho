@@ -2,7 +2,6 @@
 
 namespace Quochao56\Employee\Filament\Resources\EmployeeResource\Tables;
 
-use Filament\Tables\Table;
 use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -10,7 +9,8 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use App\Enum\BaseStatusEnum;
+use Filament\Tables\Table;
+use Quochao56\Core\Enum\BaseStatusEnum;
 
 class EmployeeTable
 {

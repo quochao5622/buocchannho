@@ -2,7 +2,7 @@
 
 namespace Quochao56\Acl\Policies;
 
-use App\Models\User;
+use Quochao56\Core\Models\User;
 
 class UserPolicy
 {

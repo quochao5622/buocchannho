@@ -2,8 +2,8 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages;
 
-use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Filament\Resources\Pages\CreateRecord;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 
 class CreatePlanning extends CreateRecord
 {

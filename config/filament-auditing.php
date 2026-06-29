@@ -1,6 +1,7 @@
 <?php
 
-use App\Filament\Resources\AuditResource;
+use Quochao56\Core\Filament\Resources\AuditResource;
+use Quochao56\Core\Models\User;
 
 return [
 
@@ -37,7 +38,7 @@ return [
 
     'mapping' => [
         'user_id' => [
-            'model' => App\Models\User::class,
+            'model' => User::class,
             'field' => 'name',
             'label' => 'User',
         ],

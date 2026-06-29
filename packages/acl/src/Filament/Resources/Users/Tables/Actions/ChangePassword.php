@@ -5,7 +5,9 @@ namespace Quochao56\Acl\Filament\Resources\Users\Tables\Actions;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class ChangePassword
 {
@@ -24,30 +26,29 @@ class ChangePassword
                     ->placeholder(trans('filament-users::user.resource.change_password_auto'))
                     ->password()
                     ->revealable(filament()->arePasswordsRevealable())
-                    ->required(static fn($record) => ! $record)
-                    ->rule(\Illuminate\Validation\Rules\Password::default())
-                    ->dehydrated(fn($state) => filled($state))
+                    ->required(static fn ($record) => ! $record)
+                    ->rule(Password::default())
+                    ->dehydrated(fn ($state) => filled($state))
                     ->same('passwordConfirmation'),
                 Forms\Components\TextInput::make('passwordConfirmation')
                     ->label(trans('filament-users::user.resource.password_confirmation'))
                     ->placeholder(trans('filament-users::user.resource.change_password_auto'))
                     ->password()
                     ->revealable(filament()->arePasswordsRevealable())
-                    ->required(static fn($record) => ! $record)
+                    ->required(static fn ($record) => ! $record)
                     ->dehydrated(false),
             ])
             ->action(static function ($record, $data) {
                 // Kiểm tra xem người dùng thực sự có nhập password mới hay không
-                $hasPassword = !empty($data['password']);
+                $hasPassword = ! empty($data['password']);
 
-                if (!$hasPassword) {
-                    // Nếu không nhập => Tự động sinh password ngẫu nhiên
-                    $plainPassword = \Illuminate\Support\Str::random(12);
+                if (! $hasPassword) {
+                    // Nếu không nhập => Tự động sinh password ngẫu nhiên và hash
+                    $plainPassword = Str::random(12);
                     $record->password = bcrypt($plainPassword);
                 } else {
-                    // Nếu có nhập => Lấy password đã hash (hoặc chưa hash tùy vào việc bạn xử lý ở tầng dehydrate)
-                    // Nếu ở trên bạn đã dùng dehydrateStateUsing(fn($state) => bcrypt($state)) thì ở đây ghi nhận trực tiếp:
-                    $record->password = $data['password'];
+                    // Truyền plain text lên nên phải hash trước khi lưu
+                    $record->password = bcrypt($data['password']);
                     $plainPassword = null;
                 }
 
@@ -56,8 +57,8 @@ class ChangePassword
                 Notification::make()
                     ->title(trans('filament-users::user.resource.change_password'))
                     ->body(
-                        !$hasPassword
-                            ? trans('filament-users::user.resource.change_password_auto') . ' [' . $plainPassword . ']'
+                        ! $hasPassword
+                            ? trans('filament-users::user.resource.change_password_auto').' ['.$plainPassword.']'
                             : trans('filament-users::user.resource.change_password_success')
                     )
                     ->success()

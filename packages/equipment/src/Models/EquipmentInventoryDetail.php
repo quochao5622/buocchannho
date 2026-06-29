@@ -10,7 +10,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class EquipmentInventoryDetail extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
+
     protected $table = 'equipment_inventory_details';
 
     protected $fillable = [

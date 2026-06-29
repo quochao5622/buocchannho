@@ -11,6 +11,24 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="Acl">
+            <directory>packages/acl/tests</directory>
+        </testsuite>
+        <testsuite name="Core">
+            <directory>packages/core/tests</directory>
+        </testsuite>
+        <testsuite name="Employee">
+            <directory>packages/employee/tests</directory>
+        </testsuite>
+        <testsuite name="Equipment">
+            <directory>packages/equipment/tests</directory>
+        </testsuite>
+        <testsuite name="PlanningEvaluation">
+            <directory>packages/planning_evaluation/tests</directory>
+        </testsuite>
+        <testsuite name="Student">
+            <directory>packages/student/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

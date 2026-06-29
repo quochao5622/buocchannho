@@ -2,17 +2,17 @@
 
 namespace Quochao56\Employee\Models;
 
-use Quochao56\PlanningEvaluation\Models\Planning;
-use Quochao56\Student\Models\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Enum\BaseStatusEnum;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\Student\Models\Student;
 
 class Employee extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected $table = 'employees';
 

@@ -5,6 +5,7 @@ namespace Quochao56\Acl;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Quochao56\Acl\Filament\Pages\EditProfile;
+use Quochao56\Acl\Filament\Resources\ActivityResource;
 use Quochao56\Acl\Filament\Resources\RoleResource;
 
 class AclPlugin implements Plugin
@@ -19,6 +20,7 @@ class AclPlugin implements Plugin
         $panel
             ->resources([
                 RoleResource::class,
+                ActivityResource::class,
             ])
             ->profile(EditProfile::class, isSimple: false);
     }

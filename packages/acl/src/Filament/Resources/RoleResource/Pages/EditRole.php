@@ -2,9 +2,9 @@
 
 namespace Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 
-use Quochao56\Acl\Filament\Resources\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Quochao56\Acl\Filament\Resources\RoleResource;
 use Quochao56\Core\Traits\HasAutoSave;
 
 class EditRole extends EditRecord

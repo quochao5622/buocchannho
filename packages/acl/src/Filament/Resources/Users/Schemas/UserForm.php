@@ -3,9 +3,12 @@
 namespace Quochao56\Acl\Filament\Resources\Users\Schemas;
 
 use Filament\Fields\Field;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Quochao56\Acl\Filament\Resources\Users\Schemas\Components\Password;
 use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components;
+use TomatoPHP\FilamentUsers\Filament\Resources\Users\Schemas\Components\Roles as UserRolesField;
 
 class UserForm
 {
@@ -29,6 +32,13 @@ class UserForm
         $components[] = Components\Email::make();
         $components[] = Password::make();                      // ← bcrypt()
         $components[] = Components\PasswordConfirmation::make();
+
+        $components[] = UserRolesField::make();
+        $components[] = Checkbox::make('is_super_admin')
+            ->label(trans('acl::user.fields.super_admin'));
+        $components[] = Toggle::make('is_active')
+            ->label(trans('acl::user.fields.is_active'))
+            ->default(true);
 
         return $components;
     }

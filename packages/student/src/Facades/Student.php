@@ -2,8 +2,8 @@
 
 namespace Quochao56\Student\Facades;
 
-use Quochao56\Student\Student as Quochao56StudentStudent;
 use Illuminate\Support\Facades\Facade;
+use Quochao56\Student\Student as Quochao56StudentStudent;
 
 /**
  * @see Quochao56StudentStudent

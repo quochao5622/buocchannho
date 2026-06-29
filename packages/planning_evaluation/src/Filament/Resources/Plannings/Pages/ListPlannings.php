@@ -2,9 +2,9 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages;
 
-use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 
 class ListPlannings extends ListRecords
 {

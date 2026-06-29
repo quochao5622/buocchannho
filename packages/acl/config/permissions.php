@@ -124,4 +124,13 @@ return [
             'restore' => 'Khôi phục lịch sử dữ liệu',
         ],
     ],
+    'activities' => [
+        'label' => 'Nhật ký hoạt động',
+        'icon' => 'heroicon-o-clipboard-document-list',
+        'permissions' => [
+            'index' => 'Xem danh sách nhật ký hoạt động',
+            'view' => 'Xem chi tiết nhật ký hoạt động',
+        ],
+    ],
+
 ];

@@ -1,10 +1,10 @@
 <?php
 
-use Quochao56\PlanningEvaluation\Tests\TestCase;
-use Quochao56\PlanningEvaluation\Models\Planning;
-use Quochao56\Student\Models\Student;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
-use App\Enum\BaseStatusEnum;
+use Quochao56\PlanningEvaluation\Models\Planning;
+use Quochao56\PlanningEvaluation\Tests\TestCase;
+use Quochao56\Student\Models\Student;
 
 uses(TestCase::class);
 

@@ -2,14 +2,13 @@
 
 namespace Quochao56\Acl\Filament\Resources\Users\Schemas\Components;
 
-use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 
 class Password
 {
     public static function make(): TextInput
     {
-        return Forms\Components\TextInput::make('password')
+        return TextInput::make('password')
             ->hidden(static fn ($record) => $record)
             ->label(trans('filament-users::user.resource.password'))
             ->password()

@@ -2,11 +2,11 @@
 
 namespace Quochao56\Student\Filament\Resources\StudentResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 class StudentForm
 {

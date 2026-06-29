@@ -3,11 +3,11 @@
 namespace Quochao56\Equipment\Filament\Actions;
 
 use Filament\Actions\Action;
-use Quochao56\Equipment\Models\EquipmentInventory;
-use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Quochao56\Equipment\Models\Equipment;
+use Quochao56\Equipment\Models\EquipmentInventory;
 
 class ApproveAction extends Action
 {
@@ -25,7 +25,7 @@ class ApproveAction extends Action
 
                 foreach ($record->details as $detail) {
                     $equipment = Equipment::query()->find($detail->equipment_id);
-                    if (!$equipment) {
+                    if (! $equipment) {
                         continue;
                     }
 

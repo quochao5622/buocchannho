@@ -2,16 +2,16 @@
 
 namespace Quochao56\Equipment\Filament\Resources;
 
-use Illuminate\Contracts\Support\Htmlable;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\CreateEquipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\EditEquipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\ListEquipments;
-use Quochao56\Equipment\Models\Equipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Schemas\EquipmentForm;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Tables\EquipmentTable;
+use Quochao56\Equipment\Models\Equipment;
 
 class EquipmentResource extends Resource
 {

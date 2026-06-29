@@ -2,7 +2,6 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Actions;
 
-use App\Enum\BaseStatusEnum;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExportEvaluationWordAction extends Action
@@ -54,7 +54,7 @@ class ExportEvaluationWordAction extends Action
     {
         $templatePath = realpath(__DIR__.'/../../../resources/templates/template_KQDG.docx');
 
-        if (!$templatePath || !file_exists($templatePath)) {
+        if (! $templatePath || ! file_exists($templatePath)) {
             throw new FileNotFoundException('Template not found at: '.$templatePath);
         }
 
@@ -74,12 +74,12 @@ class ExportEvaluationWordAction extends Action
 
         $templateProcessor = new TemplateProcessor($templatePath);
 
-        $templateProcessor->setValue('name',          (string) ($record->name ?? ''));
-        $templateProcessor->setValue('student_name',  (string) ($student?->name ?? ''));
-        $templateProcessor->setValue('student_dob',   $student?->dob ? $student->dob->format('d/m/Y') : '');
-        $templateProcessor->setValue('gender',        $genderMap[$student?->gender ?? ''] ?? '');
+        $templateProcessor->setValue('name', (string) ($record->name ?? ''));
+        $templateProcessor->setValue('student_name', (string) ($student?->name ?? ''));
+        $templateProcessor->setValue('student_dob', $student?->dob ? $student->dob->format('d/m/Y') : '');
+        $templateProcessor->setValue('gender', $genderMap[$student?->gender ?? ''] ?? '');
         $templateProcessor->setValue('employee_name', (string) ($employee?->name ?? ''));
-        $templateProcessor->setValue('time',          $time);
+        $templateProcessor->setValue('time', $time);
 
         $details = $record->evaluation_details ?? [];
         $flatRows = $this->buildFlatRows($details);
@@ -120,14 +120,14 @@ class ExportEvaluationWordAction extends Action
         $disk = Storage::disk('local');
         $directory = 'exports/evaluations';
 
-        if (!$disk->exists($directory)) {
+        if (! $disk->exists($directory)) {
             $disk->makeDirectory($directory);
         }
 
         $relativePath = $directory.'/'.$outputFile;
         $templateProcessor->saveAs($disk->path($relativePath));
 
-        if (!$disk->exists($relativePath)) {
+        if (! $disk->exists($relativePath)) {
             throw new FileNotFoundException($relativePath);
         }
 
@@ -244,7 +244,7 @@ class ExportEvaluationWordAction extends Action
             $hasContent = true;
         }
 
-        if (!$hasContent) {
+        if (! $hasContent) {
             $textRun->addText('', $this->defaultTextStyle());
         }
 

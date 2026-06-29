@@ -2,8 +2,8 @@
 
 namespace Quochao56\Equipment\Facades;
 
-use Quochao56\Equipment\Equipment as Quochao56EquipmentEquipment;
 use Illuminate\Support\Facades\Facade;
+use Quochao56\Equipment\Equipment as Quochao56EquipmentEquipment;
 
 /**
  * @see Quochao56EquipmentEquipment

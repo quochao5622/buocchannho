@@ -2,7 +2,6 @@
 
 namespace Quochao56\Equipment\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Models\User;
 
 class EquipmentInventory extends Model implements AuditableContract
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
+
     protected $table = 'equipment_inventories';
 
     protected $fillable = [
@@ -55,7 +56,7 @@ class EquipmentInventory extends Model implements AuditableContract
             $latestInventory = static::latest()->first();
             $latestCode = $latestInventory ? (int) str_replace('INV', '', $latestInventory->inventory_code) : 0;
 
-            return 'INV' . str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
+            return 'INV'.str_pad($latestCode + 1, 10, '0', STR_PAD_LEFT);
         }
 
         return $this->attributes['inventory_code'];
@@ -93,7 +94,7 @@ class EquipmentInventory extends Model implements AuditableContract
 
             foreach ($this->details as $detail) {
                 $equipment = Equipment::query()->find($detail->equipment_id);
-                if (!$equipment) {
+                if (! $equipment) {
                     continue;
                 }
 

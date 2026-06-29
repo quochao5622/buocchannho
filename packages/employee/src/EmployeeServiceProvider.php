@@ -10,11 +10,11 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use Quochao56\Employee\Commands\EmployeeCommand;
+use Quochao56\Employee\Testing\TestsEmployee;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Quochao56\Employee\Commands\EmployeeCommand;
-use Quochao56\Employee\Testing\TestsEmployee;
 
 class EmployeeServiceProvider extends PackageServiceProvider
 {

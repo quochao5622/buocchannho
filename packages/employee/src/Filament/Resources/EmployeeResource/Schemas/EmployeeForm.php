@@ -2,12 +2,12 @@
 
 namespace Quochao56\Employee\Filament\Resources\EmployeeResource\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use App\Enum\BaseStatusEnum;
+use Filament\Schemas\Schema;
+use Quochao56\Core\Enum\BaseStatusEnum;
 
 class EmployeeForm
 {

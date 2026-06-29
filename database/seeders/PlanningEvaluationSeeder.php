@@ -3,14 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Enum\BaseStatusEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
-use Quochao56\Student\Models\Student;
-use Quochao56\PlanningEvaluation\Models\Planning;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
+use Quochao56\PlanningEvaluation\Models\Planning;
 use Quochao56\PlanningEvaluation\Models\StudentAssignment;
+use Quochao56\Student\Models\Student;
 
 class PlanningEvaluationSeeder extends Seeder
 {
@@ -203,7 +203,7 @@ class PlanningEvaluationSeeder extends Seeder
         // - Đầu tiên gán cho Nguyễn Văn A (Từ 6 tháng trước -> 3 tháng trước)
         // - Sau đó gán cho Admin Teacher (Từ 3 tháng trước -> nay)
         $hasAssignment = StudentAssignment::query()->where('student_id', $students[4]->id)->exists();
-        if (!$hasAssignment) {
+        if (! $hasAssignment) {
             StudentAssignment::query()->create([
                 'student_id' => $students[4]->id,
                 'employee_id' => $teacher1->id,

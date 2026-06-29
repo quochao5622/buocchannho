@@ -2,6 +2,9 @@
 
 namespace Quochao56\Core;
 
+use Illuminate\Support\Facades\Gate;
+use OwenIt\Auditing\Models\Audit;
+use Quochao56\Core\Policies\AuditPolicy;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -23,5 +26,10 @@ class CoreServiceProvider extends PackageServiceProvider
         if (is_dir(__DIR__.'/../lang')) {
             $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.core');
         }
+    }
+
+    public function packageBooted(): void
+    {
+        Gate::policy(Audit::class, AuditPolicy::class);
     }
 }
