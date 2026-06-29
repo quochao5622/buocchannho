@@ -17,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Maatwebsite\Excel\Excel;
+use Quochao56\Core\Support\VietnameseSearch;
 use Quochao56\Equipment\Filament\Exports\EquipmentExcelExport;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\CreateEquipment;
 use Quochao56\Equipment\Filament\Resources\EquipmentResource\Pages\EditEquipment;
@@ -124,11 +125,11 @@ class EquipmentResource extends Resource
                     ->openUrlInNewTab(),
                 TextColumn::make('equipment_code')
                     ->label(trans('packages.equipment::equipment.form.equipment_code'))
-                    ->searchable()
+                    ->searchable(query: VietnameseSearch::column('equipment_code'))
                     ->sortable(),
                 TextColumn::make('name')
                     ->label(trans('packages.equipment::equipment.form.name'))
-                    ->searchable()
+                    ->searchable(query: VietnameseSearch::column('name'))
                     ->sortable(),
                 TextColumn::make('category.name')
                     ->label(trans('packages.equipment::equipment.form.category'))

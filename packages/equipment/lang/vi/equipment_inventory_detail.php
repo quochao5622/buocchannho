@@ -6,6 +6,8 @@ return [
 
     'fields' => [
         'equipment' => 'Học cụ',
+        'equipment_code' => 'Mã học cụ',
+        'location' => 'Vị trí',
         'quantity_expected' => 'SL dự kiến',
         'quantity_actual' => 'SL thực tế',
         'status' => 'Trạng thái',
