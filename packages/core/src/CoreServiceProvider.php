@@ -2,8 +2,10 @@
 
 namespace Quochao56\Core;
 
+use Filament\Auth\Notifications\VerifyEmail as FilamentVerifyEmail;
 use Illuminate\Support\Facades\Gate;
 use OwenIt\Auditing\Models\Audit;
+use Quochao56\Core\Notifications\VerifyEmailNotification;
 use Quochao56\Core\Policies\AuditPolicy;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -26,6 +28,8 @@ class CoreServiceProvider extends PackageServiceProvider
         if (is_dir(__DIR__.'/../lang')) {
             $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.core');
         }
+
+        $this->app->bind(FilamentVerifyEmail::class, VerifyEmailNotification::class);
     }
 
     public function packageBooted(): void

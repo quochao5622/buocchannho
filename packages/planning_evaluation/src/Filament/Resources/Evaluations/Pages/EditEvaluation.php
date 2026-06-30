@@ -2,11 +2,13 @@
 
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Validation\ValidationException;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Core\Traits\HasAutoSave;
+use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
 use Quochao56\PlanningEvaluation\Filament\Actions\ExportEvaluationWordAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
@@ -54,12 +56,19 @@ class EditEvaluation extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ExportEvaluationWordAction::make(),
+            ApproveAction::make(),
+            ActionGroup::make([
+                ExportEvaluationWordAction::make(),
+                DeleteAction::make(),
+            ])
+                ->label('Thao tác')
+                ->icon('heroicon-m-chevron-down')
+                ->color('gray')
+                ->button(),
             $this->getSaveFormAction()
                 ->submit(null)
                 ->action(fn () => $this->save())
                 ->keyBindings(['mod+s']),
-            DeleteAction::make(),
         ];
     }
 

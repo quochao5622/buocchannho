@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
 
 class EvaluationsTable
 {
@@ -30,6 +31,7 @@ class EvaluationsTable
                     ->dateTime(),
             ])
             ->actions([
+                ApproveAction::make(),
                 EditAction::make(),
                 ViewAction::make(),
                 DeleteAction::make(),

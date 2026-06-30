@@ -6,6 +6,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema as DbSchema;
 use Quochao56\Acl\Filament\Resources\RoleResource\Pages;
 use Quochao56\Acl\Filament\Resources\RoleResource\Schemas\RoleForm;
 use Quochao56\Acl\Filament\Resources\RoleResource\Tables\RoleTable;
@@ -50,10 +51,21 @@ class RoleResource extends Resource
 
     public static function syncPermissionsToDatabase(): void
     {
+        if (! DbSchema::hasTable('permissions')) {
+            return;
+        }
+
+        $groups = config('permissions', []);
+        $configHash = md5(serialize($groups));
+
+        // Use cache to prevent running database queries on every boot request
+        if (cache()->get('permissions_sync_hash') === $configHash) {
+            return;
+        }
+
         // Clear cached permissions to avoid state issues
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $groups = config('permissions', []);
         $activePermissions = [];
 
         foreach ($groups as $groupKey => $groupConfig) {
@@ -72,6 +84,7 @@ class RoleResource extends Resource
             ->whereNotIn('name', $activePermissions)
             ->delete();
 
+        cache()->forever('permissions_sync_hash', $configHash);
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 

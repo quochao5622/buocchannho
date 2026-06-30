@@ -18,6 +18,6 @@ class Password
             ->dehydrated(static fn ($state) => filled($state))
             ->dehydrateStateUsing(fn ($state) => bcrypt($state))
             ->same('passwordConfirmation')
-            ->validationAttribute(__('filament-panels::pages/auth/register.form.password.validation_attribute'));
+            ->validationAttribute(__('filament-panels::auth/pages/register.form.password.validation_attribute'));
     }
 }

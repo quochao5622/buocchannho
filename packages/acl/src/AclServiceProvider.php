@@ -10,12 +10,15 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Lab404\Impersonate\Events\LeaveImpersonation;
 use Lab404\Impersonate\Events\TakeImpersonation;
+use Quochao56\Acl\Filament\Resources\RoleResource;
 use Quochao56\Acl\Filament\Resources\Users\Schemas\UserForm;
 use Quochao56\Acl\Listeners\LogSuccessfulLogin;
 use Quochao56\Acl\Listeners\LogSuccessfulLogout;
+use Quochao56\Acl\Policies\ActivityPolicy;
 use Quochao56\Acl\Policies\RolePolicy;
 use Quochao56\Acl\Policies\UserPolicy;
 use Quochao56\Core\Models\User;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\Permission\Models\Role;
@@ -65,6 +68,7 @@ class AclServiceProvider extends PackageServiceProvider
         // 2. Register Policies
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Activity::class, ActivityPolicy::class);
 
         // Fix Impersonate Leave/Take logout issue in Laravel 11/12
         Event::listen(LeaveImpersonation::class, function (LeaveImpersonation $event) {
@@ -94,12 +98,21 @@ class AclServiceProvider extends PackageServiceProvider
                     ->label(trans('acl::user.fields.active'))
                     ->boolean()
                     ->sortable(),
+                IconColumn::make('email_verified_at')
+                    ->label(trans('acl::user.fields.email_verified'))
+                    ->boolean()
+                    ->sortable(),
             ]);
             UserFilters::register([
                 UserRolesFilter::make(),
                 TernaryFilter::make('is_active')
                     ->label(trans('acl::user.fields.is_active')),
             ]);
+        }
+
+        // 4. Automatically sync permissions to database on boot
+        if (class_exists(RoleResource::class)) {
+            RoleResource::syncPermissionsToDatabase();
         }
     }
 }

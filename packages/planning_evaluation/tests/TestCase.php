@@ -16,7 +16,6 @@ use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\LivewireServiceProvider;
-use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Quochao56\Employee\EmployeeServiceProvider;
 use Quochao56\PlanningEvaluation\PlanningEvaluationServiceProvider;
@@ -29,7 +28,6 @@ use Spatie\Permission\PermissionServiceProvider;
 class TestCase extends Orchestra
 {
     use LazilyRefreshDatabase;
-    use WithWorkbench;
 
     protected function setUp(): void
     {
@@ -90,6 +88,7 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
+        $this->loadMigrationsFrom(__DIR__.'/../../../database/migrations');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadMigrationsFrom(__DIR__.'/../../student/database/migrations');
         $this->loadMigrationsFrom(__DIR__.'/../../employee/database/migrations');

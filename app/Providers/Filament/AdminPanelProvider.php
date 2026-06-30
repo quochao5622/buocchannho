@@ -41,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->emailVerification()
             ->brandLogo(asset('images/logo/logo150x150.jpg'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('images/logo/logo32x32.jpg'))
@@ -80,7 +81,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentUsersPlugin::make(),
                 FilamentLogViewer::make()
                     ->navigationGroup('Hệ thống')
-                    ->authorize(fn (): bool => auth()->check() && auth()->user()->can('logs.index')),
+                    ->authorize(fn(): bool => auth()->check() && auth()->user()->can('logs.index')),
                 FilamentAuditingPlugin::make(),
             ])
             ->navigationGroups([
@@ -93,7 +94,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Hệ thống'),
             ])
-            ->spa()
+            // ->spa()
             ->maxContentWidth(Width::Full)
 
             ->sidebarCollapsibleOnDesktop(true);
@@ -103,7 +104,7 @@ class AdminPanelProvider extends PanelProvider
     {
         FilamentView::registerRenderHook(
             PanelsRenderHook::SCRIPTS_AFTER,
-            fn (): string => new HtmlString('
+            fn(): string => new HtmlString('
         <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
             '),
         );

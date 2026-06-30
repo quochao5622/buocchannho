@@ -29,11 +29,14 @@ class ChangePassword
                     ->required(static fn ($record) => ! $record)
                     ->rule(Password::default())
                     ->dehydrated(fn ($state) => filled($state))
+                    ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
+                    ->saved(fn (?string $state): bool => filled($state))
                     ->same('passwordConfirmation'),
                 Forms\Components\TextInput::make('passwordConfirmation')
                     ->label(trans('filament-users::user.resource.password_confirmation'))
                     ->placeholder(trans('filament-users::user.resource.change_password_auto'))
                     ->password()
+                    ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
                     ->revealable(filament()->arePasswordsRevealable())
                     ->required(static fn ($record) => ! $record)
                     ->dehydrated(false),
@@ -45,11 +48,11 @@ class ChangePassword
                 if (! $hasPassword) {
                     // Nếu không nhập => Tự động sinh password ngẫu nhiên và hash
                     $plainPassword = Str::random(12);
-                    $record->password = bcrypt($plainPassword);
+                    $record->password = $plainPassword;
                 } else {
                     // Truyền plain text lên nên phải hash trước khi lưu
-                    $record->password = bcrypt($data['password']);
                     $plainPassword = null;
+                    $record->password = $data['password'];
                 }
 
                 $record->save();

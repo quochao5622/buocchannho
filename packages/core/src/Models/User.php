@@ -2,18 +2,19 @@
 
 namespace Quochao56\Core\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Notifications\VerifyEmailNotification;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements AuditableContract, FilamentUser
+class User extends Authenticatable implements AuditableContract, FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use Auditable, HasFactory, HasRoles, Notifiable;
@@ -63,6 +64,11 @@ class User extends Authenticatable implements AuditableContract, FilamentUser
     public function isSuperAdmin(): bool
     {
         return (bool) $this->is_super_admin;
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification);
     }
 
     protected static function newFactory()

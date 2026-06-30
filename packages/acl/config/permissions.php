@@ -39,6 +39,7 @@ return [
             'tracker' => 'Xem báo cáo tổng quan ai đã nộp kế hoạch (Tracker)',
             'progress' => 'Xem báo cáo tiến độ học sinh',
             'view_all' => 'Xem toàn bộ kế hoạch (không giới hạn phân công)',
+            'approve' => 'Duyệt kế hoạch',
         ],
     ],
     'evaluations' => [
@@ -52,6 +53,7 @@ return [
             'destroy' => 'Xóa đánh giá',
             'export' => 'Xuất Word đánh giá',
             'view_all' => 'Xem toàn bộ đánh giá (không giới hạn phân công)',
+            'approve' => 'Duyệt đánh giá',
         ],
     ],
     'equipments' => [
