@@ -27,7 +27,18 @@ class PlanningForm
                     ->label(trans('packages.planning_evaluation::planning.fields.description')),
                 Select::make('employee_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.employee'))
-                    ->relationship('employee', 'name')
+                    ->options(function () {
+                        $query = Employee::query();
+                        if (auth()->check() && ! auth()->user()->isSuperAdmin()) {
+                            $canManageAll = auth()->user()->hasPermissionTo('employees.index')
+                                || auth()->user()->hasPermissionTo('employees.edit');
+                            if (! $canManageAll) {
+                                $query->where('email', auth()->user()->email);
+                            }
+                        }
+
+                        return $query->pluck('name', 'id')->toArray();
+                    })
                     ->default(function () {
                         $studentId = request()->query('student_id');
                         if ($studentId) {
@@ -45,7 +56,25 @@ class PlanningForm
                     ->searchable(),
                 Select::make('student_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
-                    ->relationship('student', 'name')
+                    ->options(function () {
+                        $query = Student::query()->where('status', 'active');
+                        if (auth()->check() && ! auth()->user()->isSuperAdmin()) {
+                            $canManageAll = auth()->user()->hasPermissionTo('employees.index')
+                                || auth()->user()->hasPermissionTo('employees.edit');
+                            if (! $canManageAll) {
+                                $employee = Employee::where('email', auth()->user()->email)->first();
+                                if ($employee) {
+                                    $query->whereHas('currentAssignment', function ($q) use ($employee) {
+                                        $q->where('employee_id', $employee->id);
+                                    });
+                                } else {
+                                    $query->whereRaw('1 = 0');
+                                }
+                            }
+                        }
+
+                        return $query->pluck('name', 'id')->toArray();
+                    })
                     ->default(fn () => request()->query('student_id'))
                     ->searchable(),
                 DatePicker::make('start_date')
