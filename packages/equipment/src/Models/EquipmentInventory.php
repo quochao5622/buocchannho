@@ -35,9 +35,9 @@ class EquipmentInventory extends Model implements AuditableContract
     public static function statusOptions(): array
     {
         return [
-            'draft' => 'Draft',
-            'completed' => 'Completed',
-            'approved' => 'Approved',
+            'draft' => trans('packages.equipment::equipment_inventory.status.draft'),
+            'completed' => trans('packages.equipment::equipment_inventory.status.completed'),
+            'approved' => trans('packages.equipment::equipment_inventory.status.approved'),
         ];
     }
 

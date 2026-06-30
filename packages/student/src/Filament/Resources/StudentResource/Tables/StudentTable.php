@@ -135,6 +135,7 @@ class StudentTable
                         ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

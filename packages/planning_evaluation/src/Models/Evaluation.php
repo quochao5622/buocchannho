@@ -35,6 +35,10 @@ class Evaluation extends Model implements AuditableContract
         });
 
         static::saved(function (self $evaluation): void {
+            if (! $evaluation->wasChanged() && ! $evaluation->wasRecentlyCreated) {
+                return;
+            }
+
             EvaluationHistory::query()->create([
                 'evaluation_id' => $evaluation->getKey(),
                 'snapshot' => $evaluation->fresh()?->attributesToArray() ?? $evaluation->attributesToArray(),

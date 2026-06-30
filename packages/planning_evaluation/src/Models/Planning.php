@@ -41,6 +41,10 @@ class Planning extends Model implements AuditableContract
         });
 
         static::saved(function (self $planning): void {
+            if (! $planning->wasChanged() && ! $planning->wasRecentlyCreated) {
+                return;
+            }
+
             PlanningHistory::query()->create([
                 'planning_id' => $planning->getKey(),
                 'snapshot' => $planning->fresh()?->attributesToArray() ?? $planning->attributesToArray(),

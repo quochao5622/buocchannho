@@ -3,6 +3,7 @@
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Tables;
 
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -11,7 +12,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use Filament\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -42,11 +42,11 @@ class PlanningsTable
                 TextColumn::make('employee.name')
                     ->label(trans('packages.planning_evaluation::planning.fields.employee'))
                     ->searchable()
-                    ->formatStateUsing(fn($state) => $state ?: '-'),
+                    ->formatStateUsing(fn ($state) => $state ?: '-'),
                 TextColumn::make('student.name')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
                     ->searchable()
-                    ->formatStateUsing(fn($state) => $state ?: '-'),
+                    ->formatStateUsing(fn ($state) => $state ?: '-'),
                 TextColumn::make('start_date')->label(trans('packages.planning_evaluation::planning.fields.start_date'))->date('d/m/Y'),
                 TextColumn::make('end_date')->label(trans('packages.planning_evaluation::planning.fields.end_date'))->date('d/m/Y'),
                 TextColumn::make('status')->label(trans('packages.planning_evaluation::planning.fields.status'))
@@ -89,7 +89,7 @@ class PlanningsTable
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['created_from'],
-                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                         );
                     }),
 
@@ -104,7 +104,7 @@ class PlanningsTable
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['created_until'],
-                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                         );
                     }),
             ])
@@ -113,7 +113,7 @@ class PlanningsTable
                 Action::make('evaluate')
                     ->label(trans('packages.planning_evaluation::planning.tracker.evaluation'))
                     ->color('warning')
-                    ->visible(fn(Planning $record): bool => (($record->status?->value ?? $record->status) === BaseStatusEnum::Published->value))
+                    ->visible(fn (Planning $record): bool => (($record->status?->value ?? $record->status) === BaseStatusEnum::Published->value))
                     ->action(function (Planning $record) {
                         $evaluation = Evaluation::upsertFromPlanning($record);
 
@@ -155,7 +155,7 @@ class PlanningsTable
                             $cloned->student_id = $data['student_id'];
                             $cloned->start_date = $data['start_date'];
                             $cloned->end_date = $data['end_date'];
-                            $cloned->name = $record->name . trans('packages.planning_evaluation::planning.clone.suffix');
+                            $cloned->name = $record->name.trans('packages.planning_evaluation::planning.clone.suffix');
 
                             $newStudent = Student::find($data['student_id']);
                             $employeeId = null;
@@ -185,6 +185,7 @@ class PlanningsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }
