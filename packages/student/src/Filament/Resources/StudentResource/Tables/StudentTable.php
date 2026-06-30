@@ -68,24 +68,14 @@ class StudentTable
 
                 TextColumn::make('status')
                     ->label(trans('packages.student::student.fields.status'))
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => trans('packages.student::student.status.active'),
-                        'inactive' => trans('packages.student::student.status.inactive'),
-                        default => $state,
-                    }),
+                    ->badge(),
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->label(trans('packages.student::student.fields.status'))
                     ->options([
-                        'active' => trans('packages.student::student.status.active'),
-                        'inactive' => trans('packages.student::student.status.inactive'),
+                        BaseStatusEnum::Active->value => BaseStatusEnum::Active->getLabel(),
+                        BaseStatusEnum::Inactive->value => BaseStatusEnum::Inactive->getLabel(),
                     ]),
             ])
             ->actions([

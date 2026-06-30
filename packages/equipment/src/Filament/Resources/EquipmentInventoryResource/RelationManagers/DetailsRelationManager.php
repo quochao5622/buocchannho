@@ -5,11 +5,9 @@ namespace Quochao56\Equipment\Filament\Resources\EquipmentInventoryResource\Rela
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Table;
-use Quochao56\Equipment\Models\EquipmentInventoryDetail;
 
 class DetailsRelationManager extends RelationManager
 {
@@ -50,22 +48,38 @@ class DetailsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('quantity_expected')
-                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_expected'))
+                TextColumn::make('quantity_expected_good')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_expected_good'))
                     ->sortable()
                     ->width('15px'),
 
-                TextInputColumn::make('quantity_actual')
-                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_actual'))
+                TextInputColumn::make('quantity_actual_good')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_actual_good'))
                     ->type('number')
                     ->rules(['required', 'numeric', 'min:0'])
                     ->width('15px'),
 
-                SelectColumn::make('status')
-                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.status'))
-                    ->options(EquipmentInventoryDetail::statusOptions())
-                    ->rules(['required'])
-                    ->width('120px'),
+                TextColumn::make('quantity_expected_broken')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_expected_broken'))
+                    ->sortable()
+                    ->width('15px'),
+
+                TextInputColumn::make('quantity_actual_broken')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_actual_broken'))
+                    ->type('number')
+                    ->rules(['required', 'numeric', 'min:0'])
+                    ->width('15px'),
+
+                TextColumn::make('quantity_expected_missing')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_expected_missing'))
+                    ->sortable()
+                    ->width('15px'),
+
+                TextInputColumn::make('quantity_actual_missing')
+                    ->label(trans('packages.equipment::equipment_inventory_detail.fields.quantity_actual_missing'))
+                    ->type('number')
+                    ->rules(['required', 'numeric', 'min:0'])
+                    ->width('15px'),
 
                 TextInputColumn::make('notes')
                     ->label(trans('packages.equipment::equipment_inventory_detail.fields.notes'))

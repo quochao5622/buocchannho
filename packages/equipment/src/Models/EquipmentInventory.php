@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Quochao56\Core\Models\User;
+use Quochao56\Equipment\Enum\InventoryStatus;
 
 class EquipmentInventory extends Model implements AuditableContract
 {
@@ -27,6 +28,7 @@ class EquipmentInventory extends Model implements AuditableContract
 
     protected $casts = [
         'inventory_date' => 'date',
+        'status' => InventoryStatus::class,
     ];
 
     /**
@@ -35,9 +37,9 @@ class EquipmentInventory extends Model implements AuditableContract
     public static function statusOptions(): array
     {
         return [
-            'draft' => trans('packages.equipment::equipment_inventory.status.draft'),
-            'completed' => trans('packages.equipment::equipment_inventory.status.completed'),
-            'approved' => trans('packages.equipment::equipment_inventory.status.approved'),
+            InventoryStatus::Draft->value => InventoryStatus::Draft->getLabel(),
+            InventoryStatus::Completed->value => InventoryStatus::Completed->getLabel(),
+            InventoryStatus::Approved->value => InventoryStatus::Approved->getLabel(),
         ];
     }
 
@@ -86,7 +88,7 @@ class EquipmentInventory extends Model implements AuditableContract
         DB::transaction(function () {
             $this->refresh();
 
-            if ($this->status !== 'completed') {
+            if ($this->status !== InventoryStatus::Completed) {
                 throw new \RuntimeException('Only completed inventories can be approved.');
             }
 
@@ -99,12 +101,13 @@ class EquipmentInventory extends Model implements AuditableContract
                 }
 
                 $equipment->update([
-                    'quantity' => (int) $detail->quantity_actual,
-                    'status' => (string) $detail->status,
+                    'quantity_good' => (int) $detail->quantity_actual_good,
+                    'quantity_broken' => (int) $detail->quantity_actual_broken,
+                    'quantity_missing' => (int) $detail->quantity_actual_missing,
                 ]);
             }
 
-            $this->forceFill(['status' => 'approved'])->save();
+            $this->forceFill(['status' => InventoryStatus::Approved])->save();
         });
     }
 }

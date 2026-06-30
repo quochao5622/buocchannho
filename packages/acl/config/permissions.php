@@ -87,6 +87,7 @@ return [
             'edit' => 'Chỉnh sửa kiểm kho',
             'show' => 'Xem chi tiết kiểm kho',
             'destroy' => 'Xóa kiểm kho',
+            'approve' => 'Duyệt kiểm kho',
         ],
     ],
     'users' => [

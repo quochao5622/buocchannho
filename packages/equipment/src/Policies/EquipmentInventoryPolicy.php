@@ -40,4 +40,9 @@ class EquipmentInventoryPolicy
     {
         return $user->hasPermissionTo('equipment_inventories.destroy');
     }
+
+    public function approve(User $user, EquipmentInventory $record): bool
+    {
+        return $user->hasPermissionTo('equipment_inventories.approve');
+    }
 }

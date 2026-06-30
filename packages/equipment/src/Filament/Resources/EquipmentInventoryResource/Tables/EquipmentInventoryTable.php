@@ -10,8 +10,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Quochao56\Core\Support\VietnameseSearch;
+use Quochao56\Equipment\Enum\InventoryStatus;
 use Quochao56\Equipment\Filament\Actions\ApproveAction;
-use Quochao56\Equipment\Models\EquipmentInventory;
 
 class EquipmentInventoryTable
 {
@@ -32,14 +32,7 @@ class EquipmentInventoryTable
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(trans('packages.equipment::equipment_inventory.fields.status'))
-                    ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'draft' => 'gray',
-                        'completed' => 'info',
-                        'approved' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (?string $state): string => EquipmentInventory::statusOptions()[$state] ?? ($state ?? '-')),
+                    ->badge(),
                 TextColumn::make('updated_at')
                     ->label(trans('packages.equipment::equipment_inventory.fields.updated_at'))
                     ->dateTime('d/m/Y H:i')
@@ -50,7 +43,7 @@ class EquipmentInventoryTable
             ->filters([
                 SelectFilter::make('status')
                     ->label(trans('packages.equipment::equipment_inventory.fields.status'))
-                    ->options(EquipmentInventory::statusOptions()),
+                    ->options(InventoryStatus::class),
             ])
             ->actions([
                 EditAction::make(),

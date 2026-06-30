@@ -7,6 +7,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Quochao56\Core\Enum\BaseStatusEnum;
 
 class StudentForm
 {
@@ -57,10 +58,10 @@ class StudentForm
             Select::make('status')
                 ->label(trans('packages.student::student.fields.status'))
                 ->options([
-                    'active' => trans('packages.student::student.status.active'),
-                    'inactive' => trans('packages.student::student.status.inactive'),
+                    BaseStatusEnum::Active->value => BaseStatusEnum::Active->getLabel(),
+                    BaseStatusEnum::Inactive->value => BaseStatusEnum::Inactive->getLabel(),
                 ])
-                ->default('active')
+                ->default(BaseStatusEnum::Active->value)
                 ->required(),
             FileUpload::make('avatar')
                 ->label(trans('packages.student::student.fields.avatar'))

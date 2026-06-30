@@ -9,6 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Quochao56\Equipment\Enum\InventoryStatus;
 use Quochao56\Equipment\Models\EquipmentInventory;
 
 class EquipmentInventoryForm
@@ -35,8 +36,15 @@ class EquipmentInventoryForm
 
             Select::make('status')
                 ->label(trans('packages.equipment::equipment_inventory.fields.status'))
-                ->options(EquipmentInventory::statusOptions())
-                ->default('draft')
+                ->options(fn () => auth()->user()->can('equipment_inventories.approve')
+                    ? InventoryStatus::class
+                    : collect(InventoryStatus::cases())
+                        ->reject(fn ($status) => $status === InventoryStatus::Approved)
+                        ->mapWithKeys(fn ($status) => [$status->value => $status->getLabel()])
+                        ->toArray()
+                )
+                ->default(InventoryStatus::Draft->value)
+                ->disabled(fn (?EquipmentInventory $record) => $record?->status === InventoryStatus::Approved)
                 ->required(),
 
             Textarea::make('notes')

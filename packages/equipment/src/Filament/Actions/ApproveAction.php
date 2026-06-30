@@ -4,9 +4,8 @@ namespace Quochao56\Equipment\Filament\Actions;
 
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Quochao56\Equipment\Models\Equipment;
+use Quochao56\Equipment\Enum\InventoryStatus;
 use Quochao56\Equipment\Models\EquipmentInventory;
 
 class ApproveAction extends Action
@@ -19,24 +18,7 @@ class ApproveAction extends Action
     public function handle(EquipmentInventory $record): void
     {
         try {
-
-            DB::transaction(function () use ($record) {
-                $record->loadMissing('details');
-
-                foreach ($record->details as $detail) {
-                    $equipment = Equipment::query()->find($detail->equipment_id);
-                    if (! $equipment) {
-                        continue;
-                    }
-
-                    $equipment->update([
-                        'quantity' => (int) $detail->quantity_actual,
-                        'status' => (string) $detail->status,
-                    ]);
-                }
-
-                $record->update(['status' => 'approved']);
-            });
+            $record->approve();
 
             Notification::make()
                 ->title(trans('packages.equipment::equipment_inventory.approve.success'))
@@ -49,7 +31,6 @@ class ApproveAction extends Action
                 ->send();
             Log::error($th);
         }
-
     }
 
     protected function setUp(): void
@@ -59,7 +40,7 @@ class ApproveAction extends Action
         $this->label(trans('packages.equipment::equipment_inventory.approve.label'));
         $this->color('success');
         $this->requiresConfirmation();
-        $this->visible(fn (EquipmentInventory $record) => $record->status === 'completed');
+        $this->visible(fn (EquipmentInventory $record) => $record->status === InventoryStatus::Completed && auth()->user()->can('equipment_inventories.approve'));
 
         $this->action(fn (EquipmentInventory $record) => $this->handle($record));
     }

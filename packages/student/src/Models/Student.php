@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Models\Planning;
 use Quochao56\PlanningEvaluation\Models\StudentAssignment;
@@ -32,6 +33,7 @@ class Student extends Model implements AuditableContract
 
     protected $casts = [
         'dob' => 'date',
+        'status' => BaseStatusEnum::class,
     ];
 
     public function plannings()

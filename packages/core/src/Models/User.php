@@ -30,6 +30,7 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
         'password',
         'is_super_admin',
         'is_active',
+        'email_verified_at',
     ];
 
     /**

@@ -41,19 +41,24 @@ class EquipmentTable
                 TextColumn::make('category.name')
                     ->label(trans('packages.equipment::equipment.form.category'))
                     ->sortable(),
+                TextColumn::make('quantity_good')
+                    ->label(trans('packages.equipment::equipment.form.quantity_good'))
+                    ->badge()
+                    ->color('success')
+                    ->sortable(),
+                TextColumn::make('quantity_broken')
+                    ->label(trans('packages.equipment::equipment.form.quantity_broken'))
+                    ->badge()
+                    ->color('danger')
+                    ->sortable(),
+                TextColumn::make('quantity_missing')
+                    ->label(trans('packages.equipment::equipment.form.quantity_missing'))
+                    ->badge()
+                    ->color('warning')
+                    ->sortable(),
                 TextColumn::make('quantity')
                     ->label(trans('packages.equipment::equipment.form.quantity'))
                     ->sortable(),
-                TextColumn::make('status')
-                    ->label(trans('packages.equipment::equipment.form.status'))
-                    ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'good' => 'success',
-                        'broken' => 'danger',
-                        'missing' => 'warning',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (?string $state): string => Equipment::statusOptions()[$state] ?? ($state ?? '-')),
                 TextColumn::make('location')
                     ->label(trans('packages.equipment::equipment.form.location'))
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -68,9 +73,6 @@ class EquipmentTable
                 SelectFilter::make('category_id')
                     ->label(trans('packages.equipment::equipment.form.category'))
                     ->options(fn () => EquipmentCategory::getTreeOptions()),
-                SelectFilter::make('status')
-                    ->label(trans('packages.equipment::equipment.form.status'))
-                    ->options(Equipment::statusOptions()),
             ])
             ->headerActions([
                 ExportAction::make('export')

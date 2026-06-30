@@ -53,6 +53,7 @@ class EquipmentServiceProvider extends PackageServiceProvider
             'create_equipments_table',
             'create_equipment_inventories_table',
             'create_equipment_inventory_details_table',
+            'split_quantities_by_status_on_equipments_table',
         ];
     }
 }

@@ -67,15 +67,12 @@ class VietnameseSearch
     }
 
     /**
-     * Áp dụng search không dấu cho một hoặc nhiều cột (MySQL query).
-     *
-     * @param  string[]  $columns  Tên cột (chỉ hỗ trợ cột local, không hỗ trợ dot-notation)
-     */
     public static function apply(Builder $query, string $search, array $columns): Builder
     {
-        $term = '%'.trim($search).'%';
+        $term = '%' . trim($search) . '%';
+        $isMySql = $query->getConnection()->getDriverName() === 'mysql';
 
-        return $query->where(function (Builder $q) use ($term, $columns) {
+        return $query->where(function (Builder $q) use ($term, $columns, $isMySql) {
             foreach ($columns as $i => $column) {
                 $method = $i === 0 ? 'whereRaw' : 'orWhereRaw';
 
@@ -83,7 +80,11 @@ class VietnameseSearch
                     continue;
                 }
 
-                $q->{$method}("`{$column}` LIKE ? COLLATE utf8mb4_0900_ai_ci", [$term]);
+                if ($isMySql) {
+                    $q->{$method}("`{$column}` COLLATE utf8mb4_0900_ai_ci LIKE ?", [$term]);
+                } else {
+                    $q->{$method}("`{$column}` LIKE ?", [$term]);
+                }
             }
         });
     }
@@ -96,10 +97,17 @@ class VietnameseSearch
     public static function column(string $column): \Closure
     {
         return function (Builder $query, string $search) use ($column): Builder {
-            return $query->orWhereRaw(
-                "`{$column}` LIKE ? COLLATE utf8mb4_0900_ai_ci",
-                ['%'.trim($search).'%']
-            );
+            $isMySql = $query->getConnection()->getDriverName() === 'mysql';
+            $term = '%'.trim($search).'%';
+
+            if ($isMySql) {
+                return $query->orWhereRaw(
+                    "`{$column}` COLLATE utf8mb4_0900_ai_ci LIKE ?",
+                    [$term]
+                );
+            }
+
+            return $query->orWhere("`{$column}`", 'LIKE', $term);
         };
     }
 }

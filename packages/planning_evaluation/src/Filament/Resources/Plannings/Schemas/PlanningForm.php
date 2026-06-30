@@ -58,12 +58,19 @@ class PlanningForm
                     ->displayFormat('d/m/Y'),
                 Select::make('status')
                     ->label(trans('packages.planning_evaluation::planning.fields.status'))
-                    ->options([
-                        BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
-                        BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
-                        BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
-                    ])
-                    ->default(BaseStatusEnum::Published->value)
+                    ->options(fn () => auth()->user()->can('plannings.approve')
+                        ? [
+                            BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
+                            BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                            BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                        ]
+                        : [
+                            BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                            BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                        ]
+                    )
+                    ->default(fn () => auth()->user()->can('plannings.approve') ? BaseStatusEnum::Published->value : BaseStatusEnum::Draft->value)
+                    ->disabled(fn ($record) => ($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value)
                     ->required(),
                 Repeater::make('planning_details')
                     ->label(trans('packages.planning_evaluation::planning.fields.details'))

@@ -30,12 +30,19 @@ class EvaluationForm
                 ->searchable(),
             Select::make('status')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.status'))
-                ->options([
-                    BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
-                    BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
-                    BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
-                ])
+                ->options(fn () => auth()->user()->can('evaluations.approve')
+                    ? [
+                        BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
+                        BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                        BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                    ]
+                    : [
+                        BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                        BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                    ]
+                )
                 ->default(BaseStatusEnum::Draft->value)
+                ->disabled(fn ($record) => ($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value)
                 ->required(),
             Repeater::make('evaluation_details')
                 ->label(trans('packages.planning_evaluation::evaluation.fields.evaluation_details'))
