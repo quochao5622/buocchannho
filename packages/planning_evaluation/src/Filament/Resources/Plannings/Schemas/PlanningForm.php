@@ -10,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Student\Models\Student;
@@ -53,6 +54,7 @@ class PlanningForm
 
                         return 4;
                     })
+                    ->disabled(fn (?Model $record) => $record !== null)
                     ->searchable(),
                 Select::make('student_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
@@ -76,6 +78,7 @@ class PlanningForm
                         return $query->pluck('name', 'id')->toArray();
                     })
                     ->default(fn () => request()->query('student_id'))
+                    ->disabled(fn (?Model $record) => $record !== null)
                     ->searchable(),
                 DatePicker::make('start_date')
                     ->label(trans('packages.planning_evaluation::planning.fields.start_date'))
@@ -87,16 +90,17 @@ class PlanningForm
                     ->displayFormat('d/m/Y'),
                 Select::make('status')
                     ->label(trans('packages.planning_evaluation::planning.fields.status'))
-                    ->options(fn () => auth()->user()->can('plannings.approve')
-                        ? [
-                            BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
-                            BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
-                            BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
-                        ]
-                        : [
-                            BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
-                            BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
-                        ]
+                    ->options(
+                        fn () => auth()->user()->can('plannings.approve')
+                            ? [
+                                BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
+                                BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                                BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                            ]
+                            : [
+                                BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                                BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                            ]
                     )
                     ->default(fn () => auth()->user()->can('plannings.approve') ? BaseStatusEnum::Published->value : BaseStatusEnum::Draft->value)
                     ->disabled(fn ($record) => ($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value)

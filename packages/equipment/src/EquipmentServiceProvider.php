@@ -41,6 +41,10 @@ class EquipmentServiceProvider extends PackageServiceProvider
         if (is_dir(__DIR__.'/../lang')) {
             $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.equipment');
         }
+
+        if (file_exists(__DIR__.'/../config/permissions.php')) {
+            $this->mergeConfigFrom(__DIR__.'/../config/permissions.php', 'permissions');
+        }
     }
 
     /**

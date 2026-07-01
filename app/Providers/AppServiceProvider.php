@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
@@ -21,7 +22,6 @@ use Quochao56\PlanningEvaluation\Policies\PlanningPolicy;
 use Quochao56\Student\Models\Student;
 use Quochao56\Student\Policies\StudentPolicy;
 use Tapp\FilamentAuditing\Models\Audit as TappAudit;
-use Filament\Support\Facades\FilamentTimezone;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,12 +35,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::before(function ($user, $ability) {
-            if ($user->isSuperAdmin()) {
-                return true;
-            }
-        });
-
         FilamentTimezone::set(config('app.timezone'));
 
         Gate::policy(Student::class, StudentPolicy::class);

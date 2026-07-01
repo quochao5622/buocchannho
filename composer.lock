@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "157d314db9e8ea4cff3aecefe5c3a676",
+    "content-hash": "61cc012568b880f0eb8d567c38f17c16",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -6543,6 +6543,41 @@
                 "issues": "https://github.com/quochao56/planning-evaluation/issues",
                 "source": "https://github.com/quochao56/planning-evaluation"
             },
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "quochao56/session-log",
+            "version": "dev-develop",
+            "dist": {
+                "type": "path",
+                "url": "packages/session_log",
+                "reference": "065af9c46b16d34345dc89d80a00f18d5781b17f"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "quochao56/core": "*@dev",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Quochao56\\SessionLog\\SessionLogServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quochao56\\SessionLog\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Daily logs and behavior incident logging for special education children.",
             "transport-options": {
                 "relative": true
             }
@@ -14558,6 +14593,7 @@
         "quochao56/employee": 20,
         "quochao56/equipment": 20,
         "quochao56/planning-evaluation": 20,
+        "quochao56/session-log": 20,
         "quochao56/student": 20
     },
     "prefer-stable": true,

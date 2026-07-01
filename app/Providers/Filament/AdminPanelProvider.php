@@ -28,6 +28,7 @@ use Quochao56\Acl\AclPlugin;
 use Quochao56\Employee\EmployeePlugin;
 use Quochao56\Equipment\EquipmentPlugin;
 use Quochao56\PlanningEvaluation\PlanningEvaluationPlugin;
+use Quochao56\SessionLog\SessionLogPlugin;
 use Quochao56\Student\StudentPlugin;
 use Tapp\FilamentAuditing\FilamentAuditingPlugin;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
@@ -76,37 +77,45 @@ class AdminPanelProvider extends PanelProvider
                 EmployeePlugin::make(),
                 StudentPlugin::make(),
                 PlanningEvaluationPlugin::make(),
+                SessionLogPlugin::make(),
                 EquipmentPlugin::make(),
                 AclPlugin::make(),
                 FilamentUsersPlugin::make(),
                 FilamentLogViewer::make()
-                    ->navigationGroup('Hệ thống')
+                    ->navigationGroup(trans('navigation.system'))
                     ->authorize(fn(): bool => auth()->check() && auth()->user()->can('logs.index')),
                 FilamentAuditingPlugin::make(),
             ])
             ->navigationGroups([
-                NavigationGroup::make()
-                    ->label(trans('packages.student::student.navigation_group')),
-                NavigationGroup::make()
-                    ->label(trans('packages.planning_evaluation::planning.navigation_group')),
-                NavigationGroup::make()
-                    ->label(trans('packages.equipment::equipment.common.navigation_group')),
-                NavigationGroup::make()
-                    ->label('Hệ thống'),
+                $this->collapsedNavigationGroup(trans('packages.student::student.navigation_group')),
+                $this->collapsedNavigationGroup(trans('packages.session_log::daily_log.navigation_group')),
+                $this->collapsedNavigationGroup(trans('packages.planning_evaluation::planning.navigation_group')),
+                $this->collapsedNavigationGroup(trans('packages.equipment::equipment.common.navigation_group')),
+                $this->collapsedNavigationGroup(trans('navigation.system')),
             ])
             // ->spa()
             ->maxContentWidth(Width::Full)
-
+            ->collapsibleNavigationGroups()
             ->sidebarCollapsibleOnDesktop(true);
     }
 
     public function boot(): void
     {
         FilamentView::registerRenderHook(
-            PanelsRenderHook::SCRIPTS_AFTER,
-            fn(): string => new HtmlString('
-        <script>document.addEventListener("scroll-to-top", () => window.scrollTo(0, 0))</script>
-            '),
+            PanelsRenderHook::STYLES_AFTER,
+            fn(): string => new HtmlString('<link rel="stylesheet" href="' . asset('css/admin.css') . '">'),
         );
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SCRIPTS_AFTER,
+            fn(): string => new HtmlString('<script src="' . asset('js/admin.js') . '" defer></script>'),
+        );
+    }
+
+    private function collapsedNavigationGroup(string $label): NavigationGroup
+    {
+        return NavigationGroup::make()
+            ->label($label)
+            ->collapsible()
+            ->collapsed();
     }
 }

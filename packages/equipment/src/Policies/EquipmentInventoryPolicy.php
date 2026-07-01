@@ -3,13 +3,14 @@
 namespace Quochao56\Equipment\Policies;
 
 use Quochao56\Core\Models\User;
+use Quochao56\Equipment\Enum\InventoryStatus;
 use Quochao56\Equipment\Models\EquipmentInventory;
 
 class EquipmentInventoryPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->isSuperAdmin()) {
+        if ($user->isSuperAdmin() && ! in_array($ability, ['update', 'delete', 'approve'])) {
             return true;
         }
 
@@ -33,16 +34,28 @@ class EquipmentInventoryPolicy
 
     public function update(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('equipment_inventories.edit');
+        if (($record->status?->value ?? $record->status) === InventoryStatus::Approved->value) {
+            return false;
+        }
+
+        return $user->isSuperAdmin() || $user->hasPermissionTo('equipment_inventories.edit');
     }
 
     public function delete(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('equipment_inventories.destroy');
+        if (($record->status?->value ?? $record->status) === InventoryStatus::Approved->value) {
+            return false;
+        }
+
+        return $user->isSuperAdmin() || $user->hasPermissionTo('equipment_inventories.destroy');
     }
 
     public function approve(User $user, EquipmentInventory $record): bool
     {
-        return $user->hasPermissionTo('equipment_inventories.approve');
+        if (($record->status?->value ?? $record->status) !== InventoryStatus::Completed->value) {
+            return false;
+        }
+
+        return $user->isSuperAdmin() || $user->hasPermissionTo('equipment_inventories.approve');
     }
 }

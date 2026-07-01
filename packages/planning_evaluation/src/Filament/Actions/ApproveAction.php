@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
-use Quochao56\PlanningEvaluation\Models\Planning;
 
 class ApproveAction extends Action
 {
@@ -58,17 +57,7 @@ class ApproveAction extends Action
         $this->label('Duyệt');
         $this->color('success');
         $this->requiresConfirmation();
-
-        $this->visible(function (Model $record): bool {
-            if ($record instanceof Planning) {
-                return auth()->user()->can('plannings.approve') && ($record->status?->value ?? $record->status) !== BaseStatusEnum::Published->value;
-            }
-            if ($record instanceof Evaluation) {
-                return auth()->user()->can('evaluations.approve') && ($record->status?->value ?? $record->status) !== BaseStatusEnum::Published->value;
-            }
-
-            return false;
-        });
+        $this->authorize('approve');
 
         $this->action(fn (Model $record) => $this->handle($record));
     }

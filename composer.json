@@ -23,6 +23,7 @@
         "quochao56/employee": "*@dev",
         "quochao56/equipment": "*@dev",
         "quochao56/planning-evaluation": "*@dev",
+        "quochao56/session-log": "*@dev",
         "quochao56/student": "*@dev",
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-permission": "^8.0",
@@ -45,7 +46,8 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Quochao56\\SessionLog\\Database\\Seeders\\": "packages/session_log/database/seeders/"
         }
     },
     "autoload-dev": {
@@ -56,6 +58,7 @@
             "Quochao56\\Employee\\Tests\\": "packages/employee/tests/",
             "Quochao56\\Equipment\\Tests\\": "packages/equipment/tests/",
             "Quochao56\\PlanningEvaluation\\Tests\\": "packages/planning_evaluation/tests/",
+            "Quochao56\\SessionLog\\Tests\\": "packages/session_log/tests/",
             "Quochao56\\Student\\Tests\\": "packages/student/tests/"
         }
     },
