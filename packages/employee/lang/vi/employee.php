@@ -5,7 +5,7 @@ return [
     'navigation_label' => 'Giáo viên',
     'model_label' => 'Giáo viên',
     'plural_model_label' => 'Giáo viên',
-    'navigation_group' => 'Quản lý',
+    'navigation_group' => 'Quản lý giáo viên',
     'fields' => [
         'employee_code' => 'Mã Giáo viên',
         'name' => 'Họ tên',

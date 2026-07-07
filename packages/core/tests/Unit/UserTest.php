@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Notification;
 use Quochao56\Core\Models\User;
 use Quochao56\Core\Notifications\VerifyEmailNotification;
 use Quochao56\Core\Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 
 uses(TestCase::class, RefreshDatabase::class);
 
@@ -16,6 +17,16 @@ it('determines if user is super admin', function () {
 
     $regularUser = clone User::factory()->make(['is_super_admin' => false]);
     expect($regularUser->isSuperAdmin())->toBeFalse();
+});
+
+it('allows super admin to bypass permission checks via hasPermissionTo', function () {
+    Permission::findOrCreate('any.random.permission', 'web');
+
+    $user = clone User::factory()->make(['is_super_admin' => true]);
+    expect($user->hasPermissionTo('any.random.permission'))->toBeTrue();
+
+    $regularUser = clone User::factory()->make(['is_super_admin' => false]);
+    expect($regularUser->hasPermissionTo('any.random.permission'))->toBeFalse();
 });
 
 it('determines if user can access filament panel based on is_active', function () {

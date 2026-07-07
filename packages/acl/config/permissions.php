@@ -47,5 +47,4 @@ return [
             'view' => 'Xem chi tiết nhật ký hoạt động',
         ],
     ],
-
 ];

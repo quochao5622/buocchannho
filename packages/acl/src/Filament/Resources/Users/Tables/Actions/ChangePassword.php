@@ -41,7 +41,7 @@ class ChangePassword
                     ->required(static fn ($record) => ! $record)
                     ->dehydrated(false),
             ])
-            ->action(static function ($record, $data) {
+            ->action(static function ($record, $data, $livewire) {
                 // Kiểm tra xem người dùng thực sự có nhập password mới hay không
                 $hasPassword = ! empty($data['password']);
 
@@ -66,6 +66,8 @@ class ChangePassword
                     )
                     ->success()
                     ->send();
+
+                $livewire->dispatch('notificationsSent');
             });
     }
 }

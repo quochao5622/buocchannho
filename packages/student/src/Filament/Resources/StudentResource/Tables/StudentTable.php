@@ -94,7 +94,7 @@ class StudentTable
                     BulkAction::make('assign_teacher')
                         ->label(trans('packages.planning_evaluation::planning.assignment.assign_teacher_bulk'))
                         ->icon('heroicon-o-user-plus')
-                        ->visible(fn () => auth()->check() && auth()->user()->can('students.assign'))
+                        ->visible(fn () => auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('students.assign')))
                         ->form([
                             Select::make('employee_id')
                                 ->label(trans('packages.planning_evaluation::planning.assignment.teacher'))

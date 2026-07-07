@@ -5,7 +5,7 @@ return [
     'navigation_label' => 'Học sinh',
     'model_label' => 'Học sinh',
     'plural_model_label' => 'Học sinh',
-    'navigation_group' => 'Quản lý',
+    'navigation_group' => 'Quản lý học sinh',
     'fields' => [
         'name' => 'Họ tên',
         'nickname' => 'Biệt danh',

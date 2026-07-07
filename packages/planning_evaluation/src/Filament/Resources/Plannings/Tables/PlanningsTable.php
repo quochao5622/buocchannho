@@ -150,7 +150,7 @@ class PlanningsTable
                                 ->displayFormat('d/m/Y')
                                 ->required(),
                         ])
-                        ->action(function (Planning $record, array $data): void {
+                        ->action(function (Planning $record, array $data, $livewire): void {
                             $cloned = $record->replicate();
                             $cloned->student_id = $data['student_id'];
                             $cloned->start_date = $data['start_date'];
@@ -173,6 +173,8 @@ class PlanningsTable
                                 ->success()
                                 ->title(trans('packages.planning_evaluation::planning.clone.success'))
                                 ->send();
+
+                            $livewire->dispatch('notificationsSent');
                         }),
                     DeleteAction::make(),
                 ])

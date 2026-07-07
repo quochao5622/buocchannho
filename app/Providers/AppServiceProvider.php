@@ -2,13 +2,19 @@
 
 namespace App\Providers;
 
+use App\Filament\Pages\CustomManageSettings;
+use DamodarBhattarai\FilamentSettings\Filament\Pages\ManageSettings;
 use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
 use Quochao56\Core\Policies\AuditPolicy;
 use Quochao56\Employee\Models\Employee;
+use Quochao56\Employee\Models\EmployeeAttendance;
+use Quochao56\Employee\Models\LeaveRequest;
+use Quochao56\Employee\Policies\EmployeeAttendancePolicy;
 use Quochao56\Employee\Policies\EmployeePolicy;
+use Quochao56\Employee\Policies\LeaveRequestPolicy;
 use Quochao56\Equipment\Models\Equipment;
 use Quochao56\Equipment\Models\EquipmentCategory;
 use Quochao56\Equipment\Models\EquipmentInventory;
@@ -20,6 +26,8 @@ use Quochao56\PlanningEvaluation\Models\Planning;
 use Quochao56\PlanningEvaluation\Policies\EvaluationPolicy;
 use Quochao56\PlanningEvaluation\Policies\PlanningPolicy;
 use Quochao56\Student\Models\Student;
+use Quochao56\Student\Models\StudentLeaveRequest;
+use Quochao56\Student\Policies\StudentLeaveRequestPolicy;
 use Quochao56\Student\Policies\StudentPolicy;
 use Tapp\FilamentAuditing\Models\Audit as TappAudit;
 
@@ -30,7 +38,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            ManageSettings::class,
+            CustomManageSettings::class
+        );
     }
 
     public function boot(): void
@@ -44,7 +55,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(EquipmentCategory::class, EquipmentCategoryPolicy::class);
         Gate::policy(EquipmentInventory::class, EquipmentInventoryPolicy::class);
         Gate::policy(Employee::class, EmployeePolicy::class);
+        Gate::policy(EmployeeAttendance::class, EmployeeAttendancePolicy::class);
+        Gate::policy(LeaveRequest::class, LeaveRequestPolicy::class);
         Gate::policy(Audit::class, AuditPolicy::class);
         Gate::policy(TappAudit::class, AuditPolicy::class);
+        Gate::policy(StudentLeaveRequest::class, StudentLeaveRequestPolicy::class);
     }
 }

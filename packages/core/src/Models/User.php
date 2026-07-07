@@ -7,17 +7,21 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Quochao56\Core\Notifications\VerifyEmailNotification;
+use Quochao56\Employee\Models\Employee;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements AuditableContract, FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use Auditable, HasFactory, HasRoles, Notifiable;
+    use Auditable, HasFactory, HasRoles, Notifiable {
+        HasRoles::hasPermissionTo as spatieHasPermissionTo;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -57,6 +61,11 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
         ];
     }
 
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class, 'email', 'email');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return (bool) $this->is_active;
@@ -65,6 +74,15 @@ class User extends Authenticatable implements AuditableContract, FilamentUser, M
     public function isSuperAdmin(): bool
     {
         return (bool) $this->is_super_admin;
+    }
+
+    public function hasPermissionTo($permission, $guardName = null): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return $this->spatieHasPermissionTo($permission, $guardName);
     }
 
     public function sendEmailVerificationNotification(): void

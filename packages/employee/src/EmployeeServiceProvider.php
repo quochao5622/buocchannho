@@ -10,6 +10,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use Quochao56\Employee\Commands\DetectAbsentEmployeesCommand;
 use Quochao56\Employee\Commands\EmployeeCommand;
 use Quochao56\Employee\Testing\TestsEmployee;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -69,6 +70,10 @@ class EmployeeServiceProvider extends PackageServiceProvider
         if (file_exists(__DIR__.'/../config/permissions.php')) {
             $this->mergeConfigFrom(__DIR__.'/../config/permissions.php', 'permissions');
         }
+
+        if (is_dir(__DIR__.'/../resources/views')) {
+            $this->loadViewsFrom(__DIR__.'/../resources/views', 'employee');
+        }
     }
 
     public function packageBooted(): void
@@ -124,6 +129,7 @@ class EmployeeServiceProvider extends PackageServiceProvider
     {
         return [
             EmployeeCommand::class,
+            DetectAbsentEmployeesCommand::class,
         ];
     }
 

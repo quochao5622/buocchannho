@@ -4,6 +4,7 @@ namespace Quochao56\Student;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Quochao56\Student\Filament\Resources\StudentLeaveRequestResource;
 use Quochao56\Student\Filament\Resources\StudentResource;
 
 class StudentPlugin implements Plugin
@@ -17,6 +18,7 @@ class StudentPlugin implements Plugin
     {
         $panel->resources([
             StudentResource::class,
+            StudentLeaveRequestResource::class,
         ]);
     }
 

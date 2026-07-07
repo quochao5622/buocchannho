@@ -69,4 +69,9 @@ class Student extends Model implements AuditableContract
         // strip tags and trim whitespace
         $this->attributes['name'] = trim(strip_tags($value));
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', BaseStatusEnum::Active);
+    }
 }

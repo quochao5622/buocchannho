@@ -158,6 +158,7 @@ class StudentServiceProvider extends PackageServiceProvider
     {
         return [
             'create_students_table',
+            '2026_07_06_000000_create_student_leave_requests_table',
         ];
     }
 }

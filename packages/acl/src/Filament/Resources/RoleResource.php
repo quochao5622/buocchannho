@@ -74,7 +74,10 @@ class RoleResource extends Resource
             }
             foreach (array_keys($groupConfig['permissions']) as $action) {
                 $permName = "{$groupKey}.{$action}";
-                Permission::findOrCreate($permName, 'web');
+                Permission::firstOrCreate([
+                    'name' => $permName,
+                    'guard_name' => 'web',
+                ]);
                 $activePermissions[] = $permName;
             }
         }

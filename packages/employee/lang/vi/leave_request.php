@@ -1,0 +1,45 @@
+<?php
+
+return [
+    'navigation_label' => 'Nghỉ phép',
+    'model_label' => 'Đơn xin nghỉ phép',
+    'plural_model_label' => 'Đơn xin nghỉ phép',
+    'navigation_group' => 'Quản lý giáo viên',
+    'fields' => [
+        'employee_id' => 'Giáo viên',
+        'leave_type' => 'Loại nghỉ phép',
+        'start_date' => 'Từ ngày',
+        'end_date' => 'Đến ngày',
+        'half_day' => 'Nghỉ nửa ngày',
+        'half_day_session' => 'Buổi nghỉ',
+        'reason' => 'Lý do nghỉ',
+        'status' => 'Trạng thái',
+        'approved_by' => 'Người duyệt',
+        'approved_at' => 'Thời điểm duyệt',
+        'rejection_reason' => 'Lý do từ chối',
+        'session_morning' => 'Buổi sáng',
+        'session_afternoon' => 'Buổi chiều',
+    ],
+    'type' => [
+        'annual' => 'Nghỉ phép năm',
+        'sick' => 'Nghỉ ốm',
+        'unpaid' => 'Nghỉ không lương',
+        'maternity' => 'Nghỉ thai sản',
+        'other' => 'Khác',
+    ],
+    'status' => [
+        'pending' => 'Chờ duyệt',
+        'approved' => 'Đã duyệt',
+        'rejected' => 'Từ chối',
+    ],
+    'actions' => [
+        'approve' => 'Duyệt đơn',
+        'reject' => 'Từ chối',
+        'approve_confirm' => 'Bạn có chắc chắn muốn duyệt đơn xin nghỉ phép này?',
+        'reject_confirm' => 'Bạn có chắc chắn muốn từ chối đơn xin nghỉ phép này?',
+        'approve_success' => 'Đã duyệt đơn xin nghỉ phép thành công.',
+        'reject_success' => 'Đã từ chối đơn xin nghỉ phép.',
+        'rejection_reason_required' => 'Vui lòng điền lý do từ chối.',
+        'enter_rejection_reason' => 'Nhập lý do từ chối đơn',
+    ],
+];

@@ -7,7 +7,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Quochao56\Employee\Models\Employee;
+use Quochao56\Student\Models\Student;
 
 class DailyLogTable
 {
@@ -46,6 +49,16 @@ class DailyLogTable
                     ->badge(),
             ])
             ->defaultSort('log_date', 'desc')
+            ->filters([
+                SelectFilter::make('employee_id')
+                    ->label(trans('packages.session_log::daily_log.fields.employee'))
+                    ->searchable()
+                    ->options(fn () => Employee::query()->pluck('name', 'id')->toArray()),
+                SelectFilter::make('student_id')
+                    ->label(trans('packages.session_log::daily_log.fields.student_id'))
+                    ->searchable()
+                    ->options(fn () => Student::query()->pluck('name', 'id')->toArray()),
+            ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make()

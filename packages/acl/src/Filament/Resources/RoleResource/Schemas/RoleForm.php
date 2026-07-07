@@ -23,8 +23,13 @@ class RoleForm
 
         // Mapping keys to friendly group tabs
         $groupMapping = [
-            'students' => 'Học sinh & Giáo viên',
-            'employees' => 'Học sinh & Giáo viên',
+            'employees' => 'Quản lý giáo viên',
+            'employee_attendances' => 'Quản lý giáo viên',
+            'leave_requests' => 'Quản lý giáo viên',
+            'attendance_correction_requests' => 'Quản lý giáo viên',
+
+            'students' => 'Quản lý học sinh',
+            'student_leave_requests' => 'Quản lý học sinh',
 
             'daily_logs' => 'Nhật ký & Trị liệu',
             'behavior_incidents' => 'Nhật ký & Trị liệu',
@@ -45,7 +50,11 @@ class RoleForm
 
         // Define groups and order
         $tabGroups = [
-            'Học sinh & Giáo viên' => [
+            'Quản lý giáo viên' => [
+                'icon' => 'heroicon-o-user-group',
+                'sections' => [],
+            ],
+            'Quản lý học sinh' => [
                 'icon' => 'heroicon-o-academic-cap',
                 'sections' => [],
             ],
