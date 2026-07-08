@@ -57,11 +57,11 @@ class EmployeeAttendanceResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
-        if (!$user->can('approve_flagged_location', 'employee_attendances') && !$user->isSuperAdmin()) {
+        if (! $user->can('approveFlaggedLocation', EmployeeAttendance::class)) {
             return null;
         }
 

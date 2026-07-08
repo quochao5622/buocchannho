@@ -29,7 +29,9 @@ class ApproveAction extends Action
                                 ->danger()
                                 ->send();
 
-                            $this->getLivewire()->dispatch('notificationsSent');
+                            if ($this->getLivewire()) {
+                                $this->getLivewire()->dispatch('notificationsSent');
+                            }
 
                             return;
                         }
@@ -44,14 +46,18 @@ class ApproveAction extends Action
                 ->success()
                 ->send();
 
-            $this->getLivewire()->dispatch('notificationsSent');
+            if ($this->getLivewire()) {
+                $this->getLivewire()->dispatch('notificationsSent');
+            }
         } catch (\Throwable $th) {
             Notification::make()
                 ->title('Đã xảy ra lỗi khi duyệt.')
                 ->danger()
                 ->send();
 
-            $this->getLivewire()->dispatch('notificationsSent');
+            if ($this->getLivewire()) {
+                $this->getLivewire()->dispatch('notificationsSent');
+            }
             Log::error($th);
         }
     }

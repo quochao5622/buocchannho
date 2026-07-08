@@ -4,10 +4,12 @@ namespace Quochao56\Employee;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Quochao56\Employee\Filament\Pages\MonthlyTimesheetPage;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource;
 use Quochao56\Employee\Filament\Resources\EmployeeAttendanceResource;
 use Quochao56\Employee\Filament\Resources\EmployeeResource;
 use Quochao56\Employee\Filament\Resources\LeaveRequestResource;
+use Quochao56\Employee\Filament\Widgets\HRAttendanceOverviewWidget;
 use Quochao56\Employee\Filament\Widgets\MobileCheckinWidget;
 
 class EmployeePlugin implements Plugin
@@ -26,8 +28,12 @@ class EmployeePlugin implements Plugin
                 LeaveRequestResource::class,
                 AttendanceCorrectionRequestResource::class,
             ])
+            ->pages([
+                MonthlyTimesheetPage::class,
+            ])
             ->widgets([
                 MobileCheckinWidget::class,
+                HRAttendanceOverviewWidget::class,
             ]);
     }
 

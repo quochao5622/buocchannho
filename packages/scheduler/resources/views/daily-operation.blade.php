@@ -1,27 +1,23 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-900 dark:border-gray-800">
-            <form class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <form>
                 {{ $this->form }}
             </form>
         </div>
         <div class="mt-5">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-4" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;">
-            <div class="p-4 bg-white border border-gray-200 rounded-xl dark:bg-gray-900 dark:border-gray-800" style="padding:12px;border:1px solid rgba(148,163,184,.35);border-radius:12px;background:linear-gradient(180deg, rgba(148,163,184,.12), rgba(15,23,42,.02));">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px;">
+            <div class="p-4 bg-white border border-gray-200 rounded-xl dark:bg-gray-900 dark:border-gray-800" style="padding:12px;border:1px solid rgba(59,130,246,.35);border-radius:12px;background:linear-gradient(180deg, rgba(59,130,246,.2), rgba(59,130,246,.05));">
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ trans('packages.scheduler::scheduler.daily_operations.summary.total') }}</p>
-                <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100" style="color:#f8fafc;font-weight:700;">{{ $summary['total'] }}</p>
-            </div>
-            <div class="p-4 bg-white border border-gray-200 rounded-xl dark:bg-gray-900 dark:border-gray-800" style="padding:12px;border:1px solid rgba(16,185,129,.35);border-radius:12px;background:linear-gradient(180deg, rgba(16,185,129,.2), rgba(16,185,129,.05));">
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ trans('packages.scheduler::scheduler.daily_operations.summary.present') }}</p>
-                <p class="mt-1 text-2xl font-semibold text-emerald-600" style="color:#10b981;font-weight:700;">{{ $summary['present'] }}</p>
+                <p class="mt-1 text-2xl font-semibold text-blue-600" style="color:#2563eb;font-weight:700;">{{ $summary['total'] }}</p>
             </div>
             <div class="p-4 bg-white border border-gray-200 rounded-xl dark:bg-gray-900 dark:border-gray-800" style="padding:12px;border:1px solid rgba(244,63,94,.35);border-radius:12px;background:linear-gradient(180deg, rgba(244,63,94,.2), rgba(244,63,94,.05));">
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ trans('packages.scheduler::scheduler.daily_operations.summary.absent') }}</p>
-                <p class="mt-1 text-2xl font-semibold text-rose-600" style="color:#f43f5e;font-weight:700;">{{ $summary['absent'] }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Đã hủy</p>
+                <p class="mt-1 text-2xl font-semibold text-rose-600" style="color:#f43f5e;font-weight:700;">{{ $summary['canceled'] }}</p>
             </div>
             <div class="p-4 bg-white border border-gray-200 rounded-xl dark:bg-gray-900 dark:border-gray-800" style="padding:12px;border:1px solid rgba(245,158,11,.35);border-radius:12px;background:linear-gradient(180deg, rgba(245,158,11,.2), rgba(245,158,11,.05));">
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ trans('packages.scheduler::scheduler.daily_operations.summary.recorded_absence') }}</p>
-                <p class="mt-1 text-2xl font-semibold text-amber-600" style="color:#f59e0b;font-weight:700;">{{ $summary['recorded_absence'] }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Dời lịch</p>
+                <p class="mt-1 text-2xl font-semibold text-amber-600" style="color:#f59e0b;font-weight:700;">{{ $summary['rescheduled'] }}</p>
             </div>
         </div>
 
@@ -36,7 +32,6 @@
                             <th class="px-3 py-2 text-left font-medium" style="padding:10px 12px;white-space:nowrap;">{{ trans('packages.scheduler::scheduler.daily_operations.table.teacher') }}</th>
                             <th class="px-3 py-2 text-left font-medium" style="padding:10px 12px;white-space:nowrap;">{{ trans('packages.scheduler::scheduler.daily_operations.table.classroom') }}</th>
                             <th class="px-3 py-2 text-left font-medium" style="padding:10px 12px;white-space:nowrap;">{{ trans('packages.scheduler::scheduler.daily_operations.table.schedule_status') }}</th>
-                            <th class="px-3 py-2 text-left font-medium" style="padding:10px 12px;white-space:nowrap;">{{ trans('packages.scheduler::scheduler.daily_operations.table.attendance') }}</th>
                             <th class="px-3 py-2 text-left font-medium" style="padding:10px 12px;white-space:nowrap;">{{ trans('packages.scheduler::scheduler.daily_operations.table.notes') }}</th>
                         </tr>
                     </thead>
@@ -44,19 +39,11 @@
                         @forelse ($rows as $row)
                             @php
                                 $scheduleStatus = $row['schedule_status'];
-                                $attendanceStatus = $row['attendance_status'];
 
                                 $scheduleBadge = match ($scheduleStatus) {
                                     'canceled' => ['bg' => 'rgba(244,63,94,.18)', 'text' => '#fb7185', 'border' => 'rgba(244,63,94,.45)'],
                                     'substituted' => ['bg' => 'rgba(99,102,241,.18)', 'text' => '#a5b4fc', 'border' => 'rgba(99,102,241,.45)'],
                                     'rescheduled' => ['bg' => 'rgba(245,158,11,.18)', 'text' => '#fbbf24', 'border' => 'rgba(245,158,11,.45)'],
-                                    default => ['bg' => 'rgba(16,185,129,.18)', 'text' => '#34d399', 'border' => 'rgba(16,185,129,.45)'],
-                                };
-
-                                $attendanceBadge = match ($attendanceStatus) {
-                                    'absent_unexcused' => ['bg' => 'rgba(239,68,68,.18)', 'text' => '#f87171', 'border' => 'rgba(239,68,68,.45)'],
-                                    'absent_excused' => ['bg' => 'rgba(245,158,11,.18)', 'text' => '#fbbf24', 'border' => 'rgba(245,158,11,.45)'],
-                                    'late' => ['bg' => 'rgba(59,130,246,.18)', 'text' => '#60a5fa', 'border' => 'rgba(59,130,246,.45)'],
                                     default => ['bg' => 'rgba(16,185,129,.18)', 'text' => '#34d399', 'border' => 'rgba(16,185,129,.45)'],
                                 };
                             @endphp
@@ -71,16 +58,11 @@
                                         {{ trans('packages.scheduler::scheduler.daily_operations.status.' . $row['schedule_status']) }}
                                     </span>
                                 </td>
-                                <td class="px-3 py-2" style="padding:10px 12px;white-space:nowrap;">
-                                    <span style="display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid {{ $attendanceBadge['border'] }};background:{{ $attendanceBadge['bg'] }};color:{{ $attendanceBadge['text'] }};font-weight:600;">
-                                        {{ trans('packages.scheduler::scheduler.attendances.status.' . $row['attendance_status']) }}
-                                    </span>
-                                </td>
                                 <td class="px-3 py-2" style="padding:10px 12px;min-width:180px;">{{ $row['notes'] }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-3 py-6 text-center text-gray-500 dark:text-gray-400" style="padding:18px 12px;">
+                                <td colspan="7" class="px-3 py-6 text-center text-gray-500 dark:text-gray-400" style="padding:18px 12px;">
                                     Chưa có buổi học trong ngày được chọn.
                                 </td>
                             </tr>

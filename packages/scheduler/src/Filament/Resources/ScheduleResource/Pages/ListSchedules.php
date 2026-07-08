@@ -6,10 +6,10 @@ use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use Quochao56\Core\Traits\HasNotifications;
 use Quochao56\Employee\Models\Employee;
@@ -32,6 +32,7 @@ class ListSchedules extends ListRecords
                 ->label(trans('packages.scheduler::scheduler.schedules.quick_create.label'))
                 ->icon('heroicon-o-bolt')
                 ->color('success')
+                ->visible(fn () => auth()->user()->can('schedules.create'))
                 ->form([
                     Select::make('type')
                         ->label(trans('packages.scheduler::scheduler.schedules.quick_create.type'))
@@ -47,17 +48,11 @@ class ListSchedules extends ListRecords
                         ->label(trans('packages.scheduler::scheduler.schedules.quick_create.assignment_mode'))
                         ->options([
                             'group' => trans('packages.scheduler::scheduler.schedules.quick_create.assignment_mode_options.group'),
-                            'round_robin' => trans('packages.scheduler::scheduler.schedules.quick_create.assignment_mode_options.round_robin'),
                             'manual' => trans('packages.scheduler::scheduler.schedules.quick_create.assignment_mode_options.manual'),
                         ])
-                        ->default('round_robin')
+                        ->default('manual')
                         ->helperText(trans('packages.scheduler::scheduler.schedules.quick_create.assignment_mode_help'))
                         ->required(),
-
-                    TextInput::make('title')
-                        ->label(trans('packages.scheduler::scheduler.schedules.quick_create.title'))
-                        ->required()
-                        ->placeholder(trans('packages.scheduler::scheduler.schedules.quick_create.title_placeholder')),
 
                     Select::make('day_of_week')
                         ->label(trans('packages.scheduler::scheduler.schedules.quick_create.day_of_week'))
@@ -122,14 +117,17 @@ class ListSchedules extends ListRecords
                             return $grouped;
                         })
                         ->multiple()
+                        ->maxItems(fn (Get $get) => $get('type') === 'individual' ? 1 : null)
                         ->suffixActions([
                             Action::make('selectAllEmployees')
                                 ->label('Chọn tất cả')
                                 ->icon('heroicon-m-check-circle')
+                                ->visible(fn (Get $get) => $get('type') !== 'individual')
                                 ->action(fn (Select $component) => $component->state(Employee::active()->pluck('id')->toArray())),
                             Action::make('selectEmployeesByPosition')
                                 ->label('Theo chức vụ')
                                 ->icon('heroicon-m-funnel')
+                                ->visible(fn (Get $get) => $get('type') !== 'individual')
                                 ->form([
                                     Select::make('position')
                                         ->label('Chức vụ')
@@ -149,10 +147,12 @@ class ListSchedules extends ListRecords
                         ->label(trans('packages.scheduler::scheduler.schedules.quick_create.student_ids'))
                         ->options(Student::active()->pluck('name', 'id'))
                         ->multiple()
+                        ->maxItems(fn (Get $get) => $get('type') === 'individual' ? 1 : null)
                         ->suffixActions([
                             Action::make('selectAllStudents')
                                 ->label('Chọn tất cả')
                                 ->icon('heroicon-m-check-circle')
+                                ->visible(fn (Get $get) => $get('type') !== 'individual')
                                 ->action(fn (Select $component) => $component->state(Student::active()->pluck('id')->toArray())),
                         ])
                         ->searchable()
@@ -161,7 +161,7 @@ class ListSchedules extends ListRecords
                 ->action(function (array $data) {
                     $type = $data['type'];
                     $assignmentMode = $data['assignment_mode'] ?? 'round_robin';
-                    $title = $data['title'];
+                    $title = null;
                     $dayOfWeek = $this->normalizeDays($data['day_of_week'] ?? []);
                     $startTime = $data['start_time'];
                     $endTime = $data['end_time'];

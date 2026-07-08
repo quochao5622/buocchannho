@@ -49,7 +49,7 @@ class PlanningEvaluationTracker extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('plannings.tracker'));
+        return auth()->check() && auth()->user()->hasPermissionTo('plannings.tracker');
     }
 
     protected string $view = 'planning-evaluation::tracker';

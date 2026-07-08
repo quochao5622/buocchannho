@@ -7,6 +7,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Quochao56\Employee\Filament\Resources\EmployeeAttendanceResource;
+use Quochao56\Employee\Models\EmployeeAttendance;
 
 class EditEmployeeAttendance extends EditRecord
 {
@@ -17,7 +18,7 @@ class EditEmployeeAttendance extends EditRecord
         $record = $this->record;
         $actions = [];
 
-        if ($record->flagged_location && $record->verification_status === 'pending' && (auth()->user()?->can('approve_flagged_location', 'employee_attendances') || auth()->user()?->isSuperAdmin())) {
+        if ($record->flagged_location && $record->verification_status === 'pending' && auth()->user()?->can('approveFlaggedLocation', EmployeeAttendance::class)) {
             $actions[] = Action::make('approve')
                 ->label(trans('packages.employee::employee_attendance.actions.approve'))
                 ->icon('heroicon-o-check-circle')

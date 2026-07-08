@@ -23,7 +23,7 @@ class ListStudentLeaveRequests extends ListRecords
         $query = parent::getTableQuery();
         $user = auth()->user();
 
-        if ($user->isSuperAdmin() || $user->hasPermissionTo('student_leave_requests.view_all')) {
+        if ($user->hasPermissionTo('student_leave_requests.view_all')) {
             return $query;
         }
 

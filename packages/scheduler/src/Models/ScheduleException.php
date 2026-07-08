@@ -18,7 +18,9 @@ class ScheduleException extends Model implements AuditableContract
     protected $fillable = [
         'schedule_id',
         'exception_date',
+        'new_exception_date',
         'action',
+        'cancel_actor',
         'new_employee_id',
         'new_classroom_id',
         'new_start_time',
@@ -29,7 +31,9 @@ class ScheduleException extends Model implements AuditableContract
 
     protected $casts = [
         'exception_date' => 'date',
+        'new_exception_date' => 'date',
         'action' => 'string',
+        'cancel_actor' => 'string',
     ];
 
     public function schedule(): BelongsTo

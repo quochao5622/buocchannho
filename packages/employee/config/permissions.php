@@ -13,7 +13,7 @@ return [
         ],
     ],
     'employee_attendances' => [
-        'label' => 'Chấm công nhân viên',
+        'label' => 'Chấm công giáo viên',
         'icon' => 'heroicon-o-clock',
         'permissions' => [
             'index' => 'Xem danh sách chấm công',
@@ -21,10 +21,11 @@ return [
             'edit' => 'Chỉnh sửa chấm công',
             'show' => 'Xem chi tiết chấm công',
             'destroy' => 'Xóa chấm công',
-            'view_all' => 'Xem chấm công toàn bộ nhân viên',
+            'view_all' => 'Xem chấm công toàn bộ giáo viên',
             'approve_flagged_location' => 'Duyệt chấm công ngoài vị trí',
             'reject_flagged_location' => 'Từ chối chấm công ngoài vị trí',
             'manage' => 'Quản lý chấm công (chấm bù, duyệt)',
+            'view_overview' => 'Xem widget tổng quan nhân sự & chấm công',
         ],
     ],
     'leave_requests' => [
@@ -36,7 +37,7 @@ return [
             'edit' => 'Chỉnh sửa đơn nghỉ phép',
             'destroy' => 'Xóa đơn nghỉ phép',
             'approve' => 'Duyệt/Từ chối đơn nghỉ phép',
-            'view_all' => 'Xem đơn nghỉ phép toàn bộ nhân viên',
+            'view_all' => 'Xem đơn nghỉ phép toàn bộ giáo viên',
         ],
     ],
     'attendance_correction_requests' => [

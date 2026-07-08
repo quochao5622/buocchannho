@@ -34,6 +34,12 @@ class RoleForm
             'daily_logs' => 'Nhật ký & Trị liệu',
             'behavior_incidents' => 'Nhật ký & Trị liệu',
 
+            'schedules' => 'Lịch học',
+            'schedule_exceptions' => 'Lịch học',
+            'classrooms' => 'Lịch học',
+            'calendar_overviews' => 'Lịch học',
+            'daily_operations' => 'Lịch học',
+
             'plannings' => 'Học tập',
             'evaluations' => 'Học tập',
 
@@ -44,6 +50,7 @@ class RoleForm
             'users' => 'Hệ thống & Cấu hình',
             'roles' => 'Hệ thống & Cấu hình',
             'logs' => 'Hệ thống & Cấu hình',
+            'settings' => 'Hệ thống & Cấu hình',
             'audits' => 'Hệ thống & Cấu hình',
             'activities' => 'Hệ thống & Cấu hình',
         ];
@@ -60,6 +67,10 @@ class RoleForm
             ],
             'Nhật ký & Trị liệu' => [
                 'icon' => 'heroicon-o-book-open',
+                'sections' => [],
+            ],
+            'Lịch học' => [
+                'icon' => 'heroicon-o-calendar-days',
                 'sections' => [],
             ],
             'Học tập' => [

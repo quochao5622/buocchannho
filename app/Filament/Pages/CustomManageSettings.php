@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Quochao56\Core\Traits\HasNotifications;
 
@@ -24,19 +25,41 @@ class CustomManageSettings extends BaseManageSettings
 {
     use HasNotifications;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
+    }
+
+    public static function canAccess(): bool
+    {
+        return Auth::check() && Auth::user()->hasPermissionTo('settings.index');
+    }
+
     /**
      * Save all settings from the form to the database.
      * Overridden to translate notification text and dispatch notificationsSent.
      */
     public function save(): void
     {
+        if (! Auth::user()?->hasPermissionTo('settings.edit')) {
+            Notification::make()
+                ->title('Không có quyền cập nhật cấu hình')
+                ->body('Bạn không được cấp quyền chỉnh sửa cấu hình hệ thống.')
+                ->danger()
+                ->send();
+
+            $this->dispatch('notificationsSent');
+
+            return;
+        }
+
         $formData = $this->form->getState();
         $settings = $formData['settings'] ?? [];
 
         foreach ($settings as $key => $value) {
             $settingModel = Setting::where('key', $key)->first();
 
-            if (! $settingModel) {
+            if (! $settingModel instanceof Setting) {
                 continue;
             }
 

@@ -6,7 +6,6 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Quochao56\Scheduler\Filament\Pages\CalendarOverview;
 use Quochao56\Scheduler\Filament\Pages\DailyOperationPage;
-use Quochao56\Scheduler\Filament\Resources\AttendanceResource;
 use Quochao56\Scheduler\Filament\Resources\ClassroomResource;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource;
 
@@ -22,7 +21,6 @@ class SchedulerPlugin implements Plugin
         $panel
             ->resources([
                 ScheduleResource::class,
-                AttendanceResource::class,
                 ClassroomResource::class,
             ])
             ->pages([

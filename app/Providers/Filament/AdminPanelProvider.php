@@ -2,8 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Plugins\CustomFilamentSettingsPlugin;
 use AchyutN\FilamentLogViewer\FilamentLogViewer;
-use DamodarBhattarai\FilamentSettings\FilamentSettingsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,6 +21,7 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -91,9 +92,11 @@ class AdminPanelProvider extends PanelProvider
                 AclPlugin::make(),
                 FilamentUsersPlugin::make(),
                 FilamentLogViewer::make()
+                    ->authorize(fn (): bool => Auth::check() && Auth::user()->hasPermissionTo('logs.index'))
                     ->navigationGroup(trans('navigation.system')),
                 FilamentAuditingPlugin::make(),
-                FilamentSettingsPlugin::make(),
+                CustomFilamentSettingsPlugin::make()
+                    ->canModifyFields(fn ($user): bool => (bool) ($user?->hasPermissionTo('settings.edit'))),
             ])
             ->navigationGroups([
                 $this->collapsedNavigationGroup(trans('packages.employee::employee.navigation_group')),

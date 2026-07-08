@@ -22,12 +22,12 @@ class CalendarOverview extends Page implements HasForms
 
     public static function getNavigationLabel(): string
     {
-        return 'Lịch biểu tổng quan';
+        return trans('packages.scheduler::scheduler.calendar_overview.navigation_label');
     }
 
     public function getTitle(): string|Htmlable
     {
-        return 'Lịch biểu tổng quan';
+        return trans('packages.scheduler::scheduler.calendar_overview.title');
     }
 
     public static function getNavigationGroup(): ?string
@@ -41,7 +41,7 @@ class CalendarOverview extends Page implements HasForms
     {
         $user = Auth::user();
 
-        return $user && ($user->isSuperAdmin() || $user->hasPermissionTo('schedules.index'));
+        return $user && $user->hasPermissionTo('calendar_overviews.index');
     }
 
     protected string $view = 'scheduler::calendar-overview';
@@ -56,6 +56,13 @@ class CalendarOverview extends Page implements HasForms
 
     public function mount(): void
     {
+        $user = Auth::user();
+        $isManager = $user && $user->can('employees.index');
+
+        if (! $isManager && $user?->employee) {
+            $this->employeeId = $user->employee->id;
+        }
+
         $this->form->fill([
             'employeeId' => $this->employeeId,
             'studentId' => $this->studentId,
@@ -66,46 +73,64 @@ class CalendarOverview extends Page implements HasForms
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('employeeId')
-                    ->label('Giáo viên')
-                    ->placeholder('Tất cả giáo viên')
-                    ->options(function () {
-                        $teachers = Employee::active()->get();
-                        $grouped = [];
-                        foreach ($teachers as $teacher) {
-                            $posLabel = $teacher->position ?: 'Chưa phân chức vụ';
-                            $grouped[$posLabel][$teacher->id] = $teacher->name;
-                        }
+        $user = Auth::user();
+        $isManager = $user && $user->can('employees.index');
 
-                        return $grouped;
-                    })
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->employeeId = $state),
+        $components = [];
 
-                Select::make('studentId')
-                    ->label('Học sinh')
-                    ->placeholder('Tất cả học sinh')
-                    ->options(Student::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->studentId = $state),
+        if ($isManager) {
+            $components[] = Select::make('employeeId')
+                ->label(trans('packages.scheduler::scheduler.calendar_overview.filters.teacher'))
+                ->placeholder(trans('packages.scheduler::scheduler.calendar_overview.filters.all_teachers'))
+                ->options(function () {
+                    $teachers = Employee::active()->get();
+                    $grouped = [];
+                    foreach ($teachers as $teacher) {
+                        $posLabel = $teacher->position ?: 'Chưa phân chức vụ';
+                        $grouped[$posLabel][$teacher->id] = $teacher->name;
+                    }
 
-                Select::make('classroomId')
-                    ->label('Phòng học')
-                    ->placeholder('Tất cả phòng học')
-                    ->options(Classroom::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->classroomId = $state),
+                    return $grouped;
+                })
+                ->searchable()
+                ->live()
+                ->afterStateUpdated(fn ($state) => $this->employeeId = $state);
+        }
 
-                TextInput::make('guardianKeyword')
-                    ->label('Tìm theo phụ huynh')
-                    ->placeholder('Tên cha/mẹ hoặc số điện thoại')
-                    ->live(debounce: 600)
-                    ->afterStateUpdated(fn ($state) => $this->guardianKeyword = $state),
-            ]);
+        $components[] = Select::make('studentId')
+            ->label(trans('packages.scheduler::scheduler.calendar_overview.filters.student'))
+            ->placeholder(trans('packages.scheduler::scheduler.calendar_overview.filters.all_students'))
+            ->options(function () use ($isManager, $user) {
+                $query = Student::active();
+                if (! $isManager && $user?->employee) {
+                    $query->whereHas('currentAssignment', function ($q) use ($user) {
+                        $q->where('employee_id', $user->employee->id);
+                    });
+                }
+
+                return $query->pluck('name', 'id');
+            })
+            ->searchable()
+            ->live()
+            ->afterStateUpdated(fn ($state) => $this->studentId = $state);
+
+        $components[] = Select::make('classroomId')
+            ->label(trans('packages.scheduler::scheduler.calendar_overview.filters.classroom'))
+            ->placeholder(trans('packages.scheduler::scheduler.calendar_overview.filters.all_classrooms'))
+            ->options(Classroom::active()->pluck('name', 'id'))
+            ->searchable()
+            ->live()
+            ->afterStateUpdated(fn ($state) => $this->classroomId = $state);
+
+        $components[] = TextInput::make('guardianKeyword')
+            ->label(trans('packages.scheduler::scheduler.calendar_overview.filters.guardian_keyword'))
+            ->placeholder(trans('packages.scheduler::scheduler.calendar_overview.filters.guardian_keyword_placeholder'))
+            ->live(debounce: 600)
+            ->afterStateUpdated(fn ($state) => $this->guardianKeyword = $state);
+
+        return $schema->components($components)->columns([
+            'sm' => 1,
+            'md' => 4,
+        ]);
     }
 }

@@ -18,26 +18,26 @@ class ScheduleExceptionPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('schedules.index');
+        return $user->hasPermissionTo('schedule_exceptions.index');
     }
 
     public function view(User $user, ScheduleException $record): bool
     {
-        return $user->hasPermissionTo('schedules.show');
+        return $user->hasPermissionTo('schedule_exceptions.show');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('schedules.edit');
+        return $user->hasPermissionTo('schedule_exceptions.create');
     }
 
     public function update(User $user, ScheduleException $record): bool
     {
-        return $user->hasPermissionTo('schedules.edit');
+        return $user->hasPermissionTo('schedule_exceptions.edit');
     }
 
     public function delete(User $user, ScheduleException $record): bool
     {
-        return $user->hasPermissionTo('schedules.edit');
+        return $user->hasPermissionTo('schedule_exceptions.destroy');
     }
 }

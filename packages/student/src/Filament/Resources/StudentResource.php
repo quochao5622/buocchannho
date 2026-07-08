@@ -56,7 +56,7 @@ class StudentResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('students.view_all'))) {
+        if (auth()->check() && auth()->user()->can('students.view_all')) {
             return $query;
         }
 

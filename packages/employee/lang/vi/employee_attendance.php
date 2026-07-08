@@ -6,8 +6,9 @@ return [
     'plural_model_label' => 'Lịch sử chấm công',
     'navigation_group' => 'Quản lý giáo viên',
     'fields' => [
-        'employee_id' => 'Nhân viên',
+        'employee_id' => 'Giáo viên',
         'date' => 'Ngày chấm công',
+        'session' => 'Ca làm việc',
         'check_in_at' => 'Giờ Check-in',
         'check_out_at' => 'Giờ Check-out',
         'status' => 'Trạng thái',
@@ -23,6 +24,7 @@ return [
         'verification_status' => 'Trạng thái xác minh',
         'auto_closed' => 'Tự động đóng phiên',
         'flagged_missing_checkin' => 'Thiếu check-in',
+        'flagged_missing_checkout' => 'Quên check-out',
         'corrected_by' => 'Người duyệt điều chỉnh',
         'corrected_at' => 'Thời điểm duyệt điều chỉnh',
         'schedule_id' => 'Ca học liên kết',
@@ -33,6 +35,11 @@ return [
         'early_leave' => 'Về sớm',
         'absent' => 'Vắng mặt',
         'on_leave' => 'Nghỉ phép',
+    ],
+    'sessions' => [
+        'morning' => 'Buổi sáng',
+        'afternoon' => 'Buổi chiều',
+        'evening' => 'Buổi tối',
     ],
     'verification_status' => [
         'pending' => 'Chờ duyệt',
@@ -49,7 +56,7 @@ return [
         'already_checked_in' => 'Bạn đã check-in ngày hôm nay.',
         'not_checked_in_yet' => 'Bạn chưa check-in ngày hôm nay.',
         'already_checked_out' => 'Bạn đã hoàn thành chấm công ngày hôm nay.',
-        'no_associated_employee' => 'Tài khoản của bạn không được liên kết với nhân viên nào.',
+        'no_associated_employee' => 'Tài khoản của bạn không được liên kết với giáo viên nào.',
         'outside_radius' => 'Bạn đang ở ngoài bán kính cho phép (cách trung tâm :distance mét). Không thể tự chấm công.',
         'geolocation_required' => 'Bạn cần cấp quyền định vị vị trí để tự chấm công.',
         'check_in_failed' => 'Chấm công vào thất bại',
@@ -58,7 +65,7 @@ return [
     ],
     'notifications' => [
         'auto_close_title' => 'Phiên chấm công tự động đóng',
-        'auto_close_body' => 'Nhân viên :name chưa check-out ngày :date. Hệ thống đã tự động ghi nhận checkout lúc :checkout.',
+        'auto_close_body' => 'Giáo viên :name chưa check-out ngày :date. Hệ thống đã tự động ghi nhận checkout lúc :checkout.',
     ],
     'notes' => [
         'auto_absent' => 'Vắng mặt - được ghi nhận tự động cuối ngày.',

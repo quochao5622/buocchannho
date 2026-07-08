@@ -9,8 +9,9 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
+use Illuminate\Support\Facades\Auth;
 use Quochao56\Core\Traits\HasNotifications;
-use Quochao56\Employee\Filament\Resources\EmployeeAttendanceResource;
+use Quochao56\Employee\Helpers\GeoFenceHelper;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Employee\Models\EmployeeAttendance;
 use Quochao56\Employee\Services\AttendanceCheckinService;
@@ -45,12 +46,14 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
                 'isCheckedOut' => false,
                 'checkInDiffMinutes' => 0,
                 'checkoutMinimumMinutes' => 0,
+                'hasOpenAttendance' => false,
+                'todayRecords' => collect(),
             ];
         }
 
         $todayRecord = EmployeeAttendance::where('employee_id', $employee->id)
             ->whereDate('date', now()->toDateString())
-            ->latest()
+            ->where('session', $this->currentSessionKey())
             ->first();
 
         $isCheckedIn = $todayRecord && $todayRecord->check_in_at !== null;
@@ -63,6 +66,13 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
 
         $minMinutes = (int) (settings('checkout_minimum_minutes') ?? 0);
 
+        $hasOpenAttendance = $this->findOpenAttendanceForCheckout($employee) !== null;
+
+        $todayRecords = EmployeeAttendance::where('employee_id', $employee->id)
+            ->whereDate('date', now()->toDateString())
+            ->orderBy('check_in_at', 'asc')
+            ->get();
+
         return [
             'employee' => $employee,
             'todayRecord' => $todayRecord,
@@ -70,6 +80,8 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
             'isCheckedOut' => $isCheckedOut,
             'checkInDiffMinutes' => $checkInDiffMinutes,
             'checkoutMinimumMinutes' => $minMinutes,
+            'hasOpenAttendance' => $hasOpenAttendance,
+            'todayRecords' => $todayRecords,
         ];
     }
 
@@ -89,10 +101,10 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
 
         $existing = EmployeeAttendance::where('employee_id', $employee->id)
             ->whereDate('date', now()->toDateString())
-            ->whereNotNull('check_in_at')
+            ->where('session', $this->currentSessionKey())
             ->first();
 
-        if ($existing) {
+        if ($existing && $existing->check_in_at) {
             $this->notify(
                 Notification::make()
                     ->title(trans('packages.employee::employee_attendance.actions.already_checked_in'))
@@ -119,8 +131,8 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
             if ($record->flagged_location) {
                 $centerLat = settings('center_latitude');
                 $centerLon = settings('center_longitude');
-                $distance = $this->latitude && $this->longitude 
-                    ? \Quochao56\Employee\Helpers\GeoFenceHelper::distanceInMeters($this->latitude, $this->longitude, $centerLat, $centerLon)
+                $distance = $this->latitude && $this->longitude
+                    ? GeoFenceHelper::distanceInMeters($this->latitude, $this->longitude, $centerLat, $centerLon)
                     : null;
                 $distanceText = $distance !== null ? round($distance) : '?';
 
@@ -154,18 +166,28 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
         }
 
         $record = EmployeeAttendance::where('employee_id', $employee->id)
-            ->whereDate('date', now()->toDateString())
-            ->whereNotNull('check_in_at')
-            ->whereNull('check_out_at')
-            ->latest()
+            ->whereKey(optional($this->findOpenAttendanceForCheckout($employee))->id)
             ->first();
 
         if (! $record) {
-            $this->notify(
-                Notification::make()
-                    ->title(trans('packages.employee::employee_attendance.actions.not_checked_in_yet'))
-                    ->warning()
-            );
+            $sessionRecord = EmployeeAttendance::where('employee_id', $employee->id)
+                ->whereDate('date', now()->toDateString())
+                ->where('session', $this->currentSessionKey())
+                ->first();
+
+            if ($sessionRecord && $sessionRecord->check_out_at) {
+                $this->notify(
+                    Notification::make()
+                        ->title(trans('packages.employee::employee_attendance.actions.already_checked_out'))
+                        ->warning()
+                );
+            } else {
+                $this->notify(
+                    Notification::make()
+                        ->title(trans('packages.employee::employee_attendance.actions.not_checked_in_yet'))
+                        ->warning()
+                );
+            }
 
             return;
         }
@@ -188,21 +210,15 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
             if ($record->flagged_location) {
                 $centerLat = settings('center_latitude');
                 $centerLon = settings('center_longitude');
-                $distance = $this->latitude && $this->longitude 
-                    ? \Quochao56\Employee\Helpers\GeoFenceHelper::distanceInMeters($this->latitude, $this->longitude, $centerLat, $centerLon)
+                $distance = $this->latitude && $this->longitude
+                    ? GeoFenceHelper::distanceInMeters($this->latitude, $this->longitude, $centerLat, $centerLon)
                     : null;
                 $distanceText = $distance !== null ? round($distance) : '?';
 
                 $notification = Notification::make()
                     ->title($message)
                     ->body(trans('packages.employee::employee_attendance.actions.outside_radius', ['distance' => $distanceText]))
-                    ->warning()
-                    ->actions([
-                        Action::make('view_approval')
-                            ->label(trans('packages.employee::employee_attendance.actions.view_approval'))
-                            ->url(EmployeeAttendanceResource::getUrl('index'))
-                            ->openUrlInNewTab(),
-                    ]);
+                    ->warning();
             }
 
             $this->notify($notification);
@@ -232,10 +248,7 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
                 }
 
                 $record = EmployeeAttendance::where('employee_id', $employee->id)
-                    ->whereDate('date', now()->toDateString())
-                    ->whereNotNull('check_in_at')
-                    ->whereNull('check_out_at')
-                    ->latest()
+                    ->whereKey(optional($this->findOpenAttendanceForCheckout($employee))->id)
                     ->first();
 
                 if ($record) {
@@ -256,12 +269,45 @@ class MobileCheckinWidget extends Widget implements HasActions, HasForms
 
     protected function getEmployee(): ?Employee
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return null;
         }
 
         return Employee::where('email', $user->email)->first();
+    }
+
+    protected function currentSessionKey(): string
+    {
+        return EmployeeAttendance::resolveSessionForDateTime(now());
+    }
+
+    protected function findOpenAttendanceForCheckout(Employee $employee): ?EmployeeAttendance
+    {
+        /** @var EmployeeAttendance|null $attendance */
+        $attendance = EmployeeAttendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('date', now()->toDateString())
+            ->where('session', $this->currentSessionKey())
+            ->whereNotNull('check_in_at')
+            ->whereNull('check_out_at')
+            ->latest('check_in_at')
+            ->first();
+
+        if ($attendance) {
+            return $attendance;
+        }
+
+        /** @var EmployeeAttendance|null $fallbackAttendance */
+        $fallbackAttendance = EmployeeAttendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('date', now()->toDateString())
+            ->whereNotNull('check_in_at')
+            ->whereNull('check_out_at')
+            ->latest('check_in_at')
+            ->first();
+
+        return $fallbackAttendance;
     }
 }

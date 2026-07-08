@@ -56,7 +56,7 @@ class PlanningResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('plannings.view_all'))) {
+        if (auth()->check() && auth()->user()->can('plannings.view_all')) {
             return $query;
         }
 

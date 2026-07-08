@@ -6,6 +6,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\CreateSchedule;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\EditSchedule;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\ListSchedules;
@@ -69,5 +71,27 @@ class ScheduleResource extends Resource
             'create' => CreateSchedule::route('/create'),
             'edit' => EditSchedule::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = Auth::user();
+
+        $isManager = $user && $user->can('employees.index');
+
+        if (! $isManager && $user?->employee) {
+            $employeeId = (int) $user->employee->id;
+
+            $query->where(function (Builder $builder) use ($employeeId) {
+                $builder->where('employee_id', $employeeId)
+                    ->orWhereHas('exceptions', function (Builder $sub) use ($employeeId) {
+                        $sub->where('action', 'substitute')
+                            ->where('new_employee_id', $employeeId);
+                    });
+            });
+        }
+
+        return $query;
     }
 }

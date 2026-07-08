@@ -23,7 +23,7 @@ class NoConflictScheduleRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! $this->studentId || ! $this->employeeId || ! $this->startTime || ! $this->endTime || ! $this->startDate) {
+        if (! $this->employeeId || ! $this->startTime || ! $this->endTime || ! $this->startDate) {
             return;
         }
 
@@ -59,46 +59,50 @@ class NoConflictScheduleRule implements ValidationRule
             ->first();
 
         if ($teacherConflict) {
-            $fail("Giáo viên này đã có lịch dạy khác trùng khung giờ (Lịch: {$teacherConflict->title}).");
+            $tTitle = $teacherConflict->title ?? ($teacherConflict->type === 'group' ? 'Dạy nhóm' : 'Lớp 1-1');
+            $fail("Giáo viên này đã có lịch dạy khác trùng khung giờ (Lịch: {$tTitle}).");
 
             return;
         }
 
         // 2. Check Student Conflict
-        $studentConflict = Schedule::active()
-            ->where('student_id', $this->studentId)
-            ->when($this->ignoreId, fn ($q) => $q->where('id', '!=', $this->ignoreId))
-            ->where(function ($query) {
-                $query->whereNull('day_of_week');
-                if (is_array($this->dayOfWeek)) {
-                    $query->orWhere(function ($q) {
-                        foreach ($this->dayOfWeek as $day) {
-                            $q->orWhereJsonContains('day_of_week', (int) $day);
-                        }
+        if ($this->studentId) {
+            $studentConflict = Schedule::active()
+                ->where('student_id', $this->studentId)
+                ->when($this->ignoreId, fn ($q) => $q->where('id', '!=', $this->ignoreId))
+                ->where(function ($query) {
+                    $query->whereNull('day_of_week');
+                    if (is_array($this->dayOfWeek)) {
+                        $query->orWhere(function ($q) {
+                            foreach ($this->dayOfWeek as $day) {
+                                $q->orWhereJsonContains('day_of_week', (int) $day);
+                            }
+                        });
+                    } elseif ($this->dayOfWeek !== null) {
+                        $query->orWhereJsonContains('day_of_week', (int) $this->dayOfWeek);
+                    }
+                })
+                ->where(function ($query) {
+                    $query->where(function ($q) {
+                        $q->whereNull('end_date')
+                            ->orWhere('end_date', '>=', $this->startDate);
                     });
-                } elseif ($this->dayOfWeek !== null) {
-                    $query->orWhereJsonContains('day_of_week', (int) $this->dayOfWeek);
-                }
-            })
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('end_date')
-                        ->orWhere('end_date', '>=', $this->startDate);
-                });
-                if ($this->endDate) {
-                    $query->where('start_date', '<=', $this->endDate);
-                }
-            })
-            ->where(function ($query) {
-                $query->where('start_time', '<', $this->endTime)
-                    ->where('end_time', '>', $this->startTime);
-            })
-            ->first();
+                    if ($this->endDate) {
+                        $query->where('start_date', '<=', $this->endDate);
+                    }
+                })
+                ->where(function ($query) {
+                    $query->where('start_time', '<', $this->endTime)
+                        ->where('end_time', '>', $this->startTime);
+                })
+                ->first();
 
-        if ($studentConflict) {
-            $fail("Học sinh này đã có lịch học khác trùng khung giờ (Lịch: {$studentConflict->title}).");
+            if ($studentConflict) {
+                $sTitle = $studentConflict->title ?? ($studentConflict->type === 'group' ? 'Dạy nhóm' : 'Lớp 1-1');
+                $fail("Học sinh này đã có lịch học khác trùng khung giờ (Lịch: {$sTitle}).");
 
-            return;
+                return;
+            }
         }
 
         // 3. Check Room Conflict (if classroom set)
@@ -134,7 +138,8 @@ class NoConflictScheduleRule implements ValidationRule
                 ->first();
 
             if ($roomConflict) {
-                $fail("Phòng học này đã được đăng ký sử dụng trong khung giờ này (Lịch: {$roomConflict->title}).");
+                $rTitle = $roomConflict->title ?? ($roomConflict->type === 'group' ? 'Dạy nhóm' : 'Lớp 1-1');
+                $fail("Phòng học này đã được đăng ký sử dụng trong khung giờ này (Lịch: {$rTitle}).");
 
                 return;
             }
@@ -203,6 +208,33 @@ class NoConflictScheduleRule implements ValidationRule
             ->exists();
 
         if ($exceptionBusy) {
+            return false;
+        }
+
+        // C. Check if teacher has a session rescheduled to this date
+        $rescheduledBusy = ScheduleException::query()
+            ->where('action', 'reschedule')
+            ->whereDate('new_exception_date', $date)
+            ->whereHas('schedule', function ($scheduleQuery) use ($teacherId, $ignoreScheduleId) {
+                $scheduleQuery->where('employee_id', $teacherId)
+                    ->when($ignoreScheduleId, fn ($q) => $q->where('id', '!=', $ignoreScheduleId));
+            })
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->whereNotNull('new_start_time')
+                        ->where('new_start_time', '<', $endTime)
+                        ->where('new_end_time', '>', $startTime);
+                })->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->whereNull('new_start_time')
+                        ->whereHas('schedule', function ($sQuery) use ($startTime, $endTime) {
+                            $sQuery->where('start_time', '<', $endTime)
+                                ->where('end_time', '>', $startTime);
+                        });
+                });
+            })
+            ->exists();
+
+        if ($rescheduledBusy) {
             return false;
         }
 

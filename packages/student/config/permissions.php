@@ -22,7 +22,6 @@ return [
             'create' => 'Tạo đơn xin nghỉ phép học sinh',
             'edit' => 'Chỉnh sửa đơn nghỉ phép học sinh',
             'destroy' => 'Xóa đơn nghỉ phép học sinh',
-            'approve' => 'Duyệt đơn nghỉ phép học sinh',
             'view_all' => 'Xem đơn nghỉ phép toàn bộ học sinh',
         ],
     ],

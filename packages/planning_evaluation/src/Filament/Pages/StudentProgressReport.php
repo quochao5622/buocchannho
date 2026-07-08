@@ -38,7 +38,7 @@ class StudentProgressReport extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermissionTo('plannings.progress'));
+        return auth()->check() && auth()->user()->hasPermissionTo('plannings.progress');
     }
 
     protected string $view = 'planning-evaluation::student-progress-report';

@@ -14,18 +14,18 @@ class ClassroomForm
     {
         return $schema->components([
             TextInput::make('name')
-                ->label('Tên phòng học')
+                ->label(trans('packages.scheduler::scheduler.classrooms.fields.name'))
                 ->required()
                 ->maxLength(255),
 
             Select::make('status')
-                ->label('Trạng thái')
+                ->label(trans('packages.scheduler::scheduler.classrooms.fields.status'))
                 ->options(BaseStatusEnum::class)
                 ->default(BaseStatusEnum::Active)
                 ->required(),
 
             Textarea::make('description')
-                ->label('Mô tả/Ghi chú')
+                ->label(trans('packages.scheduler::scheduler.classrooms.fields.description'))
                 ->rows(3)
                 ->columnSpanFull()
                 ->nullable(),

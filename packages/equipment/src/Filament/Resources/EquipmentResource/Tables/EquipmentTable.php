@@ -77,6 +77,7 @@ class EquipmentTable
             ->headerActions([
                 ExportAction::make('export')
                     ->label(trans('packages.equipment::equipment.form.export'))
+                    ->color('success')
                     ->exports([
                         EquipmentExcelExport::make('equipments')
                             ->fromTable()

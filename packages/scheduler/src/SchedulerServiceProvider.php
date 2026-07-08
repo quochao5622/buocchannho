@@ -3,10 +3,10 @@
 namespace Quochao56\Scheduler;
 
 use Illuminate\Support\Facades\Gate;
-use Quochao56\Scheduler\Models\Attendance;
+use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
 use Quochao56\Scheduler\Models\ScheduleException;
-use Quochao56\Scheduler\Policies\AttendancePolicy;
+use Quochao56\Scheduler\Policies\ClassroomPolicy;
 use Quochao56\Scheduler\Policies\ScheduleExceptionPolicy;
 use Quochao56\Scheduler\Policies\SchedulePolicy;
 use Spatie\LaravelPackageTools\Package;
@@ -51,6 +51,10 @@ class SchedulerServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         Gate::policy(
+            Classroom::class,
+            ClassroomPolicy::class
+        );
+        Gate::policy(
             Schedule::class,
             SchedulePolicy::class
         );
@@ -58,10 +62,7 @@ class SchedulerServiceProvider extends PackageServiceProvider
             ScheduleException::class,
             ScheduleExceptionPolicy::class
         );
-        Gate::policy(
-            Attendance::class,
-            AttendancePolicy::class
-        );
+
     }
 
     /**
@@ -73,7 +74,6 @@ class SchedulerServiceProvider extends PackageServiceProvider
             '2026_07_01_000000_create_scheduler_tables',
             '2026_07_01_000001_create_classrooms_table',
             '2026_07_01_000002_change_day_of_week_to_json_in_schedules_table',
-            '2026_07_01_000003_add_operational_fields_to_attendances_table',
         ];
     }
 }

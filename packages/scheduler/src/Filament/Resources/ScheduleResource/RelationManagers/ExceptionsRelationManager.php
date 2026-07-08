@@ -16,13 +16,30 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
+use Quochao56\Scheduler\Models\ScheduleException;
 
 class ExceptionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'exceptions';
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return trans('packages.scheduler::scheduler.exceptions.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans('packages.scheduler::scheduler.exceptions.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans('packages.scheduler::scheduler.exceptions.plural_model_label');
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -35,16 +52,34 @@ class ExceptionsRelationManager extends RelationManager
                 ->live()
                 ->required(),
 
+            DatePicker::make('new_exception_date')
+                ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_exception_date'))
+                ->native(false)
+                ->displayFormat('d/m/Y')
+                ->visible(fn (Get $get) => $get('action') === 'reschedule')
+                ->required(fn (Get $get) => $get('action') === 'reschedule')
+                ->default(fn (Get $get) => $get('exception_date')),
+
             Select::make('action')
                 ->label(trans('packages.scheduler::scheduler.exceptions.fields.action'))
                 ->options([
                     'cancel' => trans('packages.scheduler::scheduler.exceptions.action.cancel'),
                     'reschedule' => trans('packages.scheduler::scheduler.exceptions.action.reschedule'),
                     'substitute' => trans('packages.scheduler::scheduler.exceptions.action.substitute'),
+                    'change_room' => trans('packages.scheduler::scheduler.exceptions.action.change_room'),
                 ])
                 ->default('cancel')
                 ->live()
                 ->required(),
+
+            Select::make('cancel_actor')
+                ->label(trans('packages.scheduler::scheduler.exceptions.fields.cancel_actor'))
+                ->options([
+                    'teacher' => trans('packages.scheduler::scheduler.exceptions.cancel_actor.teacher'),
+                    'student' => trans('packages.scheduler::scheduler.exceptions.cancel_actor.student'),
+                ])
+                ->visible(fn (Get $get) => $get('action') === 'cancel')
+                ->required(fn (Get $get) => $get('action') === 'cancel'),
 
             Select::make('new_employee_id')
                 ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_employee_id'))
@@ -72,11 +107,12 @@ class ExceptionsRelationManager extends RelationManager
                 ->required(fn (Get $get) => $get('action') === 'reschedule'),
 
             Select::make('new_classroom_id')
-                ->label('Phòng học mới')
+                ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_classroom_id'))
                 ->options(Classroom::active()->pluck('name', 'id'))
                 ->searchable()
-                ->visible(fn (Get $get) => $get('action') === 'reschedule')
-                ->nullable(),
+                ->visible(fn (Get $get) => in_array($get('action'), ['reschedule', 'substitute', 'change_room']))
+                ->required(fn (Get $get) => $get('action') === 'change_room')
+                ->nullable(fn (Get $get) => $get('action') !== 'change_room'),
 
             Select::make('make_up_suggestion')
                 ->label(trans('packages.scheduler::scheduler.exceptions.fields.make_up_suggestion'))
@@ -91,7 +127,11 @@ class ExceptionsRelationManager extends RelationManager
                     }
 
                     [$date, $start, $end] = explode('|', $state);
-                    $suggestion = "Gợi ý bù ca: {$date} {$start}-{$end}";
+                    $suggestion = trans('packages.scheduler::scheduler.exceptions.messages.make_up_suggestion_prefix', [
+                        'date' => Carbon::parse($date)->format('d/m/Y'),
+                        'start' => $start,
+                        'end' => $end,
+                    ]);
                     $currentNotes = trim((string) ($get('notes') ?? ''));
 
                     if ($currentNotes === '') {
@@ -135,9 +175,22 @@ class ExceptionsRelationManager extends RelationManager
                         'cancel' => 'danger',
                         'reschedule' => 'warning',
                         'substitute' => 'info',
+                        'change_room' => 'success',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => trans("packages.scheduler::scheduler.exceptions.action.{$state}")),
+
+                TextColumn::make('cancel_actor')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.cancel_actor'))
+                    ->formatStateUsing(fn (?string $state): string => $state
+                        ? trans("packages.scheduler::scheduler.exceptions.cancel_actor.{$state}")
+                        : '-')
+                    ->placeholder('-'),
+
+                TextColumn::make('new_exception_date')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_exception_date'))
+                    ->date('d/m/Y')
+                    ->placeholder('-'),
 
                 TextColumn::make('newEmployee.name')
                     ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_employee_id'))
@@ -154,7 +207,7 @@ class ExceptionsRelationManager extends RelationManager
                     ->placeholder('-'),
 
                 TextColumn::make('newClassroom.name')
-                    ->label('Phòng học mới')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_classroom_id'))
                     ->placeholder('-'),
 
                 TextColumn::make('reason')
@@ -162,12 +215,28 @@ class ExceptionsRelationManager extends RelationManager
                     ->limit(50),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.create'))
+                    ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.create_heading'))
+                    ->after(function (ScheduleException $record): void {
+                        $this->afterExceptionSaved($record);
+                    }),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.edit'))
+                    ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.edit_heading'))
+                    ->after(function (ScheduleException $record): void {
+                        $this->afterExceptionSaved($record);
+                    }),
+                DeleteAction::make()
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.delete')),
             ]);
+    }
+
+    protected function afterExceptionSaved(ScheduleException $exception): void
+    {
+        //
     }
 
     protected function getMakeUpSuggestionOptions(?string $exceptionDate): array
@@ -197,6 +266,10 @@ class ExceptionsRelationManager extends RelationManager
             }
 
             foreach ($this->candidateStartTimes($duration) as $candidateStart) {
+                if ($date->isWeekday() && $candidateStart < settings('office_afternoon_end', '17:30')) {
+                    continue;
+                }
+
                 $candidateEnd = Carbon::parse($candidateStart)->addMinutes($duration)->format('H:i:s');
 
                 if ($this->hasConflictAtSlot(
@@ -210,14 +283,11 @@ class ExceptionsRelationManager extends RelationManager
                     continue;
                 }
 
+                $dayOfWeekName = trans('packages.scheduler::scheduler.schedules.day_of_week.'.($date->dayOfWeek === 0 ? 1 : ($date->dayOfWeek + 1)));
                 $value = $date->toDateString().'|'.$candidateStart.'|'.$candidateEnd;
-                $label = $date->format('d/m/Y').' - '.$candidateStart.' đến '.$candidateEnd;
+                $label = $dayOfWeekName.', '.$date->format('d/m/Y').' - '.$candidateStart.' đến '.$candidateEnd;
 
                 $suggestions[$value] = $label;
-
-                if (count($suggestions) >= 3) {
-                    return $suggestions;
-                }
             }
         }
 
@@ -228,7 +298,7 @@ class ExceptionsRelationManager extends RelationManager
     {
         $slots = [];
         $opening = Carbon::createFromTimeString('07:00:00');
-        $lastStart = Carbon::createFromTimeString('18:00:00')->subMinutes($durationMinutes);
+        $lastStart = Carbon::createFromTimeString('21:00:00')->subMinutes($durationMinutes);
 
         for ($time = $opening->copy(); $time->lte($lastStart); $time->addMinutes(60)) {
             $slots[] = $time->format('H:i:s');

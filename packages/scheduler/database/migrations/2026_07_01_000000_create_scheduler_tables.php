@@ -44,28 +44,10 @@ return new class extends Migration
             $table->index(['schedule_id', 'exception_date']);
         });
 
-        Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->nullOnDelete();
-            $table->date('attendance_date');
-            $table->enum('status', ['present', 'absent_excused', 'absent_unexcused', 'late'])->default('present');
-            $table->dateTime('check_in_at')->nullable();
-            $table->dateTime('check_out_at')->nullable();
-            $table->decimal('total_hours', 4, 2)->nullable();
-            $table->text('notes')->nullable();
-            $table->foreignId('verified_by_employee_id')->constrained('employees')->cascadeOnDelete(); // Người xác nhận điểm danh
-            $table->foreignId('actual_employee_id')->nullable()->constrained('employees')->nullOnDelete(); // Giáo viên thực tế đứng lớp
-            $table->timestamps();
-
-            $table->index(['student_id', 'attendance_date']);
-            $table->index(['schedule_id', 'attendance_date']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('attendances');
         Schema::dropIfExists('schedule_exceptions');
         Schema::dropIfExists('schedules');
     }

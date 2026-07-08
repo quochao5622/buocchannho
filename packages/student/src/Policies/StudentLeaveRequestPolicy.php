@@ -33,24 +33,11 @@ class StudentLeaveRequestPolicy
 
     public function update(User $user, StudentLeaveRequest $record): bool
     {
-        if ($user->hasPermissionTo('student_leave_requests.edit')) {
-            return true;
-        }
-
-        return $record->status === 'pending';
+        return $user->hasPermissionTo('student_leave_requests.edit');
     }
 
     public function delete(User $user, StudentLeaveRequest $record): bool
     {
-        if ($user->hasPermissionTo('student_leave_requests.destroy')) {
-            return true;
-        }
-
-        return in_array($record->status, ['pending', 'approved']);
-    }
-
-    public function approve(User $user): bool
-    {
-        return $user->hasPermissionTo('student_leave_requests.approve');
+        return $user->hasPermissionTo('student_leave_requests.destroy');
     }
 }

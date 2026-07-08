@@ -2,17 +2,16 @@
 
 namespace Quochao56\Student\Filament\Resources\StudentLeaveRequestResource\Tables;
 
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Textarea;
-use Filament\Notifications\Notification;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Quochao56\Student\Models\StudentLeaveRequest;
+use Illuminate\Database\Eloquent\Builder;
 
 class StudentLeaveRequestTable
 {
@@ -35,25 +34,9 @@ class StudentLeaveRequestTable
                     ->date('d/m/Y')
                     ->sortable(),
 
-                TextColumn::make('status')
-                    ->label(trans('packages.student::student_leave_request.fields.status'))
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => trans("packages.student::student_leave_request.status.{$state}")),
-
                 TextColumn::make('reason')
                     ->label(trans('packages.student::student_leave_request.fields.reason'))
                     ->limit(20)
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('approver.name')
-                    ->label(trans('packages.student::student_leave_request.fields.approved_by'))
-                    ->placeholder('-')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('creator.name')
@@ -68,69 +51,31 @@ class StudentLeaveRequestTable
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('status')
-                    ->label(trans('packages.student::student_leave_request.fields.status'))
-                    ->options([
-                        'pending' => trans('packages.student::student_leave_request.status.pending'),
-                        'approved' => trans('packages.student::student_leave_request.status.approved'),
-                        'rejected' => trans('packages.student::student_leave_request.status.rejected'),
-                    ]),
+                Filter::make('date_range')
+                    ->label('Khoảng ngày nghỉ')
+                    ->form([
+                        DatePicker::make('from_date')
+                            ->label('Từ ngày')
+                            ->native(false)
+                            ->displayFormat('d/m/Y'),
+                        DatePicker::make('to_date')
+                            ->label('Đến ngày')
+                            ->native(false)
+                            ->displayFormat('d/m/Y'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from_date'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('start_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['to_date'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('end_date', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
-                // Approval Action
-                Action::make('approve')
-                    ->label(trans('packages.student::student_leave_request.actions.approve'))
-                    ->icon('heroicon-o-check')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading(trans('packages.student::student_leave_request.actions.approve'))
-                    ->modalDescription(trans('packages.student::student_leave_request.actions.approve_confirm'))
-                    ->visible(fn (StudentLeaveRequest $record) => $record->status === 'pending' && auth()->user()->hasPermissionTo('student_leave_requests.approve'))
-                    ->action(function (StudentLeaveRequest $record, $livewire) {
-                        $record->update([
-                            'status' => 'approved',
-                            'approved_by' => auth()->id(),
-                            'approved_at' => now(),
-                        ]);
-
-                        Notification::make()
-                            ->title(trans('packages.student::student_leave_request.actions.approve_success'))
-                            ->success()
-                            ->send();
-
-                        $livewire->dispatch('notificationsSent');
-                    }),
-
-                // Rejection Action
-                Action::make('reject')
-                    ->label(trans('packages.student::student_leave_request.actions.reject'))
-                    ->icon('heroicon-o-x-mark')
-                    ->color('danger')
-                    ->form([
-                        Textarea::make('rejection_reason')
-                            ->label(trans('packages.student::student_leave_request.fields.rejection_reason'))
-                            ->required()
-                            ->rows(3),
-                    ])
-                    ->modalHeading(trans('packages.student::student_leave_request.actions.reject'))
-                    ->modalDescription(trans('packages.student::student_leave_request.actions.reject_confirm'))
-                    ->visible(fn (StudentLeaveRequest $record) => $record->status === 'pending' && auth()->user()->hasPermissionTo('student_leave_requests.approve'))
-                    ->action(function (StudentLeaveRequest $record, array $data, $livewire) {
-                        $record->update([
-                            'status' => 'rejected',
-                            'rejection_reason' => $data['rejection_reason'],
-                            'approved_by' => auth()->id(),
-                            'approved_at' => now(),
-                        ]);
-
-                        Notification::make()
-                            ->title(trans('packages.student::student_leave_request.actions.reject_success'))
-                            ->success()
-                            ->send();
-
-                        $livewire->dispatch('notificationsSent');
-                    }),
-
                 EditAction::make(),
                 DeleteAction::make(),
             ])

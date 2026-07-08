@@ -44,37 +44,6 @@ class StudentLeaveRequestResource extends Resource
         return trans('packages.student::student_leave_request.navigation_group');
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        $user = auth()->user();
-        if (! $user) {
-            return null;
-        }
-
-        $query = static::getModel()::query()->where('status', 'pending');
-
-        if ($user->isSuperAdmin() || $user->hasPermissionTo('student_leave_requests.view_all')) {
-            $count = $query->count();
-        } else {
-            $employee = $user->employee;
-            if ($employee) {
-                $count = $query->whereHas('student.assignments', function ($q) use ($employee) {
-                    $q->where('employee_id', $employee->id)
-                        ->where('status', 'active');
-                })->count();
-            } else {
-                $count = 0;
-            }
-        }
-
-        return $count > 0 ? (string) $count : null;
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'warning';
-    }
-
     public static function form(Schema $schema): Schema
     {
         return StudentLeaveRequestForm::configure($schema);

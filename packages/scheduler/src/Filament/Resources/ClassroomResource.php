@@ -31,17 +31,17 @@ class ClassroomResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Quản lý phòng học';
+        return trans('packages.scheduler::scheduler.classrooms.navigation_label');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Phòng học';
+        return trans('packages.scheduler::scheduler.classrooms.model_label');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Danh sách phòng học';
+        return trans('packages.scheduler::scheduler.classrooms.plural_model_label');
     }
 
     public static function form(Schema $schema): Schema

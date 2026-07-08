@@ -2,6 +2,7 @@
 
 namespace Quochao56\Scheduler\Filament\Resources\ScheduleResource\Tables;
 
+use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -11,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Student\Models\Student;
@@ -21,9 +23,15 @@ class ScheduleTable
     {
         return $table
             ->columns([
-                TextColumn::make('title')
-                    ->label(trans('packages.scheduler::scheduler.schedules.fields.title'))
-                    ->searchable()
+                TextColumn::make('type')
+                    ->label(trans('packages.scheduler::scheduler.schedules.fields.type'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'individual' => 'success',
+                        'group' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => trans("packages.scheduler::scheduler.schedules.type.{$state}"))
                     ->sortable(),
 
                 TextColumn::make('student.name')
@@ -37,19 +45,17 @@ class ScheduleTable
                     ->sortable(),
 
                 TextColumn::make('classroom.name')
-                    ->label('Phòng học')
+                    ->label(trans('packages.scheduler::scheduler.schedules.fields.classroom_id'))
                     ->placeholder('-')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('type')
-                    ->label(trans('packages.scheduler::scheduler.schedules.fields.type'))
-                    ->formatStateUsing(fn (string $state): string => trans("packages.scheduler::scheduler.schedules.type.{$state}")),
-
                 TextColumn::make('day_of_week')
                     ->label(trans('packages.scheduler::scheduler.schedules.fields.day_of_week'))
                     ->wrap()
-                    ->formatStateUsing(function ($state): string {
+                    ->placeholder('-')
+                    ->state(function (Model $record): ?string {
+                        $state = $record->day_of_week;
                         if (is_string($state)) {
                             $decoded = json_decode($state, true);
                             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
@@ -65,8 +71,14 @@ class ScheduleTable
 
                         $days = array_values(array_filter($days, fn ($day) => (int) $day >= 1 && (int) $day <= 7));
 
+                        if (empty($days) && $record->start_date) {
+                            $carbon = Carbon::parse($record->start_date);
+                            $dayOfWeek = $carbon->dayOfWeek === 0 ? 1 : ($carbon->dayOfWeek + 1);
+                            $days = [$dayOfWeek];
+                        }
+
                         if (empty($days)) {
-                            return '-';
+                            return null;
                         }
 
                         return collect($days)
@@ -82,8 +94,7 @@ class ScheduleTable
                 TextColumn::make('end_time')
                     ->label(trans('packages.scheduler::scheduler.schedules.fields.end_time'))
                     ->time('H:i:s')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label(trans('packages.scheduler::scheduler.schedules.fields.status'))
@@ -115,7 +126,7 @@ class ScheduleTable
                     ]),
 
                 SelectFilter::make('classroom_id')
-                    ->label('Phòng học')
+                    ->label(trans('packages.scheduler::scheduler.schedules.fields.classroom_id'))
                     ->options(Classroom::pluck('name', 'id'))
                     ->searchable(),
 
@@ -137,14 +148,14 @@ class ScheduleTable
                     }),
 
                 Filter::make('date_range')
-                    ->label('Khoảng ngày hiệu lực')
+                    ->label(trans('packages.scheduler::scheduler.schedules.filters.date_range'))
                     ->form([
                         DatePicker::make('from')
-                            ->label('Từ ngày')
+                            ->label(trans('packages.scheduler::scheduler.schedules.filters.from_date'))
                             ->native(false)
                             ->displayFormat('d/m/Y'),
                         DatePicker::make('to')
-                            ->label('Đến ngày')
+                            ->label(trans('packages.scheduler::scheduler.schedules.filters.to_date'))
                             ->native(false)
                             ->displayFormat('d/m/Y'),
                     ])

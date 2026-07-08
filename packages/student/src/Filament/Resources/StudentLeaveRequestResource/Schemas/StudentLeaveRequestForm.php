@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class StudentLeaveRequestForm
 {
@@ -16,10 +17,15 @@ class StudentLeaveRequestForm
             Select::make('student_id')
                 ->label(trans('packages.student::student_leave_request.fields.student_id'))
                 ->relationship('student', 'name', function (Builder $query) {
-                    $user = auth()->user();
-                    if ($user->isSuperAdmin() || $user->hasPermissionTo('student_leave_requests.view_all')) {
+                    $user = Auth::user();
+                    if (! $user) {
+                        return $query->whereRaw('1 = 0');
+                    }
+
+                    if ($user->hasPermissionTo('student_leave_requests.view_all')) {
                         return $query;
                     }
+
                     $employee = $user->employee;
                     if ($employee) {
                         return $query->whereHas('assignments', function ($q) use ($employee) {
@@ -53,31 +59,6 @@ class StudentLeaveRequestForm
                 ->required()
                 ->rows(3)
                 ->columnSpanFull(),
-
-            Select::make('status')
-                ->label(trans('packages.student::student_leave_request.fields.status'))
-                ->options([
-                    'pending' => trans('packages.student::student_leave_request.status.pending'),
-                    'approved' => trans('packages.student::student_leave_request.status.approved'),
-                    'rejected' => trans('packages.student::student_leave_request.status.rejected'),
-                ])
-                ->default('pending')
-                ->disabled()
-                ->dehydrated(),
-
-            Textarea::make('rejection_reason')
-                ->label(trans('packages.student::student_leave_request.fields.rejection_reason'))
-                ->visible(fn ($get) => $get('status') === 'rejected')
-                ->disabled()
-                ->dehydrated()
-                ->columnSpanFull(),
-
-            Select::make('created_by')
-                ->label(trans('packages.student::student_leave_request.fields.created_by'))
-                ->relationship('creator', 'name')
-                ->disabled()
-                ->dehydrated()
-                ->visible(fn ($record) => $record !== null),
         ]);
     }
 }

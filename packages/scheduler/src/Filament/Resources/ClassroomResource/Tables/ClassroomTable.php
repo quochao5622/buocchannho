@@ -16,18 +16,18 @@ class ClassroomTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Tên phòng học')
+                    ->label(trans('packages.scheduler::scheduler.classrooms.fields.name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('status')
-                    ->label('Trạng thái')
+                    ->label(trans('packages.scheduler::scheduler.classrooms.fields.status'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('description')
-                    ->label('Mô tả/Ghi chú')
-                    ->placeholder('-')
+                    ->label(trans('packages.scheduler::scheduler.classrooms.fields.description'))
+                    ->placeholder(trans('packages.scheduler::scheduler.classrooms.placeholders.empty'))
                     ->limit(50),
             ])
             ->actions([

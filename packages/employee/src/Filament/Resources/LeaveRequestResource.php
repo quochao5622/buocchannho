@@ -53,7 +53,7 @@ class LeaveRequestResource extends Resource
 
         $query = static::getModel()::query()->where('status', 'pending');
 
-        if ($user->isSuperAdmin() || $user->hasPermissionTo('leave_requests.view_all')) {
+        if ($user->hasPermissionTo('leave_requests.view_all')) {
             $count = $query->count();
         } else {
             $employee = $user->employee;

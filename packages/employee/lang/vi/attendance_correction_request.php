@@ -6,7 +6,7 @@ return [
     'plural_model_label' => 'Yêu cầu điều chỉnh chấm công',
     'navigation_group' => 'Quản lý giáo viên',
     'fields' => [
-        'employee_id' => 'Nhân viên',
+        'employee_id' => 'Giáo viên',
         'attendance_date' => 'Ngày cần điều chỉnh',
         'requested_check_in_at' => 'Giờ check-in thực tế',
         'requested_check_out_at' => 'Giờ check-out thực tế',

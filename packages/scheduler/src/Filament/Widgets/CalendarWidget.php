@@ -3,6 +3,7 @@
 namespace Quochao56\Scheduler\Filament\Widgets;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
@@ -19,6 +20,28 @@ class CalendarWidget extends FullCalendarWidget
 
     public ?string $guardianKeyword = null;
 
+    public function config(): array
+    {
+        return [
+            'initialView' => 'timeGridWeek',
+            'headerToolbar' => [
+                'left' => 'prev,next today',
+                'center' => 'title',
+                'right' => 'dayGridMonth,timeGridWeek,timeGridDay',
+            ],
+            'allDaySlot' => false,
+            'firstDay' => 1, // Thứ Hai
+            'locale' => 'vi',
+            'slotMinTime' => '07:00:00',
+            'slotMaxTime' => '22:00:00',
+        ];
+    }
+
+    protected function headerActions(): array
+    {
+        return [];
+    }
+
     public function fetchEvents(array $fetchInfo): array
     {
         $startDate = Carbon::parse($fetchInfo['start']);
@@ -26,6 +49,14 @@ class CalendarWidget extends FullCalendarWidget
 
         $startDateStr = $startDate->format('Y-m-d');
         $endDateStr = $endDate->format('Y-m-d');
+
+        // Phân quyền: Giáo viên chỉ thấy lịch của mình
+        $user = Auth::user();
+        $isManager = $user && $user->can('employees.index');
+
+        if (! $isManager && $user?->employee) {
+            $this->employeeId = $user->employee->id;
+        }
 
         $schedulesQuery = Schedule::active()
             ->where('start_date', '<=', $endDateStr)
@@ -35,7 +66,15 @@ class CalendarWidget extends FullCalendarWidget
             });
 
         if ($this->employeeId) {
-            $schedulesQuery->where('employee_id', $this->employeeId);
+            $employeeId = (int) $this->employeeId;
+            $schedulesQuery->where(function ($q) use ($employeeId, $startDateStr, $endDateStr) {
+                $q->where('employee_id', $employeeId)
+                    ->orWhereHas('exceptions', function ($sub) use ($employeeId, $startDateStr, $endDateStr) {
+                        $sub->where('action', 'substitute')
+                            ->where('new_employee_id', $employeeId)
+                            ->whereBetween('exception_date', [$startDateStr, $endDateStr]);
+                    });
+            });
         }
         if ($this->studentId) {
             $schedulesQuery->where('student_id', $this->studentId);
@@ -61,8 +100,21 @@ class CalendarWidget extends FullCalendarWidget
         $exceptions = $exceptionsQuery->with(['schedule.student', 'schedule.employee', 'schedule.classroom', 'newClassroom'])->get();
 
         $exceptionsGrouped = [];
+        $rescheduledOriginalDates = [];
         foreach ($exceptions as $exception) {
-            $exceptionsGrouped[$exception->schedule_id][$exception->exception_date->format('Y-m-d')] = $exception;
+            $effectiveDate = $exception->exception_date?->format('Y-m-d');
+
+            if ($exception->action === 'reschedule' && $exception->new_exception_date) {
+                $effectiveDate = $exception->new_exception_date->format('Y-m-d');
+
+                if ($exception->exception_date?->format('Y-m-d') !== $effectiveDate) {
+                    $rescheduledOriginalDates[$exception->schedule_id][$exception->exception_date->format('Y-m-d')] = true;
+                }
+            }
+
+            if ($effectiveDate) {
+                $exceptionsGrouped[$exception->schedule_id][$effectiveDate] = $exception;
+            }
         }
 
         $events = [];
@@ -81,8 +133,13 @@ class CalendarWidget extends FullCalendarWidget
                     continue;
                 }
 
-                if ($schedule->day_of_week !== null) {
-                    if (! in_array($myDayOfWeek, (array) $schedule->day_of_week)) {
+                $days = $schedule->day_of_week;
+                if (is_string($days)) {
+                    $days = json_decode($days, true);
+                }
+
+                if (! empty($days)) {
+                    if (! in_array($myDayOfWeek, (array) $days)) {
                         continue;
                     }
                 } else {
@@ -92,6 +149,21 @@ class CalendarWidget extends FullCalendarWidget
                 }
 
                 $exception = $exceptionsGrouped[$schedule->id][$dateStr] ?? null;
+
+                if (($rescheduledOriginalDates[$schedule->id][$dateStr] ?? false) === true) {
+                    continue;
+                }
+
+                if ($this->employeeId) {
+                    $teachingEmployeeId = (int) $schedule->employee_id;
+                    if ($exception && $exception->action === 'substitute' && $exception->new_employee_id) {
+                        $teachingEmployeeId = (int) $exception->new_employee_id;
+                    }
+
+                    if ((int) $this->employeeId !== $teachingEmployeeId) {
+                        continue;
+                    }
+                }
 
                 $startTime = $schedule->start_time;
                 $endTime = $schedule->end_time;
@@ -108,7 +180,18 @@ class CalendarWidget extends FullCalendarWidget
                         $status = 'substituted';
                         $subTeacher = $exception->new_employee_id ? Employee::find($exception->new_employee_id) : null;
                         $teacherName = $subTeacher?->name ?? 'Chưa gán';
+                        if ($exception->new_classroom_id) {
+                            $newRoom = $exception->newClassroom ?? Classroom::find($exception->new_classroom_id);
+                            $roomName = $newRoom?->name ?? $roomName;
+                        }
                         $actionLabel = ' (Dạy thay)';
+                    } elseif ($exception->action === 'change_room') {
+                        $status = 'changed_room';
+                        if ($exception->new_classroom_id) {
+                            $newRoom = $exception->newClassroom ?? Classroom::find($exception->new_classroom_id);
+                            $roomName = $newRoom?->name ?? $roomName;
+                        }
+                        $actionLabel = ' (Đổi phòng)';
                     } elseif ($exception->action === 'reschedule') {
                         $status = 'rescheduled';
                         $actionLabel = ' (Dời lịch)';
@@ -123,40 +206,57 @@ class CalendarWidget extends FullCalendarWidget
                     }
                 }
 
-                $backgroundColor = '#10b981'; // Emerald (normal)
-                $borderColor = '#059669';
+                $statusClass = 'event-status-normal';
                 if ($status === 'canceled') {
-                    $backgroundColor = '#ef4444'; // Rose
-                    $borderColor = '#dc2626';
+                    $statusClass = 'event-status-canceled';
                 } elseif ($status === 'substituted') {
-                    $backgroundColor = '#6366f1'; // Indigo
-                    $borderColor = '#4f46e5';
+                    $statusClass = 'event-status-substituted';
                 } elseif ($status === 'rescheduled') {
-                    $backgroundColor = '#f59e0b'; // Amber
-                    $borderColor = '#d97706';
+                    $statusClass = 'event-status-rescheduled';
+                } elseif ($status === 'changed_room') {
+                    $statusClass = 'event-status-substituted';
                 } elseif ($schedule->type === 'group') {
-                    $backgroundColor = '#3b82f6'; // Blue
-                    $borderColor = '#2563eb';
+                    $statusClass = 'event-status-group';
                 }
 
+                $studentName = $schedule->student?->name ?? 'Dạy nhóm';
+                $typePrefix = $schedule->type === 'group' ? '[Nhóm]' : '[1-1]';
+
+                $statusText = 'Bình thường';
+                if ($status === 'canceled') {
+                    $statusText = 'Đã hủy';
+                } elseif ($status === 'substituted') {
+                    $statusText = 'Dạy thay';
+                } elseif ($status === 'rescheduled') {
+                    $statusText = 'Dời lịch';
+                } elseif ($status === 'changed_room') {
+                    $statusText = 'Đổi phòng học';
+                }
+
+                $titleText = "{$typePrefix} ".($schedule->type === 'group' ? 'Dạy nhóm' : $studentName)."\n".
+                             "GV: {$teacherName}\n".
+                             "Phòng: {$roomName}\n".
+                             "Trạng thái: {$statusText}";
+
+                $url = '/admin/schedules/'.$schedule->id.'/edit';
                 $events[] = [
                     'id' => $schedule->id.'-'.$dateStr,
-                    'title' => $schedule->title.$actionLabel.' - '.$schedule->student->name,
+                    'title' => $titleText,
                     'start' => $dateStr.'T'.$startTime,
                     'end' => $dateStr.'T'.$endTime,
-                    'url' => '/admin/schedules/'.$schedule->id.'/edit',
-                    'backgroundColor' => $backgroundColor,
-                    'borderColor' => $borderColor,
-                    'textColor' => '#ffffff',
-                    'classNames' => [$schedule->type === 'group' ? 'event-group' : 'event-individual'],
+                    'url' => $url,
+                    'classNames' => [
+                        $schedule->type === 'group' ? 'event-group' : 'event-individual',
+                        $statusClass,
+                    ],
                     'extendedProps' => [
-                        'tooltip' => 'HS: '.$schedule->student->name.' | GV: '.$teacherName.' | Phòng: '.$roomName.' | '.$startTime.'-'.$endTime,
+                        'tooltip' => 'HS: '.$studentName.' | GV: '.$teacherName.' | Phòng: '.$roomName.' | '.$startTime.'-'.$endTime,
                     ],
                 ];
             }
 
             foreach ($exceptions as $exc) {
-                if ($exc->exception_date->format('Y-m-d') !== $dateStr) {
+                if (! $exc->new_exception_date || $exc->new_exception_date->format('Y-m-d') !== $dateStr) {
                     continue;
                 }
                 if ($exc->action !== 'reschedule') {
@@ -168,7 +268,16 @@ class CalendarWidget extends FullCalendarWidget
                     continue;
                 }
 
-                if (in_array($myDayOfWeek, (array) $sched->day_of_week)) {
+                if ($exc->exception_date?->format('Y-m-d') === $dateStr) {
+                    continue;
+                }
+
+                $scheduleDays = $sched->day_of_week;
+                if (is_string($scheduleDays)) {
+                    $scheduleDays = json_decode($scheduleDays, true);
+                }
+
+                if (in_array($myDayOfWeek, (array) $scheduleDays, true)) {
                     continue;
                 }
 
@@ -189,18 +298,26 @@ class CalendarWidget extends FullCalendarWidget
                 $roomName = $exc->newClassroom?->name ?? ($sched->classroom?->name ?? 'Không có phòng');
                 $teacherName = Employee::find($teacherId)?->name ?? $sched->employee->name;
 
+                $excStudentName = $sched->student?->name ?? 'Dạy nhóm';
+                $excTypePrefix = $sched->type === 'group' ? '[Nhóm]' : '[1-1]';
+                $excTitleText = "{$excTypePrefix} ".($sched->type === 'group' ? 'Dạy nhóm' : $excStudentName)."\n".
+                                "GV: {$teacherName}\n".
+                                "Phòng: {$roomName}\n".
+                                'Trạng thái: Dời sang';
+
+                $url = '/admin/schedules/'.$sched->id.'/edit';
                 $events[] = [
                     'id' => $sched->id.'-'.$dateStr.'-rescheduled',
-                    'title' => $sched->title.' (Dời sang) - '.$sched->student->name,
+                    'title' => $excTitleText,
                     'start' => $dateStr.'T'.($exc->new_start_time ?? $sched->start_time),
                     'end' => $dateStr.'T'.($exc->new_end_time ?? $sched->end_time),
-                    'url' => '/admin/schedules/'.$sched->id.'/edit',
-                    'backgroundColor' => '#f59e0b', // Amber
-                    'borderColor' => '#d97706',
-                    'textColor' => '#ffffff',
-                    'classNames' => [$sched->type === 'group' ? 'event-group' : 'event-individual'],
+                    'url' => $url,
+                    'classNames' => [
+                        $sched->type === 'group' ? 'event-group' : 'event-individual',
+                        'event-status-rescheduled',
+                    ],
                     'extendedProps' => [
-                        'tooltip' => 'HS: '.$sched->student->name.' | GV: '.$teacherName.' | Phòng: '.$roomName,
+                        'tooltip' => 'HS: '.$excStudentName.' | GV: '.$teacherName.' | Phòng: '.$roomName,
                     ],
                 ];
             }

@@ -12,7 +12,6 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use Quochao56\Employee\Models\Employee;
-use Quochao56\Scheduler\Models\Attendance;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
 use Quochao56\Scheduler\Models\ScheduleException;
@@ -40,7 +39,7 @@ class DailyOperationPage extends Page implements HasForms
     {
         $user = Auth::user();
 
-        return $user && ($user->isSuperAdmin() || $user->hasPermissionTo('schedules.index'));
+        return $user && $user->hasPermissionTo('daily_operations.index');
     }
 
     public static function getNavigationGroup(): ?string
@@ -62,6 +61,13 @@ class DailyOperationPage extends Page implements HasForms
     {
         $this->selectedDate = now()->toDateString();
 
+        $user = Auth::user();
+        $isManager = $user && $user->can('employees.index');
+
+        if (! $isManager && $user?->employee) {
+            $this->employeeId = $user->employee->id;
+        }
+
         $this->form->fill([
             'selectedDate' => $this->selectedDate,
             'employeeId' => $this->employeeId,
@@ -72,40 +78,72 @@ class DailyOperationPage extends Page implements HasForms
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                DatePicker::make('selectedDate')
-                    ->label(trans('packages.scheduler::scheduler.daily_operations.selected_date'))
-                    ->native(false)
-                    ->displayFormat('d/m/Y')
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->selectedDate = $state),
+        $user = Auth::user();
+        $isManager = $user && $user->can('employees.index');
 
-                Select::make('employeeId')
-                    ->label('Giáo viên')
-                    ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_teachers'))
-                    ->options(Employee::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->employeeId = $state),
+        $components = [
+            DatePicker::make('selectedDate')
+                ->label(trans('packages.scheduler::scheduler.daily_operations.selected_date'))
+                ->native(false)
+                ->displayFormat('d/m/Y')
+                ->required()
+                ->live()
+                ->afterStateUpdated(fn ($state) => $this->selectedDate = $state),
+        ];
 
-                Select::make('studentId')
-                    ->label('Học sinh')
-                    ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_students'))
-                    ->options(Student::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->studentId = $state),
+        if ($isManager) {
+            $components[] = Select::make('employeeId')
+                ->label(trans('packages.scheduler::scheduler.daily_operations.teacher'))
+                ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_teachers'))
+                ->options(Employee::active()->pluck('name', 'id'))
+                ->searchable()
+                ->live()
+                ->afterStateUpdated(fn ($state) => $this->employeeId = $state);
+        }
 
-                Select::make('classroomId')
-                    ->label('Phòng học')
-                    ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_classrooms'))
-                    ->options(Classroom::active()->pluck('name', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->classroomId = $state),
-            ]);
+        $components[] = Select::make('studentId')
+            ->label(trans('packages.scheduler::scheduler.daily_operations.student'))
+            ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_students'))
+            ->options(function () use ($isManager, $user) {
+                $query = Student::active();
+                if (! $isManager && $user?->employee) {
+                    $employeeId = (int) $user->employee->id;
+
+                    $query->where(function ($studentQuery) use ($employeeId) {
+                        $studentQuery->whereHas('currentAssignment', function ($q) use ($employeeId) {
+                            $q->where('employee_id', $employeeId);
+                        })->orWhereIn('id', function ($scheduleQuery) use ($employeeId) {
+                            $scheduleQuery->select('student_id')
+                                ->from('schedules')
+                                ->whereExists(function ($subQuery) use ($employeeId) {
+                                    $subQuery->selectRaw('1')
+                                        ->from('schedule_exceptions')
+                                        ->whereColumn('schedule_exceptions.schedule_id', 'schedules.id')
+                                        ->where('schedule_exceptions.action', 'substitute')
+                                        ->where('schedule_exceptions.new_employee_id', $employeeId);
+                                });
+                        });
+                    });
+                }
+
+                return $query->pluck('name', 'id');
+            })
+            ->searchable()
+            ->live()
+            ->afterStateUpdated(fn ($state) => $this->studentId = $state);
+
+        $components[] = Select::make('classroomId')
+            ->label(trans('packages.scheduler::scheduler.daily_operations.classroom'))
+            ->placeholder(trans('packages.scheduler::scheduler.daily_operations.all_classrooms'))
+            ->options(Classroom::active()->pluck('name', 'id'))
+            ->searchable()
+            ->live()
+            ->afterStateUpdated(fn ($state) => $this->classroomId = $state);
+
+        return $schema->components($components)->columns([
+            'sm' => 1,
+            'md' => 4,
+        ]);
     }
 
     public function getViewData(): array
@@ -114,9 +152,8 @@ class DailyOperationPage extends Page implements HasForms
 
         $summary = [
             'total' => count($rows),
-            'present' => collect($rows)->whereIn('attendance_status', ['present', 'late'])->count(),
-            'absent' => collect($rows)->whereIn('attendance_status', ['absent_excused', 'absent_unexcused'])->count(),
-            'recorded_absence' => collect($rows)->whereIn('attendance_status', ['absent_excused', 'absent_unexcused'])->count(),
+            'canceled' => collect($rows)->where('schedule_status', 'canceled')->count(),
+            'rescheduled' => collect($rows)->where('schedule_status', 'rescheduled')->count(),
         ];
 
         return [
@@ -127,6 +164,13 @@ class DailyOperationPage extends Page implements HasForms
 
     protected function buildDailyRows(): array
     {
+        $user = Auth::user();
+        $isManager = $user && ($user->isSuperAdmin() || $user->hasRole('Quản lý'));
+
+        if (! $isManager && $user?->employee) {
+            $this->employeeId = $user->employee->id;
+        }
+
         $date = Carbon::parse($this->selectedDate ?: now()->toDateString());
         $dateStr = $date->toDateString();
         $dayOfWeek = $date->dayOfWeek === 0 ? 1 : ($date->dayOfWeek + 1);
@@ -141,7 +185,16 @@ class DailyOperationPage extends Page implements HasForms
             });
 
         if ($this->employeeId) {
-            $schedulesQuery->where('employee_id', $this->employeeId);
+            $employeeId = (int) $this->employeeId;
+
+            $schedulesQuery->where(function ($query) use ($employeeId, $dateStr) {
+                $query->where('employee_id', $employeeId)
+                    ->orWhereHas('exceptions', function ($sub) use ($employeeId, $dateStr) {
+                        $sub->where('action', 'substitute')
+                            ->where('new_employee_id', $employeeId)
+                            ->whereDate('exception_date', $dateStr);
+                    });
+            });
         }
         if ($this->studentId) {
             $schedulesQuery->where('student_id', $this->studentId);
@@ -154,13 +207,10 @@ class DailyOperationPage extends Page implements HasForms
 
         $exceptions = ScheduleException::query()
             ->with(['newEmployee', 'newClassroom'])
-            ->whereDate('exception_date', $dateStr)
-            ->whereIn('schedule_id', $schedules->pluck('id'))
-            ->get()
-            ->keyBy('schedule_id');
-
-        $attendances = Attendance::query()
-            ->whereDate('attendance_date', $dateStr)
+            ->where(function ($query) use ($dateStr) {
+                $query->whereDate('exception_date', $dateStr)
+                    ->orWhereDate('new_exception_date', $dateStr);
+            })
             ->whereIn('schedule_id', $schedules->pluck('id'))
             ->get()
             ->keyBy('schedule_id');
@@ -174,7 +224,19 @@ class DailyOperationPage extends Page implements HasForms
                 : in_array($dayOfWeek, $days, true);
 
             $exception = $exceptions->get($schedule->id);
-            $hasRescheduleSession = $exception && $exception->action === 'reschedule';
+            $hasRescheduleSession = $exception
+                && $exception->action === 'reschedule'
+                && $exception->new_exception_date?->toDateString() === $dateStr;
+
+            if (
+                $exception
+                && $exception->action === 'reschedule'
+                && $exception->exception_date?->toDateString() === $dateStr
+                && $exception->new_exception_date
+                && $exception->new_exception_date->toDateString() !== $dateStr
+            ) {
+                continue;
+            }
 
             if (! $hasRegularSession && ! $hasRescheduleSession) {
                 continue;
@@ -204,18 +266,27 @@ class DailyOperationPage extends Page implements HasForms
                 }
             }
 
-            $attendance = $attendances->get($schedule->id);
-            $attendanceStatus = $attendance?->status ?? ($scheduleStatus === 'canceled' ? 'absent_excused' : 'present');
+            if ($this->employeeId) {
+                $teachingEmployeeId = (int) $schedule->employee_id;
+                if ($exception && $exception->action === 'substitute' && $exception->new_employee_id) {
+                    $teachingEmployeeId = (int) $exception->new_employee_id;
+                }
+
+                if ((int) $this->employeeId !== $teachingEmployeeId) {
+                    continue;
+                }
+            }
+
+            $rowTitle = $schedule->title ?? ($schedule->type === 'group' ? 'Dạy nhóm' : 'Can thiệp cá nhân 1-1');
 
             $rows[] = [
                 'time' => substr((string) $startTime, 0, 5).' - '.substr((string) $endTime, 0, 5),
-                'title' => $schedule->title,
+                'title' => $rowTitle,
                 'student' => $schedule->student?->name ?? '-',
                 'teacher' => $teacherName,
                 'classroom' => $roomName,
                 'schedule_status' => $scheduleStatus,
-                'attendance_status' => $attendanceStatus,
-                'notes' => $attendance?->session_note ?? $attendance?->notes ?? $exception?->reason ?? '-',
+                'notes' => $exception?->reason ?? '-',
             ];
         }
 

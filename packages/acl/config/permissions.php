@@ -31,6 +31,14 @@ return [
             'index' => 'Xem nhật ký hệ thống',
         ],
     ],
+    'settings' => [
+        'label' => 'Cấu hình hệ thống',
+        'icon' => 'heroicon-o-cog-6-tooth',
+        'permissions' => [
+            'index' => 'Xem cấu hình hệ thống',
+            'edit' => 'Chỉnh sửa cấu hình hệ thống',
+        ],
+    ],
     'audits' => [
         'label' => 'Nhật ký kiểm toán',
         'icon' => 'heroicon-o-clock',
