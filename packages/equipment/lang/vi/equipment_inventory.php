@@ -47,8 +47,13 @@ return [
     ],
 
     'approve' => [
-        'label' => 'Duyệt phiếu',
+        'label' => 'Cập nhật kho',
         'success' => 'Đã duyệt phiếu và cập nhật tồn kho.',
         'error' => 'Lỗi khi duyệt phiếu.',
+    ],
+    'status' => [
+        'draft' => 'Bản nháp',
+        'completed' => 'Đã kiểm kê',
+        'approved' => 'Đã duyệt',
     ],
 ];

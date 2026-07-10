@@ -18,3 +18,5 @@ Schedule::call(function () {
     EvaluationHistory::where('created_at', '<', now()->subMonths(6))->delete();
     Activity::where('created_at', '<', now()->subMonths(6))->delete();
 })->daily();
+
+Schedule::command('attendance:detect-absent')->dailyAt('21:30');

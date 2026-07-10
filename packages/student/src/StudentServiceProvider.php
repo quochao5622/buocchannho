@@ -65,6 +65,10 @@ class StudentServiceProvider extends PackageServiceProvider
         if (is_dir(__DIR__.'/../lang')) {
             $this->loadTranslationsFrom(__DIR__.'/../lang', 'packages.student');
         }
+
+        if (file_exists(__DIR__.'/../config/permissions.php')) {
+            $this->mergeConfigFrom(__DIR__.'/../config/permissions.php', 'permissions');
+        }
     }
 
     public function packageBooted(): void
@@ -154,6 +158,7 @@ class StudentServiceProvider extends PackageServiceProvider
     {
         return [
             'create_students_table',
+            '2026_07_06_000000_create_student_leave_requests_table',
         ];
     }
 }

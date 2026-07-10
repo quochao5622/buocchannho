@@ -17,19 +17,14 @@ class EquipmentInventoryDetail extends Model implements AuditableContract
     protected $fillable = [
         'equipment_inventory_id',
         'equipment_id',
-        'quantity_expected',
-        'quantity_actual',
-        'status',
+        'quantity_expected_good',
+        'quantity_actual_good',
+        'quantity_expected_broken',
+        'quantity_actual_broken',
+        'quantity_expected_missing',
+        'quantity_actual_missing',
         'notes',
     ];
-
-    /**
-     * @return array<string, string>
-     */
-    public static function statusOptions(): array
-    {
-        return Equipment::statusOptions();
-    }
 
     /**
      * @return BelongsTo<EquipmentInventory, $this>

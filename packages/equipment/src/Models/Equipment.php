@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Quochao56\Equipment\Enum\EquipmentStatus;
 
 class Equipment extends Model implements AuditableContract
 {
@@ -22,7 +23,9 @@ class Equipment extends Model implements AuditableContract
         'category_id',
         'image',
         'quantity',
-        'status',
+        'quantity_good',
+        'quantity_broken',
+        'quantity_missing',
         'location',
         'unit',
         'note',
@@ -34,9 +37,9 @@ class Equipment extends Model implements AuditableContract
     public static function statusOptions(): array
     {
         return [
-            'good' => 'Tốt',
-            'broken' => 'Hỏng',
-            'missing' => 'Mất tích',
+            EquipmentStatus::Good->value => EquipmentStatus::Good->getLabel(),
+            EquipmentStatus::Broken->value => EquipmentStatus::Broken->getLabel(),
+            EquipmentStatus::Missing->value => EquipmentStatus::Missing->getLabel(),
         ];
     }
 
@@ -59,6 +62,12 @@ class Equipment extends Model implements AuditableContract
 
     protected static function booted(): void
     {
+        static::saving(function (self $equipment): void {
+            $equipment->quantity = (int) $equipment->quantity_good
+                + (int) $equipment->quantity_broken
+                + (int) $equipment->quantity_missing;
+        });
+
         static::deleting(function (Equipment $equipment) {
             if ($equipment->image) {
                 Storage::disk('public')->delete($equipment->image);

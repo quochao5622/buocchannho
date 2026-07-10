@@ -4,6 +4,7 @@ namespace Quochao56\Acl\Filament\Resources\Users\Schemas;
 
 use Filament\Fields\Field;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Quochao56\Acl\Filament\Resources\Users\Schemas\Components\Password;
@@ -39,6 +40,11 @@ class UserForm
         $components[] = Toggle::make('is_active')
             ->label(trans('acl::user.fields.is_active'))
             ->default(true);
+        $components[] = DateTimePicker::make('email_verified_at')
+            ->label(trans('filament-users::user.resource.email_verified_at'))
+            ->displayFormat('d/m/Y H:i:s')
+            ->native(false)
+            ->nullable();
 
         return $components;
     }

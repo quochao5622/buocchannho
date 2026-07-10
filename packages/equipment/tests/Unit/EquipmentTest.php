@@ -22,11 +22,14 @@ it('allows mass assignment of basic attributes', function () {
         'equipment_code' => 'TB02',
         'name' => 'Ghế học sinh',
         'description' => 'Mô tả ghế',
-        'quantity' => 20,
+        'quantity_good' => 15,
+        'quantity_broken' => 5,
+        'quantity_missing' => 0,
         'category_id' => $category->id,
-        'status' => 'broken',
     ]);
 
     expect($equipment->name)->toBe('Ghế học sinh');
     expect($equipment->quantity)->toBe(20);
+    expect($equipment->quantity_good)->toBe(15);
+    expect($equipment->quantity_broken)->toBe(5);
 });

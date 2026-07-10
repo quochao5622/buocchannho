@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\Core\Models\User;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
 use Quochao56\PlanningEvaluation\Models\Planning;

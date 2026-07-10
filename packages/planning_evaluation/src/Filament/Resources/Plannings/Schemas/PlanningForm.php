@@ -10,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\Student\Models\Student;
@@ -27,7 +28,18 @@ class PlanningForm
                     ->label(trans('packages.planning_evaluation::planning.fields.description')),
                 Select::make('employee_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.employee'))
-                    ->relationship('employee', 'name')
+                    ->options(function () {
+                        $query = Employee::query();
+                        if (auth()->check() && ! auth()->user()->isSuperAdmin()) {
+                            $canManageAll = auth()->user()->hasPermissionTo('employees.index')
+                                || auth()->user()->hasPermissionTo('employees.edit');
+                            if (! $canManageAll) {
+                                $query->where('email', auth()->user()->email);
+                            }
+                        }
+
+                        return $query->pluck('name', 'id')->toArray();
+                    })
                     ->default(function () {
                         $studentId = request()->query('student_id');
                         if ($studentId) {
@@ -42,11 +54,31 @@ class PlanningForm
 
                         return 4;
                     })
+                    ->disabled(fn (?Model $record) => $record !== null)
                     ->searchable(),
                 Select::make('student_id')
                     ->label(trans('packages.planning_evaluation::planning.fields.student'))
-                    ->relationship('student', 'name')
+                    ->options(function () {
+                        $query = Student::query()->where('status', 'active');
+                        if (auth()->check() && ! auth()->user()->isSuperAdmin()) {
+                            $canManageAll = auth()->user()->hasPermissionTo('employees.index')
+                                || auth()->user()->hasPermissionTo('employees.edit');
+                            if (! $canManageAll) {
+                                $employee = Employee::where('email', auth()->user()->email)->first();
+                                if ($employee) {
+                                    $query->whereHas('currentAssignment', function ($q) use ($employee) {
+                                        $q->where('employee_id', $employee->id);
+                                    });
+                                } else {
+                                    $query->whereRaw('1 = 0');
+                                }
+                            }
+                        }
+
+                        return $query->pluck('name', 'id')->toArray();
+                    })
                     ->default(fn () => request()->query('student_id'))
+                    ->disabled(fn (?Model $record) => $record !== null)
                     ->searchable(),
                 DatePicker::make('start_date')
                     ->label(trans('packages.planning_evaluation::planning.fields.start_date'))
@@ -58,12 +90,20 @@ class PlanningForm
                     ->displayFormat('d/m/Y'),
                 Select::make('status')
                     ->label(trans('packages.planning_evaluation::planning.fields.status'))
-                    ->options([
-                        BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
-                        BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
-                        BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
-                    ])
-                    ->default(BaseStatusEnum::Published->value)
+                    ->options(
+                        fn () => auth()->user()->can('plannings.approve')
+                            ? [
+                                BaseStatusEnum::Published->value => BaseStatusEnum::Published->getLabel(),
+                                BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                                BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                            ]
+                            : [
+                                BaseStatusEnum::Pending->value => BaseStatusEnum::Pending->getLabel(),
+                                BaseStatusEnum::Draft->value => BaseStatusEnum::Draft->getLabel(),
+                            ]
+                    )
+                    ->default(fn () => auth()->user()->can('plannings.approve') ? BaseStatusEnum::Published->value : BaseStatusEnum::Draft->value)
+                    ->disabled(fn ($record) => ($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value)
                     ->required(),
                 Repeater::make('planning_details')
                     ->label(trans('packages.planning_evaluation::planning.fields.details'))

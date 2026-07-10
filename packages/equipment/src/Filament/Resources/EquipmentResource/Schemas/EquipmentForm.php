@@ -38,18 +38,33 @@ class EquipmentForm
                 ->directory('equipments')
                 ->imageEditor(),
 
-            TextInput::make('quantity')
-                ->label(trans('packages.equipment::equipment.form.quantity'))
+            TextInput::make('quantity_good')
+                ->label(trans('packages.equipment::equipment.form.quantity_good'))
                 ->numeric()
                 ->minValue(0)
                 ->default(0)
                 ->required(),
 
-            Select::make('status')
-                ->label(trans('packages.equipment::equipment.form.status'))
-                ->options(Equipment::statusOptions())
-                ->default('good')
+            TextInput::make('quantity_broken')
+                ->label(trans('packages.equipment::equipment.form.quantity_broken'))
+                ->numeric()
+                ->minValue(0)
+                ->default(0)
                 ->required(),
+
+            TextInput::make('quantity_missing')
+                ->label(trans('packages.equipment::equipment.form.quantity_missing'))
+                ->numeric()
+                ->minValue(0)
+                ->default(0)
+                ->required(),
+
+            TextInput::make('quantity')
+                ->label(trans('packages.equipment::equipment.form.quantity'))
+                ->numeric()
+                ->disabled()
+                ->dehydrated(false)
+                ->placeholder('Tự động tính'),
 
             TextInput::make('location')
                 ->label(trans('packages.equipment::equipment.form.location'))

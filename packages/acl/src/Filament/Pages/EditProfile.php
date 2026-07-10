@@ -11,7 +11,7 @@ use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public static bool $isSimple = false;
+    public static bool $isSimple = true;
 
     public function form(Schema $schema): Schema
     {

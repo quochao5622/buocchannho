@@ -50,7 +50,7 @@ class EvaluationResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->can('evaluations.view_all'))) {
+        if (auth()->check() && auth()->user()->can('evaluations.view_all')) {
             return $query;
         }
 

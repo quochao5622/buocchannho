@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use Quochao56\Core\Models\User;
 
 return [
 
@@ -64,7 +64,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => Quochao56\Core\Models\User::class,
+            'model' => User::class,
         ],
 
         // 'users' => [

@@ -3,6 +3,7 @@
 namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Tables;
 
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder; // Thêm class DatePicker
 use Illuminate\Support\Facades\Auth;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
+use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
 use Quochao56\PlanningEvaluation\Models\Planning;
@@ -120,62 +122,72 @@ class PlanningsTable
                             'record' => $evaluation,
                         ]));
                     }),
-                Action::make('clone')
-                    ->label(trans('packages.planning_evaluation::planning.clone.label'))
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color('info')
-                    ->form([
-                        Select::make('student_id')
-                            ->label(trans('packages.planning_evaluation::planning.clone.student'))
-                            ->options(Student::query()->pluck('name', 'id'))
-                            ->required()
-                            ->searchable(),
-                        DatePicker::make('start_date')
-                            ->label(trans('packages.planning_evaluation::planning.clone.start_date'))
-                            ->native(false)
-                            ->default(now())
-                            ->displayFormat('d/m/Y')
-                            ->required(),
-                        DatePicker::make('end_date')
-                            ->label(trans('packages.planning_evaluation::planning.clone.end_date'))
-                            ->native(false)
-                            ->default(now()->addMonths(3))
-                            ->displayFormat('d/m/Y')
-                            ->required(),
-                    ])
-                    ->action(function (Planning $record, array $data): void {
-                        $cloned = $record->replicate();
-                        $cloned->student_id = $data['student_id'];
-                        $cloned->start_date = $data['start_date'];
-                        $cloned->end_date = $data['end_date'];
-                        $cloned->name = $record->name.trans('packages.planning_evaluation::planning.clone.suffix');
-
-                        $newStudent = Student::find($data['student_id']);
-                        $employeeId = null;
-                        if (Auth::check()) {
-                            $employeeId = Employee::where('email', Auth::user()->email)->first()?->id;
-                        }
-                        $cloned->employee_id = $newStudent?->currentAssignment?->employee_id
-                            ?? $employeeId
-                            ?? $record->employee_id;
-
-                        $cloned->status = BaseStatusEnum::Draft;
-                        $cloned->save();
-
-                        Notification::make()
-                            ->success()
-                            ->title(trans('packages.planning_evaluation::planning.clone.success'))
-                            ->send();
-                    }),
+                ApproveAction::make(),
                 EditAction::make(),
-                ViewAction::make()
-                    ->modalWidth('90%'),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    ViewAction::make()
+                        ->modalWidth('90%'),
+                    Action::make('clone')
+                        ->label(trans('packages.planning_evaluation::planning.clone.label'))
+                        ->icon('heroicon-o-document-duplicate')
+                        ->color('info')
+                        ->form([
+                            Select::make('student_id')
+                                ->label(trans('packages.planning_evaluation::planning.clone.student'))
+                                ->options(Student::query()->pluck('name', 'id'))
+                                ->required()
+                                ->searchable(),
+                            DatePicker::make('start_date')
+                                ->label(trans('packages.planning_evaluation::planning.clone.start_date'))
+                                ->native(false)
+                                ->default(now())
+                                ->displayFormat('d/m/Y')
+                                ->required(),
+                            DatePicker::make('end_date')
+                                ->label(trans('packages.planning_evaluation::planning.clone.end_date'))
+                                ->native(false)
+                                ->default(now()->addMonths(3))
+                                ->displayFormat('d/m/Y')
+                                ->required(),
+                        ])
+                        ->action(function (Planning $record, array $data, $livewire): void {
+                            $cloned = $record->replicate();
+                            $cloned->student_id = $data['student_id'];
+                            $cloned->start_date = $data['start_date'];
+                            $cloned->end_date = $data['end_date'];
+                            $cloned->name = $record->name.trans('packages.planning_evaluation::planning.clone.suffix');
+
+                            $newStudent = Student::find($data['student_id']);
+                            $employeeId = null;
+                            if (Auth::check()) {
+                                $employeeId = Employee::where('email', Auth::user()->email)->first()?->id;
+                            }
+                            $cloned->employee_id = $newStudent?->currentAssignment?->employee_id
+                                ?? $employeeId
+                                ?? $record->employee_id;
+
+                            $cloned->status = BaseStatusEnum::Draft;
+                            $cloned->save();
+
+                            Notification::make()
+                                ->success()
+                                ->title(trans('packages.planning_evaluation::planning.clone.success'))
+                                ->send();
+
+                            $livewire->dispatch('notificationsSent');
+                        }),
+                    DeleteAction::make(),
+                ])
+                    ->label('Thao tác')
+                    ->icon('heroicon-m-chevron-down')
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

@@ -35,6 +35,13 @@ class EmployeeTable
                     ->label(trans('packages.employee::employee.fields.email'))
                     ->searchable(),
 
+                TextColumn::make('user.email')
+                    ->label('Tài khoản liên kết')
+                    ->badge()
+                    ->color(fn (?string $state): string => $state ? 'success' : 'warning')
+                    ->placeholder('Chưa liên kết')
+                    ->sortable(),
+
                 TextColumn::make('gender')
                     ->label(trans('packages.employee::employee.fields.gender'))
                     ->formatStateUsing(fn (?string $state): string => trans('packages.core::core.gender.'.$state ?? 'male')),
@@ -106,6 +113,7 @@ class EmployeeTable
                 ActionsBulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

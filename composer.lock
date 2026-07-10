@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "157d314db9e8ea4cff3aecefe5c3a676",
+    "content-hash": "6e29d50a88704a574a805cfdb08a0f30",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -911,6 +911,120 @@
                 }
             ],
             "time": "2025-08-20T19:15:30+00:00"
+        },
+        {
+            "name": "damodar-bhattarai/filament-settings",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/damodar-bhattarai/filament-settings.git",
+                "reference": "e2a87aecac3f919cefee05b2648d094a0cbc6536"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/damodar-bhattarai/filament-settings/zipball/e2a87aecac3f919cefee05b2648d094a0cbc6536",
+                "reference": "e2a87aecac3f919cefee05b2648d094a0cbc6536",
+                "shasum": ""
+            },
+            "require": {
+                "damodar-bhattarai/settings": "^1.1.4",
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0 || ^10.0",
+                "pestphp/pest": "^2.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DamodarBhattarai\\FilamentSettings\\FilamentSettingsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DamodarBhattarai\\FilamentSettings\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Damodar Bhattarai",
+                    "email": "work@damodar.dev",
+                    "homepage": "https://damodar.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Filament panel plugin for managing website settings with categorized tabs. Provides a beautiful UI for the damodar-bhattarai/settings package.",
+            "keywords": [
+                "Settings",
+                "admin",
+                "filament",
+                "laravel",
+                "panel",
+                "plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/damodar-bhattarai/filament-settings/issues",
+                "source": "https://github.com/damodar-bhattarai/filament-settings/tree/v1.2.1"
+            },
+            "time": "2026-06-17T04:42:12+00:00"
+        },
+        {
+            "name": "damodar-bhattarai/settings",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/damodar-bhattarai/settings.git",
+                "reference": "464e2697a949f0f47bdb747d9d7e9710c8e291d5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/damodar-bhattarai/settings/zipball/464e2697a949f0f47bdb747d9d7e9710c8e291d5",
+                "reference": "464e2697a949f0f47bdb747d9d7e9710c8e291d5",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Setting": "DamodarBhattarai\\Settings\\Facades\\Setting"
+                    },
+                    "providers": [
+                        "DamodarBhattarai\\Settings\\SettingsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Helpers/settingsHelper.php"
+                ],
+                "psr-4": {
+                    "DamodarBhattarai\\Settings\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Damodar Bhattarai",
+                    "email": "damodar.bhattarai.1999@gmail.com"
+                }
+            ],
+            "description": "Package to store and get general website settings on the fly.",
+            "support": {
+                "issues": "https://github.com/damodar-bhattarai/settings/issues",
+                "source": "https://github.com/damodar-bhattarai/settings/tree/1.1.4"
+            },
+            "time": "2026-06-17T04:41:40+00:00"
         },
         {
             "name": "danharrin/date-format-converter",
@@ -6222,7 +6336,7 @@
         },
         {
             "name": "quochao56/acl",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/acl",
@@ -6256,7 +6370,7 @@
         },
         {
             "name": "quochao56/core",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
@@ -6290,7 +6404,7 @@
         },
         {
             "name": "quochao56/employee",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/employee",
@@ -6390,7 +6504,7 @@
         },
         {
             "name": "quochao56/equipment",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/equipment",
@@ -6446,7 +6560,7 @@
         },
         {
             "name": "quochao56/planning-evaluation",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/planning_evaluation",
@@ -6548,8 +6662,80 @@
             }
         },
         {
+            "name": "quochao56/scheduler",
+            "version": "dev-feat/scheduler",
+            "dist": {
+                "type": "path",
+                "url": "packages/scheduler",
+                "reference": "5c3fc93e329945047b30fea9313f2ad813b3ab2b"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "quochao56/core": "*@dev",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Quochao56\\Scheduler\\SchedulerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quochao56\\Scheduler\\": "src/",
+                    "Quochao56\\Scheduler\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Therapy & Class Scheduler package for Buoc Chan Nho",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "quochao56/session-log",
+            "version": "dev-feat/scheduler",
+            "dist": {
+                "type": "path",
+                "url": "packages/session_log",
+                "reference": "d587aa03fd1abd9daad298c9394007b6c162d900"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "quochao56/core": "*@dev",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Quochao56\\SessionLog\\SessionLogServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Quochao56\\SessionLog\\": "src/",
+                    "Quochao56\\SessionLog\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Daily logs and behavior incident logging for special education children.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "quochao56/student",
-            "version": "dev-develop",
+            "version": "dev-feat/scheduler",
             "dist": {
                 "type": "path",
                 "url": "packages/student",
@@ -6922,6 +7108,80 @@
                 }
             ],
             "time": "2026-03-19T10:36:26+00:00"
+        },
+        {
+            "name": "saade/filament-fullcalendar",
+            "version": "v4.0.0-beta7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/saade/filament-fullcalendar.git",
+                "reference": "191d69b9d568a9fdfd3f3586428d8cf5a940fd50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/saade/filament-fullcalendar/zipball/191d69b9d568a9fdfd3f3586428d8cf5a940fd50",
+                "reference": "191d69b9d568a9fdfd3f3586428d8cf5a940fd50",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.92.7"
+            },
+            "require-dev": {
+                "nunomaduro/collision": "^7.0|^8.0",
+                "nunomaduro/larastan": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0|^2.0",
+                "phpstan/phpstan-phpunit": "^1.0|^2.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Saade\\FilamentFullCalendar\\FilamentFullCalendarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Saade\\FilamentFullCalendar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Saade",
+                    "email": "saade@outlook.com.br",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The Most Popular JavaScript Calendar integrated with Filament 💛",
+            "homepage": "https://github.com/saade/filament-fullcalendar",
+            "keywords": [
+                "filament-fullcalendar",
+                "laravel",
+                "saade"
+            ],
+            "support": {
+                "issues": "https://github.com/saade/filament-fullcalendar/issues",
+                "source": "https://github.com/saade/filament-fullcalendar/tree/v4.0.0-beta7"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/saade",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-14T23:35:46+00:00"
         },
         {
             "name": "scrivo/highlight.php",
@@ -14558,7 +14818,10 @@
         "quochao56/employee": 20,
         "quochao56/equipment": 20,
         "quochao56/planning-evaluation": 20,
-        "quochao56/student": 20
+        "quochao56/scheduler": 20,
+        "quochao56/session-log": 20,
+        "quochao56/student": 20,
+        "saade/filament-fullcalendar": 10
     },
     "prefer-stable": true,
     "prefer-lowest": false,
