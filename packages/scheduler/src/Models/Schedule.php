@@ -79,14 +79,15 @@ class Schedule extends Model implements AuditableContract
             ->where(function ($q) use ($employeeId, $dateStr) {
                 // Giáo viên chính thức của lịch học
                 $q->where('employee_id', $employeeId)
-                    // Hoặc giáo viên được phân dạy thay hôm nay
+                    // Hoặc giáo viên được phân dạy thay hôm nay (chỉ exception đã duyệt)
                     ->orWhereHas('exceptions', function ($sub) use ($employeeId, $dateStr) {
                         $sub->where(function ($dateQuery) use ($dateStr) {
                             $dateQuery->whereDate('exception_date', $dateStr)
                                 ->orWhereDate('new_exception_date', $dateStr);
                         })
                             ->where('action', 'substitute')
-                            ->where('new_employee_id', $employeeId);
+                            ->where('new_employee_id', $employeeId)
+                            ->where('status', 'approved');
                     });
             })
             ->whereDate('start_date', '<=', $dateStr)
@@ -98,7 +99,8 @@ class Schedule extends Model implements AuditableContract
                 $q->where(function ($dateQuery) use ($dateStr) {
                     $dateQuery->whereDate('exception_date', $dateStr)
                         ->orWhereDate('new_exception_date', $dateStr);
-                });
+                })
+                    ->where('status', 'approved');
             }])
             ->get();
 
@@ -202,7 +204,8 @@ class Schedule extends Model implements AuditableContract
                                 ->orWhereDate('new_exception_date', $dateStr);
                         })
                             ->where('action', 'substitute')
-                            ->where('new_employee_id', $employeeId);
+                            ->where('new_employee_id', $employeeId)
+                            ->where('status', 'approved');
                     });
             })
             ->whereDate('start_date', '<=', $dateStr)
@@ -214,7 +217,8 @@ class Schedule extends Model implements AuditableContract
                 $q->where(function ($dateQuery) use ($dateStr) {
                     $dateQuery->whereDate('exception_date', $dateStr)
                         ->orWhereDate('new_exception_date', $dateStr);
-                });
+                })
+                    ->where('status', 'approved');
             }])
             ->get();
 

@@ -49,11 +49,11 @@ class EmployeeAttendancePolicy
 
     public function approveFlaggedLocation(User $user): bool
     {
-        return $user->hasPermissionTo('employee_attendances.approve_flagged_location');
+        return $user->hasPermissionTo('employee_attendances.manage');
     }
 
     public function rejectFlaggedLocation(User $user): bool
     {
-        return $user->hasPermissionTo('employee_attendances.reject_flagged_location');
+        return $user->hasPermissionTo('employee_attendances.manage');
     }
 }

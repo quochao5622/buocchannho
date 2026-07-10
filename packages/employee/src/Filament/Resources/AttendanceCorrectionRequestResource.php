@@ -6,18 +6,41 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource\Pages\CreateAttendanceCorrectionRequest;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource\Pages\EditAttendanceCorrectionRequest;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource\Pages\ListAttendanceCorrectionRequests;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource\Schemas\AttendanceCorrectionRequestForm;
 use Quochao56\Employee\Filament\Resources\AttendanceCorrectionRequestResource\Tables\AttendanceCorrectionRequestTable;
 use Quochao56\Employee\Models\AttendanceCorrectionRequest;
+use Quochao56\Employee\Models\Employee;
 
 class AttendanceCorrectionRequestResource extends Resource
 {
     protected static ?string $model = AttendanceCorrectionRequest::class;
 
     protected static ?int $navigationSort = 3;
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if (! $user) {
+            return $query->whereKey(-1);
+        }
+
+        if ($user->isSuperAdmin() || $user->hasPermissionTo('attendance_correction_requests.view_all')) {
+            return $query;
+        }
+
+        $employee = Employee::where('email', $user->email)->first();
+        if ($employee) {
+            return $query->where('employee_id', $employee->id);
+        }
+
+        return $query->whereKey(-1);
+    }
 
     public static function getNavigationIcon(): string|Htmlable|null
     {
@@ -46,6 +69,11 @@ class AttendanceCorrectionRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
+        $user = auth()->user();
+        if (! $user?->hasPermissionTo('attendance_correction_requests.approve')) {
+            return null;
+        }
+
         $count = AttendanceCorrectionRequest::pending()->count();
 
         return $count > 0 ? (string) $count : null;

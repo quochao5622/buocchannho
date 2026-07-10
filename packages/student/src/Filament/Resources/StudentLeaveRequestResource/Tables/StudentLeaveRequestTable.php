@@ -34,6 +34,11 @@ class StudentLeaveRequestTable
                     ->date('d/m/Y')
                     ->sortable(),
 
+                TextColumn::make('half_day_session')
+                    ->label(trans('packages.student::student_leave_request.fields.half_day_session'))
+                    ->formatStateUsing(fn (?string $state): string => $state ? trans("packages.student::student_leave_request.fields.session_{$state}") : '-')
+                    ->sortable(),
+
                 TextColumn::make('reason')
                     ->label(trans('packages.student::student_leave_request.fields.reason'))
                     ->limit(20)

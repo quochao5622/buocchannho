@@ -2,8 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Plugins\CustomFilamentSettingsPlugin;
 use AchyutN\FilamentLogViewer\FilamentLogViewer;
+use App\Filament\Plugins\CustomFilamentSettingsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,8 +21,8 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Quochao56\Acl\AclPlugin;
@@ -111,7 +111,8 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->collapsibleNavigationGroups()
             ->sidebarCollapsibleOnDesktop(true)
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s');
     }
 
     public function boot(): void

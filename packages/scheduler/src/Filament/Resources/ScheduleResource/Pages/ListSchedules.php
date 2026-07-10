@@ -175,7 +175,11 @@ class ListSchedules extends ListRecords
                         $employeeIds = Employee::active()->pluck('id')->toArray();
                     }
                     if (empty($studentIds)) {
-                        $studentIds = Student::active()->pluck('id')->toArray();
+                        if ($type === 'group') {
+                            $studentIds = [null];
+                        } else {
+                            $studentIds = Student::active()->pluck('id')->toArray();
+                        }
                     }
 
                     if (empty($dayOfWeek)) {
@@ -197,11 +201,11 @@ class ListSchedules extends ListRecords
                         'room' => [],
                     ];
 
-                    $employeeNames = Employee::whereIn('id', $employeeIds)->pluck('name', 'id');
-                    $studentNames = Student::whereIn('id', $studentIds)->pluck('name', 'id');
+                    $employeeNames = Employee::whereIn('id', array_filter((array) $employeeIds))->pluck('name', 'id');
+                    $studentNames = Student::whereIn('id', array_filter((array) $studentIds))->pluck('name', 'id');
                     $roomName = $classroomId ? (Classroom::find($classroomId)?->name ?? 'Phòng học') : null;
 
-                    $attemptCreate = function (int $studentId, int $employeeId, array $days) use (
+                    $attemptCreate = function (?int $studentId, int $employeeId, array $days) use (
                         $title,
                         $type,
                         $startTime,
@@ -226,13 +230,14 @@ class ListSchedules extends ListRecords
                             );
 
                             if ($roomConflict) {
+                                $conflictTitle = ! empty($roomConflict->title) ? $roomConflict->title : (trans('packages.scheduler::scheduler.schedules.model_label').' #'.$roomConflict->id);
                                 $this->pushConflict(
                                     conflicts: $conflicts,
                                     type: 'room',
                                     key: (string) $classroomId,
                                     message: trans('packages.scheduler::scheduler.schedules.quick_create.room_conflict_detail', [
                                         'name' => $roomName,
-                                        'title' => $roomConflict->title,
+                                        'title' => $conflictTitle,
                                     ])
                                 );
 
@@ -251,41 +256,45 @@ class ListSchedules extends ListRecords
 
                         if ($teacherConflict) {
                             $teacherName = $employeeNames->get($employeeId) ?? 'Giáo viên';
+                            $conflictTitle = ! empty($teacherConflict->title) ? $teacherConflict->title : (trans('packages.scheduler::scheduler.schedules.model_label').' #'.$teacherConflict->id);
                             $this->pushConflict(
                                 conflicts: $conflicts,
                                 type: 'teacher',
                                 key: (string) $employeeId,
                                 message: trans('packages.scheduler::scheduler.schedules.quick_create.teacher_conflict_body', [
                                     'name' => $teacherName,
-                                    'title' => $teacherConflict->title,
+                                    'title' => $conflictTitle,
                                 ])
                             );
 
                             return;
                         }
 
-                        $studentConflict = $this->findConflictSchedule(
-                            days: $days,
-                            startDate: $startDate,
-                            endDate: $endDate,
-                            startTime: $startTime,
-                            endTime: $endTime,
-                            studentId: $studentId
-                        );
-
-                        if ($studentConflict) {
-                            $studentName = $studentNames->get($studentId) ?? 'Học sinh';
-                            $this->pushConflict(
-                                conflicts: $conflicts,
-                                type: 'student',
-                                key: (string) $studentId,
-                                message: trans('packages.scheduler::scheduler.schedules.quick_create.student_conflict_body', [
-                                    'name' => $studentName,
-                                    'title' => $studentConflict->title,
-                                ])
+                        if ($studentId !== null) {
+                            $studentConflict = $this->findConflictSchedule(
+                                days: $days,
+                                startDate: $startDate,
+                                endDate: $endDate,
+                                startTime: $startTime,
+                                endTime: $endTime,
+                                studentId: $studentId
                             );
 
-                            return;
+                            if ($studentConflict) {
+                                $studentName = $studentNames->get($studentId) ?? 'Học sinh';
+                                $conflictTitle = ! empty($studentConflict->title) ? $studentConflict->title : (trans('packages.scheduler::scheduler.schedules.model_label').' #'.$studentConflict->id);
+                                $this->pushConflict(
+                                    conflicts: $conflicts,
+                                    type: 'student',
+                                    key: (string) $studentId,
+                                    message: trans('packages.scheduler::scheduler.schedules.quick_create.student_conflict_body', [
+                                        'name' => $studentName,
+                                        'title' => $conflictTitle,
+                                    ])
+                                );
+
+                                return;
+                            }
                         }
 
                         Schedule::create([
@@ -308,13 +317,15 @@ class ListSchedules extends ListRecords
                     if ($assignmentMode === 'group') {
                         foreach ($employeeIds as $employeeId) {
                             foreach ($studentIds as $studentId) {
-                                $attemptCreate((int) $studentId, (int) $employeeId, $dayOfWeek);
+                                $sid = $studentId !== null ? (int) $studentId : null;
+                                $attemptCreate($sid, (int) $employeeId, $dayOfWeek);
                             }
                         }
                     } elseif ($assignmentMode === 'manual') {
                         foreach ($employeeIds as $employeeId) {
                             foreach ($studentIds as $studentId) {
-                                $attemptCreate((int) $studentId, (int) $employeeId, $dayOfWeek);
+                                $sid = $studentId !== null ? (int) $studentId : null;
+                                $attemptCreate($sid, (int) $employeeId, $dayOfWeek);
                             }
                         }
                     } else {
@@ -338,7 +349,8 @@ class ListSchedules extends ListRecords
                                 $teacherId = (int) $employeeIds[$assignmentIndex % $teacherCount];
                                 $assignmentIndex++;
 
-                                $attemptCreate((int) $studentId, (int) $teacherId, [(int) $day]);
+                                $sid = $studentId !== null ? (int) $studentId : null;
+                                $attemptCreate($sid, (int) $teacherId, [(int) $day]);
                             }
                         }
                     }

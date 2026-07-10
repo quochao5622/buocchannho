@@ -61,7 +61,7 @@ class EmployeeAttendanceResource extends Resource
             return null;
         }
 
-        if (! $user->can('approveFlaggedLocation', EmployeeAttendance::class)) {
+        if (! $user->hasPermissionTo('employee_attendances.manage')) {
             return null;
         }
 

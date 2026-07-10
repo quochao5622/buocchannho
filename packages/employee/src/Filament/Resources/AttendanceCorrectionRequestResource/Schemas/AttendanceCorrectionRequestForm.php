@@ -7,6 +7,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use Quochao56\Employee\Models\Employee;
 
 class AttendanceCorrectionRequestForm
 {
@@ -18,8 +19,8 @@ class AttendanceCorrectionRequestForm
                 ->relationship('employee', 'name')
                 ->searchable()
                 ->preload()
-                ->default(fn () => Employee::where('email', auth()->user()->email)->first()?->id)
-                ->disabled(fn () => ! auth()->user()->hasPermissionTo('attendance_correction_requests.view_all'))
+                ->default(fn() => Employee::where('email', auth()->user()->email)->first()?->id)
+                ->disabled(fn() => ! auth()->user()->hasPermissionTo('attendance_correction_requests.view_all'))
                 ->dehydrated() // ensure it is saved even when disabled
                 ->required(),
 
@@ -55,13 +56,13 @@ class AttendanceCorrectionRequestForm
                 ])
                 ->default('pending')
                 ->required()
-                ->disabled(fn ($record) => $record && ! $record->isPending()),
+                ->disabled(fn($record) => $record && ! $record->isPending()),
 
             Textarea::make('review_note')
                 ->label(trans('packages.employee::attendance_correction_request.fields.review_note'))
                 ->rows(2)
                 ->columnSpanFull()
-                ->visible(fn ($record) => $record && ! $record->isPending()),
+                ->visible(fn($record) => $record && ! $record->isPending()),
         ]);
     }
 }

@@ -104,6 +104,11 @@ return [
             'make_up_suggestion_help' => 'Hệ thống gợi ý các slot trống phù hợp cho cùng giáo viên/học sinh/phòng.',
             'reason' => 'Lý do thay đổi',
             'notes' => 'Ghi chú thêm',
+            'status' => 'Trạng thái duyệt',
+            'requested_by' => 'Người tạo yêu cầu',
+            'reviewed_by' => 'Người duyệt',
+            'reviewed_at' => 'Thời gian duyệt',
+            'review_note' => 'Ghi chú duyệt',
         ],
         'action' => [
             'cancel' => 'Hủy buổi học',
@@ -115,15 +120,31 @@ return [
             'teacher' => 'Giáo viên',
             'student' => 'Học sinh',
         ],
+        'status' => [
+            'pending' => 'Chờ duyệt',
+            'approved' => 'Đã duyệt',
+            'rejected' => 'Đã từ chối',
+        ],
         'actions' => [
             'create' => 'Tạo mới điều chỉnh',
             'create_heading' => 'Tạo điều chỉnh lịch học',
             'edit' => 'Chỉnh sửa',
             'edit_heading' => 'Chỉnh sửa điều chỉnh lịch học',
             'delete' => 'Xóa',
+            'approve' => 'Duyệt',
+            'reject' => 'Từ chối',
+            'approve_confirm' => 'Bạn có chắc muốn duyệt điều chỉnh này? Sau khi duyệt, hệ thống sẽ áp dụng thay đổi vào lịch học và chấm công.',
+            'reject_heading' => 'Từ chối điều chỉnh lịch học',
         ],
         'messages' => [
             'make_up_suggestion_prefix' => 'Gợi ý bù ca: :date :start-:end',
+            'approved_success' => 'Điều chỉnh đã được duyệt và áp dụng vào lịch học.',
+            'rejected_success' => 'Điều chỉnh đã bị từ chối.',
+            'pending_info' => 'Yêu cầu điều chỉnh đang chờ quản lý duyệt. Thay đổi chưa có hiệu lực.',
+        ],
+        'notifications' => [
+            'pending_title' => 'Có điều chỉnh lịch học cần duyệt',
+            'pending_body' => ':name vừa tạo yêu cầu điều chỉnh lịch học vào ngày :date. Vui lòng vào Lịch học → Điều chỉnh để xem xét.',
         ],
     ],
 

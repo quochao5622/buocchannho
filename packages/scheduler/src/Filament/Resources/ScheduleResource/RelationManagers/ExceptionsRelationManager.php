@@ -3,6 +3,7 @@
 namespace Quochao56\Scheduler\Filament\Resources\ScheduleResource\RelationManagers;
 
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -10,14 +11,20 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TimePicker;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Quochao56\Core\Models\User;
 use Quochao56\Employee\Models\Employee;
+use Quochao56\Scheduler\Enums\ScheduleExceptionAction;
+use Quochao56\Scheduler\Enums\ScheduleExceptionStatus;
+use Quochao56\Scheduler\Filament\Resources\ScheduleResource;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
 use Quochao56\Scheduler\Models\ScheduleException;
@@ -39,6 +46,11 @@ class ExceptionsRelationManager extends RelationManager
     public static function getPluralModelLabel(): string
     {
         return trans('packages.scheduler::scheduler.exceptions.plural_model_label');
+    }
+
+    public function isReadOnly(): bool
+    {
+        return false;
     }
 
     public function form(Schema $schema): Schema
@@ -171,14 +183,13 @@ class ExceptionsRelationManager extends RelationManager
                 TextColumn::make('action')
                     ->label(trans('packages.scheduler::scheduler.exceptions.fields.action'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'cancel' => 'danger',
-                        'reschedule' => 'warning',
-                        'substitute' => 'info',
-                        'change_room' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => trans("packages.scheduler::scheduler.exceptions.action.{$state}")),
+                    ->color(fn (ScheduleExceptionAction $state): string => $state->color())
+                    ->formatStateUsing(fn (ScheduleExceptionAction $state): string => $state->label()),
+
+                BadgeColumn::make('status')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.status'))
+                    ->color(fn (ScheduleExceptionStatus $state): string => $state->color())
+                    ->formatStateUsing(fn (ScheduleExceptionStatus $state): string => $state->label()),
 
                 TextColumn::make('cancel_actor')
                     ->label(trans('packages.scheduler::scheduler.exceptions.fields.cancel_actor'))
@@ -210,6 +221,22 @@ class ExceptionsRelationManager extends RelationManager
                     ->label(trans('packages.scheduler::scheduler.exceptions.fields.new_classroom_id'))
                     ->placeholder('-'),
 
+                TextColumn::make('requestedBy.name')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.requested_by'))
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('reviewedBy.name')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.reviewed_by'))
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('review_note')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.fields.review_note'))
+                    ->limit(40)
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('reason')
                     ->label(trans('packages.scheduler::scheduler.exceptions.fields.reason'))
                     ->limit(50),
@@ -218,25 +245,149 @@ class ExceptionsRelationManager extends RelationManager
                 CreateAction::make()
                     ->label(trans('packages.scheduler::scheduler.exceptions.actions.create'))
                     ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.create_heading'))
-                    ->after(function (ScheduleException $record): void {
-                        $this->afterExceptionSaved($record);
+                    ->mutateDataUsing(function (array $data): array {
+                        $canApprove = auth()->user()?->can('approve', ScheduleException::class);
+
+                        // Admin tạo trực tiếp → approved ngay; giáo viên tạo → pending
+                        $data['status'] = $canApprove ? ScheduleExceptionStatus::Approved->value : ScheduleExceptionStatus::Pending->value;
+                        $data['requested_by'] = auth()->id();
+
+                        if ($canApprove) {
+                            $data['reviewed_by'] = auth()->id();
+                            $data['reviewed_at'] = now();
+                        }
+
+                        return $data;
+                    })
+                    ->after(function (ScheduleException $record, $livewire): void {
+                        if ($record->isPending()) {
+                            // Thông báo cho user biết đang chờ duyệt
+                            Notification::make()
+                                ->warning()
+                                ->title(trans('packages.scheduler::scheduler.exceptions.messages.pending_info'))
+                                ->send();
+                            $livewire->dispatch('notificationsSent');
+
+                            // Gửi thông báo tới admin có quyền duyệt
+                            $this->notifyApprovers($record);
+                        } else {
+                            $this->afterExceptionSaved($record);
+                        }
                     }),
             ])
             ->recordActions([
+                Action::make('approve')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.approve'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.approve_confirm'))
+                    ->visible(fn (ScheduleException $record) => $record->isPending() && auth()->user()?->can('approve', ScheduleException::class))
+                    ->action(function (ScheduleException $record, $livewire): void {
+                        $record->update([
+                            'status' => ScheduleExceptionStatus::Approved->value,
+                            'reviewed_by' => auth()->id(),
+                            'reviewed_at' => now(),
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title(trans('packages.scheduler::scheduler.exceptions.messages.approved_success'))
+                            ->send();
+                        $livewire->dispatch('notificationsSent');
+
+                        $this->afterExceptionSaved($record->fresh());
+                    }),
+
+                Action::make('reject')
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.reject'))
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.reject_heading'))
+                    ->form([
+                        Textarea::make('review_note')
+                            ->label(trans('packages.scheduler::scheduler.exceptions.fields.review_note'))
+                            ->placeholder('Nhập lý do từ chối...')
+                            ->rows(3)
+                            ->required(),
+                    ])
+                    ->visible(fn (ScheduleException $record) => $record->isPending() && auth()->user()?->can('approve', ScheduleException::class))
+                    ->action(function (ScheduleException $record, array $data, $livewire): void {
+                        $record->update([
+                            'status' => ScheduleExceptionStatus::Rejected->value,
+                            'reviewed_by' => auth()->id(),
+                            'reviewed_at' => now(),
+                            'review_note' => $data['review_note'],
+                        ]);
+
+                        Notification::make()
+                            ->warning()
+                            ->title(trans('packages.scheduler::scheduler.exceptions.messages.rejected_success'))
+                            ->send();
+                        $livewire->dispatch('notificationsSent');
+                    }),
+
                 EditAction::make()
                     ->label(trans('packages.scheduler::scheduler.exceptions.actions.edit'))
                     ->modalHeading(trans('packages.scheduler::scheduler.exceptions.actions.edit_heading'))
+                    ->visible(fn (ScheduleException $record) => ! $record->isApproved() || auth()->user()?->can('approve', ScheduleException::class))
                     ->after(function (ScheduleException $record): void {
                         $this->afterExceptionSaved($record);
                     }),
+
                 DeleteAction::make()
-                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.delete')),
+                    ->label(trans('packages.scheduler::scheduler.exceptions.actions.delete'))
+                    ->visible(fn (ScheduleException $record) => ! $record->isApproved() || auth()->user()?->can('approve', ScheduleException::class)),
             ]);
     }
 
     protected function afterExceptionSaved(ScheduleException $exception): void
     {
         //
+    }
+
+    protected function notifyApprovers(ScheduleException $exception): void
+    {
+        $admins = User::permission('schedule_exceptions.approve')->get();
+        $superAdmins = User::where('is_super_admin', true)->get();
+
+        $approvers = $admins->merge($superAdmins)
+            ->unique('id')
+            ->reject(fn ($user) => $user->id === auth()->id());
+
+        /** @var Schedule|null $schedule */
+        $schedule = $this->getOwnerRecord();
+        $requestedByName = auth()->user()?->name ?? 'Giáo viên';
+        $dateStr = $exception->exception_date?->format('d/m/Y') ?? '';
+        $actionLabel = $exception->action instanceof ScheduleExceptionAction
+            ? $exception->action->shortLabel()
+            : 'Điều chỉnh';
+
+        $viewUrl = $schedule
+            ? ScheduleResource::getUrl('view', ['record' => $schedule->id])
+            : null;
+
+        foreach ($approvers as $approver) {
+            $notification = Notification::make()
+                ->warning()
+                ->title(trans('packages.scheduler::scheduler.exceptions.notifications.pending_title'))
+                ->body("{$requestedByName} vừa tạo yêu cầu **{$actionLabel}** lịch học vào ngày {$dateStr}. Vui lòng xem xét và duyệt.")
+                ->icon('heroicon-o-calendar');
+
+            if ($viewUrl) {
+                $notification->actions([
+                    Action::make('view')
+                        ->label('Xem & Duyệt')
+                        ->url($viewUrl)
+                        ->button()
+                        ->color('warning')
+                        ->markAsRead(),
+                ]);
+            }
+
+            $notification->sendToDatabase($approver);
+        }
     }
 
     protected function getMakeUpSuggestionOptions(?string $exceptionDate): array

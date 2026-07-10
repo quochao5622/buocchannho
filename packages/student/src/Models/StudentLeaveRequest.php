@@ -20,6 +20,8 @@ class StudentLeaveRequest extends Model implements AuditableContract
         'student_id',
         'start_date',
         'end_date',
+        'half_day',
+        'half_day_session',
         'reason',
         'created_by',
     ];
@@ -27,6 +29,7 @@ class StudentLeaveRequest extends Model implements AuditableContract
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'half_day' => 'boolean',
     ];
 
     protected static function booted(): void

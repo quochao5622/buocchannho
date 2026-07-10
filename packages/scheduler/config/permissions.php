@@ -10,6 +10,7 @@ return [
             'edit' => 'Chỉnh sửa lịch học',
             'show' => 'Xem chi tiết lịch học',
             'destroy' => 'Xóa lịch học',
+            'view_all' => 'Xem tất cả lịch học',
         ],
     ],
 
@@ -22,6 +23,7 @@ return [
             'edit' => 'Chỉnh sửa điều chỉnh lịch học',
             'show' => 'Xem chi tiết điều chỉnh lịch học',
             'destroy' => 'Xóa điều chỉnh lịch học',
+            'approve' => 'Duyệt/Từ chối điều chỉnh lịch học',
         ],
     ],
 

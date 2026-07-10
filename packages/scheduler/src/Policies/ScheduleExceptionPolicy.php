@@ -40,4 +40,9 @@ class ScheduleExceptionPolicy
     {
         return $user->hasPermissionTo('schedule_exceptions.destroy');
     }
+
+    public function approve(User $user): bool
+    {
+        return $user->hasPermissionTo('schedule_exceptions.approve');
+    }
 }

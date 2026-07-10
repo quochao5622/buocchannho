@@ -5,6 +5,8 @@ namespace Quochao56\Scheduler\Filament\Widgets;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Quochao56\Employee\Models\Employee;
+use Quochao56\Scheduler\Enums\ScheduleExceptionAction;
+use Quochao56\Scheduler\Filament\Resources\ScheduleResource;
 use Quochao56\Scheduler\Models\Classroom;
 use Quochao56\Scheduler\Models\Schedule;
 use Quochao56\Scheduler\Models\ScheduleException;
@@ -50,12 +52,17 @@ class CalendarWidget extends FullCalendarWidget
         $startDateStr = $startDate->format('Y-m-d');
         $endDateStr = $endDate->format('Y-m-d');
 
-        // Phân quyền: Giáo viên chỉ thấy lịch của mình
+        // Phân quyền: Giáo viên chỉ thấy lịch của mình nếu không có quyền xem tất cả
         $user = Auth::user();
-        $isManager = $user && $user->can('employees.index');
+        $canViewAll = $user && ($user->isSuperAdmin() || $user->hasPermissionTo('schedules.view_all'));
 
-        if (! $isManager && $user?->employee) {
-            $this->employeeId = $user->employee->id;
+        if (! $canViewAll) {
+            $employee = $user?->employee ?? ($user ? Employee::where('email', $user->email)->first() : null);
+            if ($employee) {
+                $this->employeeId = $employee->id;
+            } else {
+                return [];
+            }
         }
 
         $schedulesQuery = Schedule::active()
@@ -156,7 +163,7 @@ class CalendarWidget extends FullCalendarWidget
 
                 if ($this->employeeId) {
                     $teachingEmployeeId = (int) $schedule->employee_id;
-                    if ($exception && $exception->action === 'substitute' && $exception->new_employee_id) {
+                    if ($exception && $exception->action === ScheduleExceptionAction::Substitute && $exception->new_employee_id) {
                         $teachingEmployeeId = (int) $exception->new_employee_id;
                     }
 
@@ -173,10 +180,10 @@ class CalendarWidget extends FullCalendarWidget
                 $teacherName = $schedule->employee->name;
 
                 if ($exception) {
-                    if ($exception->action === 'cancel') {
+                    if ($exception->action === ScheduleExceptionAction::Cancel) {
                         $status = 'canceled';
                         $actionLabel = ' (Hủy)';
-                    } elseif ($exception->action === 'substitute') {
+                    } elseif ($exception->action === ScheduleExceptionAction::Substitute) {
                         $status = 'substituted';
                         $subTeacher = $exception->new_employee_id ? Employee::find($exception->new_employee_id) : null;
                         $teacherName = $subTeacher?->name ?? 'Chưa gán';
@@ -185,14 +192,14 @@ class CalendarWidget extends FullCalendarWidget
                             $roomName = $newRoom?->name ?? $roomName;
                         }
                         $actionLabel = ' (Dạy thay)';
-                    } elseif ($exception->action === 'change_room') {
+                    } elseif ($exception->action === ScheduleExceptionAction::ChangeRoom) {
                         $status = 'changed_room';
                         if ($exception->new_classroom_id) {
                             $newRoom = $exception->newClassroom ?? Classroom::find($exception->new_classroom_id);
                             $roomName = $newRoom?->name ?? $roomName;
                         }
                         $actionLabel = ' (Đổi phòng)';
-                    } elseif ($exception->action === 'reschedule') {
+                    } elseif ($exception->action === ScheduleExceptionAction::Reschedule) {
                         $status = 'rescheduled';
                         $actionLabel = ' (Dời lịch)';
                         if ($exception->new_start_time) {
@@ -238,7 +245,8 @@ class CalendarWidget extends FullCalendarWidget
                              "Phòng: {$roomName}\n".
                              "Trạng thái: {$statusText}";
 
-                $url = '/admin/schedules/'.$schedule->id.'/edit';
+                $canEdit = ScheduleResource::canEdit($schedule);
+                $url = $canEdit ? ScheduleResource::getUrl('edit', ['record' => $schedule->id]) : ScheduleResource::getUrl('view', ['record' => $schedule->id]);
                 $events[] = [
                     'id' => $schedule->id.'-'.$dateStr,
                     'title' => $titleText,
@@ -305,7 +313,8 @@ class CalendarWidget extends FullCalendarWidget
                                 "Phòng: {$roomName}\n".
                                 'Trạng thái: Dời sang';
 
-                $url = '/admin/schedules/'.$sched->id.'/edit';
+                $canEditSched = ScheduleResource::canEdit($sched);
+                $url = $canEditSched ? ScheduleResource::getUrl('edit', ['record' => $sched->id]) : ScheduleResource::getUrl('view', ['record' => $sched->id]);
                 $events[] = [
                     'id' => $sched->id.'-'.$dateStr.'-rescheduled',
                     'title' => $excTitleText,

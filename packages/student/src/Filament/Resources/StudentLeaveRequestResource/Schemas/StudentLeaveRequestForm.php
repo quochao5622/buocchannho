@@ -5,6 +5,7 @@ namespace Quochao56\Student\Filament\Resources\StudentLeaveRequestResource\Schem
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -53,6 +54,20 @@ class StudentLeaveRequestForm
                 ->displayFormat('d/m/Y')
                 ->default(now())
                 ->required(),
+
+            Toggle::make('half_day')
+                ->label(trans('packages.student::student_leave_request.fields.half_day'))
+                ->live()
+                ->default(false),
+
+            Select::make('half_day_session')
+                ->label(trans('packages.student::student_leave_request.fields.half_day_session'))
+                ->options([
+                    'morning' => trans('packages.student::student_leave_request.fields.session_morning'),
+                    'afternoon' => trans('packages.student::student_leave_request.fields.session_afternoon'),
+                ])
+                ->visible(fn ($get) => $get('half_day'))
+                ->required(fn ($get) => $get('half_day')),
 
             Textarea::make('reason')
                 ->label(trans('packages.student::student_leave_request.fields.reason'))

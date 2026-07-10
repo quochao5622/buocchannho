@@ -8,13 +8,16 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Quochao56\Employee\Models\Employee;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\CreateSchedule;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\EditSchedule;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\ListSchedules;
+use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Pages\ViewSchedule;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\RelationManagers\ExceptionsRelationManager;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Schemas\ScheduleForm;
 use Quochao56\Scheduler\Filament\Resources\ScheduleResource\Tables\ScheduleTable;
 use Quochao56\Scheduler\Models\Schedule;
+use Quochao56\Scheduler\Models\ScheduleException;
 
 class ScheduleResource extends Resource
 {
@@ -30,6 +33,23 @@ class ScheduleResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return trans('packages.scheduler::scheduler.navigation_group');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $user = auth()->user();
+        if (! $user?->hasPermissionTo('schedule_exceptions.approve')) {
+            return null;
+        }
+
+        $count = ScheduleException::pending()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
     }
 
     public static function getNavigationLabel(): string
@@ -69,6 +89,7 @@ class ScheduleResource extends Resource
         return [
             'index' => ListSchedules::route('/'),
             'create' => CreateSchedule::route('/create'),
+            'view' => ViewSchedule::route('/{record}'),
             'edit' => EditSchedule::route('/{record}/edit'),
         ];
     }
@@ -78,18 +99,27 @@ class ScheduleResource extends Resource
         $query = parent::getEloquentQuery();
         $user = Auth::user();
 
-        $isManager = $user && $user->can('employees.index');
+        if (! $user) {
+            return $query->whereKey(-1);
+        }
 
-        if (! $isManager && $user?->employee) {
-            $employeeId = (int) $user->employee->id;
+        $canViewAll = $user->isSuperAdmin() || $user->hasPermissionTo('schedules.view_all');
 
-            $query->where(function (Builder $builder) use ($employeeId) {
-                $builder->where('employee_id', $employeeId)
-                    ->orWhereHas('exceptions', function (Builder $sub) use ($employeeId) {
-                        $sub->where('action', 'substitute')
-                            ->where('new_employee_id', $employeeId);
-                    });
-            });
+        if (! $canViewAll) {
+            $employee = $user->employee ?? Employee::where('email', $user->email)->first();
+            if ($employee) {
+                $employeeId = (int) $employee->id;
+
+                $query->where(function (Builder $builder) use ($employeeId) {
+                    $builder->where('employee_id', $employeeId)
+                        ->orWhereHas('exceptions', function (Builder $sub) use ($employeeId) {
+                            $sub->where('action', 'substitute')
+                                ->where('new_employee_id', $employeeId);
+                        });
+                });
+            } else {
+                return $query->whereKey(-1);
+            }
         }
 
         return $query;
