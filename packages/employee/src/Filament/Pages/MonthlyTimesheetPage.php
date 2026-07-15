@@ -81,7 +81,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 ->label('Xuất bảng công (Excel)')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(fn() => $this->export()),
+                ->action(fn () => $this->export()),
         ];
     }
 
@@ -114,7 +114,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 ->displayFormat('d/m/Y')
                 ->required()
                 ->live()
-                ->afterStateUpdated(fn($state) => $this->fromDate = $state),
+                ->afterStateUpdated(fn ($state) => $this->fromDate = $state),
 
             DatePicker::make('toDate')
                 ->label('Đến ngày')
@@ -122,7 +122,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 ->displayFormat('d/m/Y')
                 ->required()
                 ->live()
-                ->afterStateUpdated(fn($state) => $this->toDate = $state),
+                ->afterStateUpdated(fn ($state) => $this->toDate = $state),
 
             Select::make('employeeId')
                 ->label('Giáo viên/Nhân viên')
@@ -130,7 +130,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 ->options(Employee::active()->pluck('name', 'id'))
                 ->searchable()
                 ->live()
-                ->afterStateUpdated(fn($state) => $this->employeeId = $state),
+                ->afterStateUpdated(fn ($state) => $this->employeeId = $state),
         ])->columns([
             'sm' => 1,
             'md' => 3,
@@ -199,7 +199,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 $dbDate = $dateInfo['db'];
 
                 // Lấy tất cả ca làm việc trong ngày của nhân viên này
-                $dayRecords = $empAttendances->filter(fn($item) => $item->date->toDateString() === $dbDate);
+                $dayRecords = $empAttendances->filter(fn ($item) => $item->date->toDateString() === $dbDate);
 
                 $hours = 0;
                 $statuses = [];
@@ -281,10 +281,10 @@ class MonthlyTimesheetPage extends Page implements HasForms
                 $records = EmployeeAttendance::where('employee_id', $employeeId)
                     ->whereDate('date', $date)
                     ->get()
-                    ->sortBy(fn($record) => $sessionOrder[$record->session] ?? 4)
+                    ->sortBy(fn ($record) => $sessionOrder[$record->session] ?? 4)
                     ->values();
 
-                $attendances = $records->map(fn($record) => [
+                $attendances = $records->map(fn ($record) => [
                     'id' => $record->id,
                     'session' => $record->session,
                     'check_in_at' => $record->check_in_at?->format('H:i:s'),
@@ -367,7 +367,7 @@ class MonthlyTimesheetPage extends Page implements HasForms
                             ->nullable(),
                     ])
                     ->rules([
-                        fn() => function (string $attribute, $value, \Closure $fail) {
+                        fn () => function (string $attribute, $value, \Closure $fail) {
                             if (! is_array($value)) {
                                 return;
                             }
@@ -398,8 +398,8 @@ class MonthlyTimesheetPage extends Page implements HasForms
                     $checkInTime = $item['check_in_at'] ?? null;
                     $checkOutTime = $item['check_out_at'] ?? null;
 
-                    $checkInDateTime = $checkInTime ? Carbon::parse($date . ' ' . $checkInTime) : null;
-                    $checkOutDateTime = $checkOutTime ? Carbon::parse($date . ' ' . $checkOutTime) : null;
+                    $checkInDateTime = $checkInTime ? Carbon::parse($date.' '.$checkInTime) : null;
+                    $checkOutDateTime = $checkOutTime ? Carbon::parse($date.' '.$checkOutTime) : null;
 
                     $totalHours = $item['total_hours'];
                     if (is_null($totalHours) && $checkInDateTime && $checkOutDateTime) {

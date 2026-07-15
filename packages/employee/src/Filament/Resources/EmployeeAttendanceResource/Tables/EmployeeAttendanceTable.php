@@ -214,8 +214,8 @@ class EmployeeAttendanceTable
                         $toDate = $tableFilterState['to_date'] ?? null;
 
                         if (! $fromDate || ! $toDate) {
-                            $fromDate = now()->subMonth()->startOfMonth()->toDateString();
-                            $toDate = now()->subMonth()->endOfMonth()->toDateString();
+                            $fromDate = now()->startOfMonth()->toDateString();
+                            $toDate = now()->endOfMonth()->toDateString();
                         }
 
                         $query = clone $livewire->getFilteredTableQuery();
@@ -229,7 +229,7 @@ class EmployeeAttendanceTable
 
                         return ExcelFacade::download(
                             new EmployeeAttendancePivotExport($fromDate, $toDate, $records),
-                            'bang-cham-cong-'.now()->format('Y-m-d-H-i-s').'.xlsx'
+                            "bang-cham-cong-{$fromDate}-to-{$toDate}.xlsx"
                         );
                     }),
                 ExportAction::make('export')
