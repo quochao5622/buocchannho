@@ -10,7 +10,7 @@ class EvaluationPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->isSuperAdmin() && ! in_array($ability, ['update', 'delete', 'approve'])) {
+        if ($user->isSuperAdmin() && ! in_array($ability, ['update', 'delete', 'approve', 'reopen'])) {
             return true;
         }
 
@@ -57,5 +57,14 @@ class EvaluationPolicy
         }
 
         return $user->isSuperAdmin() || $user->hasPermissionTo('evaluations.approve');
+    }
+
+    public function reopen(User $user, Evaluation $record): bool
+    {
+        if (($record->status?->value ?? $record->status) !== BaseStatusEnum::Published->value) {
+            return false;
+        }
+
+        return $user->isSuperAdmin() || $user->hasPermissionTo('evaluations.reopen');
     }
 }

@@ -10,7 +10,7 @@ class PlanningPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->isSuperAdmin() && ! in_array($ability, ['update', 'delete', 'approve'])) {
+        if ($user->isSuperAdmin() && ! in_array($ability, ['update', 'delete', 'approve', 'reopen'])) {
             return true;
         }
 
@@ -57,5 +57,14 @@ class PlanningPolicy
         }
 
         return $user->isSuperAdmin() || $user->hasPermissionTo('plannings.approve');
+    }
+
+    public function reopen(User $user, Planning $record): bool
+    {
+        if (($record->status?->value ?? $record->status) !== BaseStatusEnum::Published->value) {
+            return false;
+        }
+
+        return $user->isSuperAdmin() || $user->hasPermissionTo('plannings.reopen');
     }
 }

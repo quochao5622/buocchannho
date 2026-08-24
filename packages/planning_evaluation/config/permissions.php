@@ -15,6 +15,7 @@ return [
             'progress' => 'Xem báo cáo tiến độ học sinh',
             'view_all' => 'Xem toàn bộ kế hoạch (không giới hạn phân công)',
             'approve' => 'Duyệt kế hoạch',
+            'reopen' => 'Hủy duyệt / Mở lại bản nháp kế hoạch',
         ],
     ],
     'evaluations' => [
@@ -29,6 +30,7 @@ return [
             'export' => 'Xuất Word đánh giá',
             'view_all' => 'Xem toàn bộ đánh giá (không giới hạn phân công)',
             'approve' => 'Duyệt đánh giá',
+            'reopen' => 'Hủy duyệt / Mở lại bản nháp đánh giá',
         ],
     ],
 ];

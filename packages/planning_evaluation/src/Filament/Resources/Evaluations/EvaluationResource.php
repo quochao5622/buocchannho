@@ -11,6 +11,7 @@ use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages\CreateEvaluation;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages\EditEvaluation;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages\ListEvaluations;
+use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Pages\ViewEvaluation;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Schemas\EvaluationForm;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\Tables\EvaluationsTable;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
@@ -88,6 +89,7 @@ class EvaluationResource extends Resource
         return [
             'index' => ListEvaluations::route('/'),
             'create' => CreateEvaluation::route('/create'),
+            'view' => ViewEvaluation::route('/{record}'),
             'edit' => EditEvaluation::route('/{record}/edit'),
         ];
     }

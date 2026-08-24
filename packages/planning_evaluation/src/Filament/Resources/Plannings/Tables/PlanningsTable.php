@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
+use Quochao56\PlanningEvaluation\Filament\Actions\ReopenAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
 use Quochao56\PlanningEvaluation\Models\Planning;
@@ -117,12 +118,15 @@ class PlanningsTable
                     ->action(function (Planning $record) {
                         $evaluation = Evaluation::upsertFromPlanning($record);
 
-                        return redirect(EvaluationResource::getUrl('edit', [
+                        $route = auth()->user()?->can('update', $evaluation) ? 'edit' : 'view';
+
+                        return redirect(EvaluationResource::getUrl($route, [
                             'planning' => $record,
                             'record' => $evaluation,
                         ]));
                     }),
                 ApproveAction::make(),
+                ReopenAction::make(),
                 EditAction::make(),
                 ActionGroup::make([
                     ViewAction::make()

@@ -4,10 +4,14 @@ namespace Quochao56\PlanningEvaluation\Filament\Actions;
 
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Quochao56\Core\Enum\BaseStatusEnum;
+use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
+use Quochao56\PlanningEvaluation\Models\Planning;
 
 class ApproveAction extends Action
 {
@@ -45,6 +49,23 @@ class ApproveAction extends Action
                 ->title('Đã duyệt thành công!')
                 ->success()
                 ->send();
+
+            if ($this->getLivewire() instanceof EditRecord) {
+                if ($record instanceof Planning) {
+                    $this->getLivewire()->redirect(PlanningResource::getUrl('view', ['record' => $record]));
+
+                    return;
+                }
+
+                if ($record instanceof Evaluation) {
+                    $this->getLivewire()->redirect(EvaluationResource::getUrl('view', [
+                        'planning' => $record->planning_id,
+                        'record' => $record,
+                    ]));
+
+                    return;
+                }
+            }
 
             if ($this->getLivewire()) {
                 $this->getLivewire()->dispatch('notificationsSent');

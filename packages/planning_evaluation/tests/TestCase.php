@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Quochao56\Core\CoreServiceProvider;
+use Quochao56\Core\Models\User;
 use Quochao56\Employee\EmployeeServiceProvider;
 use Quochao56\PlanningEvaluation\PlanningEvaluationServiceProvider;
 use Quochao56\Student\StudentServiceProvider;
@@ -55,9 +57,11 @@ class TestCase extends Orchestra
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
             PermissionServiceProvider::class,
+            CoreServiceProvider::class,
             StudentServiceProvider::class,
             EmployeeServiceProvider::class,
             PlanningEvaluationServiceProvider::class,
+            AdminPanelProvider::class,
         ];
 
         sort($providers);
@@ -67,7 +71,17 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app): void
     {
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         $app['config']->set('database.default', 'testing');
+        $app['config']->set('auth.defaults.guard', 'web');
+        $app['config']->set('auth.guards.web', [
+            'driver' => 'session',
+            'provider' => 'users',
+        ]);
+        $app['config']->set('auth.providers.users', [
+            'driver' => 'eloquent',
+            'model' => User::class,
+        ]);
         $app['config']->set('permission.models.permission', Permission::class);
         $app['config']->set('permission.models.role', Role::class);
         $app['config']->set('permission.table_names', [
