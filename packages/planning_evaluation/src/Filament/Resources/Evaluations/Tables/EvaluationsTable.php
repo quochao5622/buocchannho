@@ -10,6 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
+use Quochao56\PlanningEvaluation\Filament\Actions\ReopenAction;
 
 class EvaluationsTable
 {
@@ -32,6 +33,7 @@ class EvaluationsTable
             ])
             ->actions([
                 ApproveAction::make(),
+                ReopenAction::make(),
                 EditAction::make(),
                 ViewAction::make(),
                 DeleteAction::make(),

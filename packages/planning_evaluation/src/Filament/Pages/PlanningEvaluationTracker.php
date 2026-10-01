@@ -248,10 +248,16 @@ class PlanningEvaluationTracker extends Page implements HasTable
                                         });
                                 })->first();
 
-                            return $evaluation ? EvaluationResource::getUrl('edit', [
+                            if (! $evaluation) {
+                                return null;
+                            }
+
+                            $route = auth()->user()?->can('update', $evaluation) ? 'edit' : 'view';
+
+                            return EvaluationResource::getUrl($route, [
                                 'planning' => $evaluation->planning_id,
                                 'record' => $evaluation->id,
-                            ]) : null;
+                            ]);
                         }
                     })
                     ->visible(function (Student $record, $livewire) {
@@ -340,7 +346,9 @@ class PlanningEvaluationTracker extends Page implements HasTable
                         if ($plan) {
                             $evaluation = Evaluation::upsertFromPlanning($plan);
 
-                            return redirect(EvaluationResource::getUrl('edit', [
+                            $route = auth()->user()?->can('update', $evaluation) ? 'edit' : 'view';
+
+                            return redirect(EvaluationResource::getUrl($route, [
                                 'planning' => $plan->id,
                                 'record' => $evaluation->id,
                             ]));

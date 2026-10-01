@@ -10,6 +10,7 @@ use Quochao56\Core\Enum\BaseStatusEnum;
 use Quochao56\Core\Traits\HasAutoSave;
 use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
 use Quochao56\PlanningEvaluation\Filament\Actions\ExportEvaluationWordAction;
+use Quochao56\PlanningEvaluation\Filament\Actions\ReopenAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 
@@ -57,6 +58,7 @@ class EditEvaluation extends EditRecord
     {
         return [
             ApproveAction::make(),
+            ReopenAction::make(),
             ActionGroup::make([
                 ExportEvaluationWordAction::make(),
                 DeleteAction::make(),
@@ -70,6 +72,47 @@ class EditEvaluation extends EditRecord
                 ->action(fn () => $this->save())
                 ->keyBindings(['mod+s']),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        $record = $parameters['record'] ?? null;
+
+        if ($record) {
+            return static::getResource()::canEdit($record) || static::getResource()::canView($record);
+        }
+
+        return parent::canAccess($parameters);
+    }
+
+    protected function authorizeAccess(): void
+    {
+        $record = $this->getRecord();
+        if (! static::getResource()::canEdit($record)) {
+            if (static::getResource()::canView($record)) {
+                $this->redirect(static::getResource()::getUrl('view', [
+                    'planning' => $record->planning_id,
+                    'record' => $record,
+                ]));
+
+                return;
+            }
+
+            abort(403);
+        }
+    }
+
+    protected function getRedirectUrl(): ?string
+    {
+        $record = $this->getRecord();
+        if (($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value) {
+            return static::getResource()::getUrl('view', [
+                'planning' => $record->planning_id,
+                'record' => $record,
+            ]);
+        }
+
+        return parent::getRedirectUrl();
     }
 
     protected function ensurePublishedHasAllAssessments(array $data): void

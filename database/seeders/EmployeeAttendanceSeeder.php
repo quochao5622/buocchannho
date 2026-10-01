@@ -233,7 +233,7 @@ class EmployeeAttendanceSeeder extends Seeder
                 }
 
                 // CASE 6: Tạo thêm chấm công ca tối cố định cho Thứ 2, Thứ 4, Thứ 6
-                if (in_array($date->dayOfWeek, [1, 3, 5]) && !($rand > 75 && $rand <= 85)) { // Tránh trùng với CASE 2 (76-85) đã tạo ca tối
+                if (in_array($date->dayOfWeek, [1, 3, 5]) && ! ($rand > 75 && $rand <= 85)) { // Tránh trùng với CASE 2 (76-85) đã tạo ca tối
                     if (rand(1, 100) <= 80) { // 80% đi dạy đầy đủ ca tối
                         EmployeeAttendance::create([
                             'employee_id' => $employee->id,

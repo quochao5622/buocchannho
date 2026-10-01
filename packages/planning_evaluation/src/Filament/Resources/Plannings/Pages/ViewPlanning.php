@@ -5,14 +5,13 @@ namespace Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ViewRecord;
 use Quochao56\Core\Enum\BaseStatusEnum;
-use Quochao56\Core\Traits\HasAutoSave;
 use Quochao56\Employee\Models\Employee;
-use Quochao56\PlanningEvaluation\Filament\Actions\ApproveAction;
 use Quochao56\PlanningEvaluation\Filament\Actions\ExportPlanningWordAction;
 use Quochao56\PlanningEvaluation\Filament\Actions\ReopenAction;
 use Quochao56\PlanningEvaluation\Filament\Resources\Evaluations\EvaluationResource;
@@ -20,10 +19,8 @@ use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\PlanningResource;
 use Quochao56\PlanningEvaluation\Models\Evaluation;
 use Quochao56\Student\Models\Student;
 
-class EditPlanning extends EditRecord
+class ViewPlanning extends ViewRecord
 {
-    use HasAutoSave;
-
     protected static string $resource = PlanningResource::class;
 
     protected function getHeaderActions(): array
@@ -43,8 +40,8 @@ class EditPlanning extends EditRecord
                         'record' => $evaluation,
                     ]));
                 }),
-            ApproveAction::make(),
             ReopenAction::make(),
+            EditAction::make(),
             ActionGroup::make([
                 Action::make('clone')
                     ->label(trans('packages.planning_evaluation::planning.clone.label'))
@@ -102,46 +99,6 @@ class EditPlanning extends EditRecord
                 ->icon('heroicon-m-chevron-down')
                 ->color('gray')
                 ->button(),
-            $this->getSaveFormAction()
-                ->submit(null)
-                ->action(fn () => $this->save())
-                ->keyBindings(['mod+s']),
-            $this->getCancelFormAction(),
         ];
-    }
-
-    public static function canAccess(array $parameters = []): bool
-    {
-        $record = $parameters['record'] ?? null;
-
-        if ($record) {
-            return static::getResource()::canEdit($record) || static::getResource()::canView($record);
-        }
-
-        return parent::canAccess($parameters);
-    }
-
-    protected function authorizeAccess(): void
-    {
-        $record = $this->getRecord();
-        if (! static::getResource()::canEdit($record)) {
-            if (static::getResource()::canView($record)) {
-                $this->redirect(static::getResource()::getUrl('view', ['record' => $record]));
-
-                return;
-            }
-
-            abort(403);
-        }
-    }
-
-    protected function getRedirectUrl(): ?string
-    {
-        $record = $this->getRecord();
-        if (($record?->status?->value ?? $record?->status) === BaseStatusEnum::Published->value) {
-            return static::getResource()::getUrl('view', ['record' => $record]);
-        }
-
-        return parent::getRedirectUrl();
     }
 }

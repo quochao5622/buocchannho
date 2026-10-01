@@ -13,6 +13,7 @@ use Quochao56\Employee\Models\Employee;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\CreatePlanning;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\EditPlanning;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\ListPlannings;
+use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Pages\ViewPlanning;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Schemas\PlanningForm;
 use Quochao56\PlanningEvaluation\Filament\Resources\Plannings\Tables\PlanningsTable;
 use Quochao56\PlanningEvaluation\Models\Planning;
@@ -94,6 +95,7 @@ class PlanningResource extends Resource
         return [
             'index' => ListPlannings::route('/'),
             'create' => CreatePlanning::route('/create'),
+            'view' => ViewPlanning::route('/{record}'),
             'edit' => EditPlanning::route('/{record}/edit'),
         ];
     }

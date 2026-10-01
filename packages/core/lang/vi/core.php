@@ -16,5 +16,9 @@ return [
     ],
     'messages' => [
         'autosaved' => 'Đã tự động lưu',
+        'create_reminder' => [
+            'title' => 'Bạn chưa lưu dữ liệu',
+            'body' => 'Bạn đã nhập dữ liệu :minutes phút nhưng chưa bấm "Tạo". Trang tạo mới không tự động lưu, hãy lưu lại để tránh mất dữ liệu.',
+        ],
     ],
 ];
